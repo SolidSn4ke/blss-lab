@@ -29,8 +29,5 @@ public class LocationEntity {
     private Country country;
 
     @OneToMany(mappedBy = "location")
-    private Set<HousingEntity> housings;
-
-    @OneToMany(mappedBy = "location")
     private Set<AddressEntity> addresses;
 }

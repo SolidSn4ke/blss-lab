@@ -20,7 +20,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "appartment")
+@Table(name = "housing")
 public class HousingEntity {
 
     @Id
@@ -43,8 +43,8 @@ public class HousingEntity {
     private HousingType type;
 
     @ManyToOne
-    @JoinColumn(name = "location_id")
-    private LocationEntity location;
+    @JoinColumn(name = "address_id")
+    private AddressEntity address;
 
     @ManyToOne
     @JoinColumn(name = "booked_by")
