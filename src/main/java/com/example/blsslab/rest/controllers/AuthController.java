@@ -27,7 +27,7 @@ public class AuthController {
     public ResponseEntity<String> signIn(@RequestBody UserDTO user) {
         ResponseDTO<UUID> response = authService.signIn(user.getUsername(), user.getPassword());
         if (response.getEntity() != null) {
-            ResponseCookie cookie = ResponseCookie.from("access-token", response.getEntity().toString())
+            ResponseCookie cookie = ResponseCookie.from("access-token", response.getEntity().toString()).path("/")
                     .maxAge(Duration.ofDays(1)).build();
 
             return ResponseEntity.status(response.getCode()).header("Set-Cookie", cookie.toString()).build();
@@ -41,7 +41,7 @@ public class AuthController {
                 user.getPassword());
 
         if (response.getEntity() != null) {
-            ResponseCookie cookie = ResponseCookie.from("access-token", response.getEntity().toString())
+            ResponseCookie cookie = ResponseCookie.from("access-token", response.getEntity().toString()).path("/")
                     .maxAge(Duration.ofDays(1)).build();
 
             return ResponseEntity.status(response.getCode()).header("Set-Cookie", cookie.toString()).build();
