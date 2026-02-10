@@ -32,13 +32,9 @@ public class UserEntity {
 
     private String accessToken;
 
-    @OneToMany(mappedBy = "user")
-    private Set<HousingEntity> bookings;
-
     @OneToMany(mappedBy = "owner")
     private Set<HousingEntity> ownedHousings;
 
-    @ManyToMany
-    @JoinTable(name = "booking_requests", joinColumns = @JoinColumn(name = "username", referencedColumnName = "username"), inverseJoinColumns = @JoinColumn(name = "housing_id", referencedColumnName = "id"))
-    private Set<HousingEntity> bookingRequests;
+    @OneToMany(mappedBy = "guest")
+    private Set<BookingEntity> bookingRequests;
 }

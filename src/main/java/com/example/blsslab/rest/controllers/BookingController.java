@@ -29,10 +29,11 @@ public class BookingController {
         return new ResponseEntity<List<HousingDTO>>(response.getEntity(), HttpStatusCode.valueOf(response.getCode()));
     }
 
-    @PostMapping("/require-housing/{id}")
-    public ResponseEntity<ResponseDTO<HousingDTO>> requireHousing(@PathVariable Long id,
-            @CookieValue(name = "access-token") String accessToken) {
-        ResponseDTO<HousingDTO> response = bookingService.requireHousing(accessToken, id);
-        return new ResponseEntity<>(response, HttpStatusCode.valueOf(response.getCode()));
-    }
+    //TODO: Переделать отправку запроса на бронирование (добавить даты и число гостей)
+    // @PostMapping("/require-housing/{id}")
+    // public ResponseEntity<ResponseDTO<HousingDTO>> requireHousing(@PathVariable Long id,
+    //         @CookieValue(name = "access-token") String accessToken) {
+    //     ResponseDTO<HousingDTO> response = bookingService.requireHousing(accessToken, id);
+    //     return new ResponseEntity<>(response, HttpStatusCode.valueOf(response.getCode()));
+    // }
 }

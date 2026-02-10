@@ -28,23 +28,26 @@ public class BookingService {
         return new ResponseDTO<List<HousingDTO>>(housings.stream().map(h -> new HousingDTO(h)).toList(), "", 200);
     }
 
-    public ResponseDTO<HousingDTO> requireHousing(String accessToken, Long housingId) {
-        UserEntity user = userRepo.findByAccessToken(accessToken);
-        HousingEntity housing = housingRepo.getReferenceById(housingId);
+    // TODO: Переписать логику бронирования
+    // public ResponseDTO<HousingDTO> requireHousing(String accessToken, Long housingId) {
 
-        if (user != null) {
+    //     UserEntity user = userRepo.findByAccessToken(accessToken);
+    //     HousingEntity housing = housingRepo.getReferenceById(housingId);
 
-            try {
-                user.getBookingRequests().add(housing);
-                housing.getRequestedBy().add(user);
-                userRepo.save(user);
-                housingRepo.save(housing);
-            } catch (EntityNotFoundException e) {
-                return new ResponseDTO<>(null, "Failed to retrive housing by id", 404);
-            }
+    //     if (user != null) {
 
-            return new ResponseDTO<>(new HousingDTO(housing), "Housing requested", 200);
-        } else
-            return new ResponseDTO<>(null, "Failed to retrive user by access token", 401);
-    }
+    //         try {
+    //             user.getBookingRequests().add(housing);
+    //             housing.getRequestedBy().add(user);
+    //             userRepo.save(user);
+    //             housingRepo.save(housing);
+    //         } catch (EntityNotFoundException e) {
+    //             return new ResponseDTO<>(null, "Failed to retrive housing by id", 404);
+    //         }
+
+    //         return new ResponseDTO<>(new HousingDTO(housing), "Housing requested", 200);
+    //     } else
+    //         return new ResponseDTO<>(null, "Failed to retrive user by access token",
+    //                 401);
+    // }
 }
