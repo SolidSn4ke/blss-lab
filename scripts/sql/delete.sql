@@ -1,4 +1,1 @@
-delete from user_table;
-delete from housing;
-delete from address;
-delete from location;
+TRUNCATE TABLE booking, housing, address, location, user_table CASCADE;

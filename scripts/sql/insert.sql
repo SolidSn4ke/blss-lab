@@ -16,25 +16,34 @@ INSERT INTO address (id, street, location_id) VALUES
 (6, 'Via Roma, 12', 6),          
 (7, 'Brandenburg Str., 5', 7);
 
-INSERT INTO housing (price, num_of_beds, rating, type, address_id) VALUES
-(120000, 2, 4.5, 'APPARTMENT', 1),
-(95000, 1, 4.2, 'ROOM', 1),
-(300000, 4, 4.8, 'HOUSE', 1),
-(80000, 2, 4.0, 'APPARTMENT', 2),
-(60000, 1, 3.8, 'ROOM', 2),
-(250000, 3, 4.6, 'HOUSE', 2),
-(150000, 3, 4.7, 'APPARTMENT', 3),
-(180000, 2, 4.9, 'HOTEL', 3),
-(500000, 5, 4.8, 'HOUSE', 3),
-(130000, 2, 4.3, 'APPARTMENT', 4),
-(70000, 1, 4.1, 'HOSTEL', 4),
-(220000, 3, 4.4, 'HOUSE', 4),
-(90000, 2, 4.6, 'APPARTMENT', 5),
-(50000, 1, 4.0, 'HOSTEL', 5),
-(180000, 3, 4.7, 'HOUSE', 5),
-(110000, 2, 4.5, 'APPARTMENT', 6),
-(85000, 1, 4.2, 'ROOM', 6),
-(280000, 4, 4.9, 'HOUSE', 6),
-(100000, 2, 4.4, 'APPARTMENT', 7),
-(65000, 1, 4.0, 'HOSTEL', 7),
-(240000, 3, 4.6, 'HOUSE', 7);
+INSERT INTO user_table (username, name, family_name, password, access_token) VALUES
+('Mike', 'Mike', 'Jonson', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846', '550e8400-e29b-41d4-a716-446655440000'),
+('tester', 'tester', 'tester', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846', '123e4567-e89b-12d3-a456-426614174000'),
+('user', 'Vlad', 'Silintsev', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846', '6ba7b810-9dad-11d1-80b4-00c04fd430c8');
+
+INSERT INTO housing (price, num_of_beds, rating, type, address_id, belongs_to) VALUES
+(12000, 2, 4.5, 'APPARTMENT', 1, 'Mike'),
+(9500, 1, 4.2, 'ROOM', 1, 'Mike'),
+(3000, 4, 4.8, 'HOUSE', 1, 'Mike'),
+(8000, 2, 4.0, 'APPARTMENT', 2, 'tester'),
+(6000, 1, 3.8, 'ROOM', 2, 'Mike'),
+(25000, 3, 4.6, 'HOUSE', 2, 'tester'),
+(15000, 3, 4.7, 'APPARTMENT', 3, 'Mike'),
+(18000, 2, 4.9, 'HOTEL', 3, 'tester'),
+(5000, 5, 4.8, 'HOUSE', 3, 'Mike'),
+(13000, 2, 4.3, 'APPARTMENT', 4, 'Mike'),
+(7000, 1, 4.1, 'HOSTEL', 4, 'Mike'),
+(22000, 3, 4.4, 'HOUSE', 4, 'Mike'),
+(9000, 2, 4.6, 'APPARTMENT', 5, 'tester'),
+(5000, 1, 4.0, 'HOSTEL', 5, 'tester'),
+(18000, 3, 4.7, 'HOUSE', 5, 'tester'),
+(11000, 2, 4.5, 'APPARTMENT', 6, 'tester'),
+(8500, 1, 4.2, 'ROOM', 6, 'tester'),
+(28000, 4, 4.9, 'HOUSE', 6, 'tester'),
+(10000, 2, 4.4, 'APPARTMENT', 7, 'tester'),
+(6500, 1, 4.0, 'HOSTEL', 7, 'tester'),
+(24000, 3, 4.6, 'HOUSE', 7, 'tester');
+
+INSERT INTO booking (check_in, check_out, booked_by, housing_id, created_at, status, total_price, adults_count, child_count, infants_count, pet_count) VALUES
+('2026-03-01', '2026-03-04', 'user', 1, '2026-01-10 14:30:45.123456', 'PENDING', 24000, 2, 0, 0, 0),
+('2026-04-15', '2026-04-19', 'user', 4, '2026-02-01 09:15:30.500000', 'PENDING', 16000, 1, 1, 0, 0);
