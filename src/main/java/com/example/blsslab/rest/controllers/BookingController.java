@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.blsslab.model.dto.BookingDTO;
 import com.example.blsslab.model.dto.HousingDTO;
 import com.example.blsslab.model.dto.ResponseDTO;
 import com.example.blsslab.service.BookingService;
@@ -29,11 +31,10 @@ public class BookingController {
         return new ResponseEntity<List<HousingDTO>>(response.getEntity(), HttpStatusCode.valueOf(response.getCode()));
     }
 
-    //TODO: Переделать отправку запроса на бронирование (добавить даты и число гостей)
-    // @PostMapping("/require-housing/{id}")
-    // public ResponseEntity<ResponseDTO<HousingDTO>> requireHousing(@PathVariable Long id,
-    //         @CookieValue(name = "access-token") String accessToken) {
-    //     ResponseDTO<HousingDTO> response = bookingService.requireHousing(accessToken, id);
-    //     return new ResponseEntity<>(response, HttpStatusCode.valueOf(response.getCode()));
-    // }
+    @PostMapping("/require-housing/{id}")
+    public ResponseEntity<ResponseDTO<HousingDTO>> requireHousing(@PathVariable Long id,
+            @CookieValue(name = "access-token") String accessToken, @RequestBody BookingDTO booking) {
+        ResponseDTO<HousingDTO> response = bookingService.requireHousing(accessToken, id, booking);
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(response.getCode()));
+    }
 }
