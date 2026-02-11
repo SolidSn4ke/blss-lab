@@ -1,403 +1,393 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0k8xxl0" targetNamespace="http://bpmn.io/schema/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="18.10.1">
-  <bpmn:collaboration id="Collaboration_0qhktwp">
-    <bpmn:participant id="Participant_0ahzqhr" name="Бронирование проживания с согласованием заявки у хоста" processRef="Process_0yddi9p" />
-    <bpmn:participant id="Participant_15kq7h0" name="Авторизация пользователя" processRef="Process_1iubait" />
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_BookingProcess" targetNamespace="http://bpmn.io/schema/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="18.12.0">
+  <bpmn:collaboration id="Collaboration_BookingProcess">
+    <bpmn:participant id="Participant_HostBookingProcess" name="Бронирование проживания с согласованием заявки у хоста" processRef="Process_BookingWithApproval" />
+    <bpmn:participant id="Participant_1a5jzsj" name="Выставление жилья для бронирования" processRef="Process_0a1qbsk" />
   </bpmn:collaboration>
-  <bpmn:process id="Process_0yddi9p" isExecutable="false">
-    <bpmn:laneSet id="LaneSet_0mq49zx">
-      <bpmn:lane id="Lane_041mrj6" name="Система">
-        <bpmn:flowNodeRef>Activity_1202rhl</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_1dhp0dc</bpmn:flowNodeRef>
+  <bpmn:process id="Process_BookingWithApproval">
+    <bpmn:laneSet id="LaneSet_Main">
+      <bpmn:lane id="Lane_Moderator" name="Хост">
+        <bpmn:flowNodeRef>Task_ReviewGuestBookingRequest</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_HostBookingApproval</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_NotifyGuestBookingApproved</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_BookingApprovedNotification</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_BookingRejectedNotification</bpmn:flowNodeRef>
       </bpmn:lane>
-      <bpmn:lane id="Lane_01gjwhn" name="Клиент">
-        <bpmn:flowNodeRef>StartEvent_0us7zwz</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_0f80ulh</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Gateway_1h1j3oe</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_1nqmcl6</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_1d8p3xr</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_0jyhl91</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_0e8s1an</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_0zf22gg</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_07v2hpc</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_0ewg5np</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_1ajp1mg</bpmn:flowNodeRef>
-      </bpmn:lane>
-      <bpmn:lane id="Lane_098cqx1" name="Хост">
-        <bpmn:flowNodeRef>Gateway_1xft300</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_0mk7arc</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_0tkpv8p</bpmn:flowNodeRef>
+      <bpmn:lane id="Lane_Host" name="Клиент">
+        <bpmn:flowNodeRef>Event_0svlfij</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SelectAvailableProperty</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_FillBookingRequest</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_BookingRequestLoop</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_BookingRejected</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_PayForBooking</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_BookingPaid</bpmn:flowNodeRef>
       </bpmn:lane>
     </bpmn:laneSet>
-    <bpmn:exclusiveGateway id="Gateway_1xft300" name="Одобрить заявку?">
-      <bpmn:incoming>Flow_1ulh7gh</bpmn:incoming>
-      <bpmn:outgoing>Flow_1skb2sz</bpmn:outgoing>
-      <bpmn:outgoing>Flow_03q14bh</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:endEvent id="Event_0mk7arc" name="Бронирование отклонено">
-      <bpmn:incoming>Flow_1skb2sz</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:startEvent id="StartEvent_0us7zwz" name="Нужно забронировать проживание">
-      <bpmn:outgoing>Flow_0v7o5o8</bpmn:outgoing>
+    <bpmn:startEvent id="Event_0svlfij" name="Нужно забронировать жилье">
+      <bpmn:outgoing>Flow_1mzs2m2</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:task id="Activity_0f80ulh" name="Подтверждение оплаты">
-      <bpmn:incoming>Flow_1jr87cj</bpmn:incoming>
-      <bpmn:outgoing>Flow_00uyim7</bpmn:outgoing>
+    <bpmn:task id="Task_SelectAvailableProperty" name="Выбрать жилье из списка доступных">
+      <bpmn:incoming>Flow_1mzs2m2</bpmn:incoming>
+      <bpmn:outgoing>Flow_SelectToBookingGateway</bpmn:outgoing>
     </bpmn:task>
-    <bpmn:exclusiveGateway id="Gateway_1h1j3oe" name="Оплата прошла успешно?">
-      <bpmn:incoming>Flow_00uyim7</bpmn:incoming>
-      <bpmn:outgoing>Flow_0otqvob</bpmn:outgoing>
-      <bpmn:outgoing>Flow_0p99mmg</bpmn:outgoing>
+    <bpmn:task id="Task_FillBookingRequest" name="Отправить заявку на бронирование">
+      <bpmn:incoming>Flow_1oho43a</bpmn:incoming>
+      <bpmn:outgoing>Flow_0w0s1c4</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Gateway_BookingRequestLoop">
+      <bpmn:incoming>Flow_RejectionToBookingGateway</bpmn:incoming>
+      <bpmn:incoming>Flow_SelectToBookingGateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_1oho43a</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:endEvent id="Event_1nqmcl6" name="Бронирование оплачено">
-      <bpmn:incoming>Flow_0otqvob</bpmn:incoming>
+    <bpmn:intermediateCatchEvent id="Event_BookingRejected" name="Бронирование отклонено">
+      <bpmn:outgoing>Flow_RejectionToBookingGateway</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_BookingRejected" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:task id="Task_ReviewGuestBookingRequest" name="Рассмотреть заявку">
+      <bpmn:incoming>Flow_0w0s1c4</bpmn:incoming>
+      <bpmn:outgoing>Flow_ReviewToHostApprovalGateway</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Gateway_HostBookingApproval" name="Заявка одобрена?">
+      <bpmn:incoming>Flow_ReviewToHostApprovalGateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_HostRejected</bpmn:outgoing>
+      <bpmn:outgoing>Flow_HostApproved</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Task_NotifyGuestBookingApproved" name="Уведомить клиента об одобрении">
+      <bpmn:incoming>Flow_HostApproved</bpmn:incoming>
+      <bpmn:outgoing>Flow_ApprovedNotifyToEvent</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:intermediateThrowEvent id="Event_BookingApprovedNotification" name="Бронирование одобрено">
+      <bpmn:incoming>Flow_ApprovedNotifyToEvent</bpmn:incoming>
+      <bpmn:outgoing>Flow_0vnvs39</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+    <bpmn:sequenceFlow id="Flow_1mzs2m2" sourceRef="Event_0svlfij" targetRef="Task_SelectAvailableProperty" />
+    <bpmn:sequenceFlow id="Flow_SelectToBookingGateway" sourceRef="Task_SelectAvailableProperty" targetRef="Gateway_BookingRequestLoop" />
+    <bpmn:sequenceFlow id="Flow_1oho43a" sourceRef="Gateway_BookingRequestLoop" targetRef="Task_FillBookingRequest" />
+    <bpmn:sequenceFlow id="Flow_0w0s1c4" sourceRef="Task_FillBookingRequest" targetRef="Task_ReviewGuestBookingRequest" />
+    <bpmn:sequenceFlow id="Flow_RejectionToBookingGateway" sourceRef="Event_BookingRejected" targetRef="Gateway_BookingRequestLoop" />
+    <bpmn:sequenceFlow id="Flow_ReviewToHostApprovalGateway" sourceRef="Task_ReviewGuestBookingRequest" targetRef="Gateway_HostBookingApproval" />
+    <bpmn:sequenceFlow id="Flow_HostRejected" name="Нет" sourceRef="Gateway_HostBookingApproval" targetRef="Event_BookingRejectedNotification" />
+    <bpmn:sequenceFlow id="Flow_HostApproved" name="Да" sourceRef="Gateway_HostBookingApproval" targetRef="Task_NotifyGuestBookingApproved" />
+    <bpmn:sequenceFlow id="Flow_ApprovedNotifyToEvent" sourceRef="Task_NotifyGuestBookingApproved" targetRef="Event_BookingApprovedNotification" />
+    <bpmn:sequenceFlow id="Flow_0vnvs39" sourceRef="Event_BookingApprovedNotification" targetRef="Task_PayForBooking" />
+    <bpmn:sequenceFlow id="Flow_PayToVerificationGateway" sourceRef="Task_PayForBooking" targetRef="Event_BookingPaid" />
+    <bpmn:task id="Task_PayForBooking" name="Оплатить бронирование">
+      <bpmn:incoming>Flow_0vnvs39</bpmn:incoming>
+      <bpmn:outgoing>Flow_PayToVerificationGateway</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="Event_BookingPaid" name="Бронирование оплачено">
+      <bpmn:incoming>Flow_PayToVerificationGateway</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:endEvent id="Event_1d8p3xr" name="Процесс оплаты завершен с ошибкой">
-      <bpmn:incoming>Flow_0p99mmg</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:task id="Activity_0jyhl91" name="Указать даты бронирования и информацию о гостях">
-      <bpmn:incoming>Flow_1xh3ean</bpmn:incoming>
-      <bpmn:outgoing>Flow_11kgow6</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:task id="Activity_0e8s1an" name="Подтверждение указанных данных в заявке">
-      <bpmn:incoming>Flow_1hstwi8</bpmn:incoming>
-      <bpmn:outgoing>Flow_1f658jy</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:task id="Activity_1202rhl" name="Отправить заявку хосту">
-      <bpmn:incoming>Flow_1f658jy</bpmn:incoming>
-      <bpmn:outgoing>Flow_04hstp0</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:task id="Activity_0tkpv8p" name="Рассмотреть заявку">
-      <bpmn:incoming>Flow_04hstp0</bpmn:incoming>
-      <bpmn:outgoing>Flow_1ulh7gh</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:task id="Activity_0zf22gg" name="Оформление заявки на бронирование">
-      <bpmn:incoming>Flow_11kgow6</bpmn:incoming>
-      <bpmn:outgoing>Flow_0zob7md</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:task id="Activity_07v2hpc" name="Выбрать жилье из списка доступных">
-      <bpmn:incoming>Flow_0v7o5o8</bpmn:incoming>
-      <bpmn:outgoing>Flow_1xh3ean</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:sequenceFlow id="Flow_1ulh7gh" sourceRef="Activity_0tkpv8p" targetRef="Gateway_1xft300" />
-    <bpmn:sequenceFlow id="Flow_1skb2sz" name="Нет" sourceRef="Gateway_1xft300" targetRef="Event_0mk7arc" />
-    <bpmn:sequenceFlow id="Flow_0v7o5o8" sourceRef="StartEvent_0us7zwz" targetRef="Activity_07v2hpc" />
-    <bpmn:sequenceFlow id="Flow_1jr87cj" sourceRef="Activity_1ajp1mg" targetRef="Activity_0f80ulh" />
-    <bpmn:sequenceFlow id="Flow_00uyim7" sourceRef="Activity_0f80ulh" targetRef="Gateway_1h1j3oe" />
-    <bpmn:sequenceFlow id="Flow_0otqvob" name="Да" sourceRef="Gateway_1h1j3oe" targetRef="Event_1nqmcl6" />
-    <bpmn:sequenceFlow id="Flow_0p99mmg" name="Нет" sourceRef="Gateway_1h1j3oe" targetRef="Event_1d8p3xr" />
-    <bpmn:sequenceFlow id="Flow_1xh3ean" sourceRef="Activity_07v2hpc" targetRef="Activity_0jyhl91" />
-    <bpmn:sequenceFlow id="Flow_11kgow6" sourceRef="Activity_0jyhl91" targetRef="Activity_0zf22gg" />
-    <bpmn:sequenceFlow id="Flow_1hstwi8" sourceRef="Activity_0ewg5np" targetRef="Activity_0e8s1an" />
-    <bpmn:sequenceFlow id="Flow_1f658jy" sourceRef="Activity_0e8s1an" targetRef="Activity_1202rhl" />
-    <bpmn:sequenceFlow id="Flow_04hstp0" sourceRef="Activity_1202rhl" targetRef="Activity_0tkpv8p" />
-    <bpmn:sequenceFlow id="Flow_0zob7md" sourceRef="Activity_0zf22gg" targetRef="Activity_0ewg5np" />
-    <bpmn:callActivity id="Activity_0ewg5np" name="Авторизация пользователя">
-      <bpmn:incoming>Flow_0zob7md</bpmn:incoming>
-      <bpmn:outgoing>Flow_1hstwi8</bpmn:outgoing>
-    </bpmn:callActivity>
-    <bpmn:task id="Activity_1ajp1mg" name="Выбрать способ оплаты">
-      <bpmn:incoming>Flow_09u0iss</bpmn:incoming>
-      <bpmn:outgoing>Flow_1jr87cj</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:sequenceFlow id="Flow_09u0iss" sourceRef="Activity_1dhp0dc" targetRef="Activity_1ajp1mg" />
-    <bpmn:sequenceFlow id="Flow_03q14bh" name="Да" sourceRef="Gateway_1xft300" targetRef="Activity_1dhp0dc" />
-    <bpmn:task id="Activity_1dhp0dc" name="Зафиксировать одобрение бронирования">
-      <bpmn:incoming>Flow_03q14bh</bpmn:incoming>
-      <bpmn:outgoing>Flow_09u0iss</bpmn:outgoing>
-    </bpmn:task>
+    <bpmn:intermediateThrowEvent id="Event_BookingRejectedNotification" name="Отправка уведомление об отклонении бронирования">
+      <bpmn:incoming>Flow_HostRejected</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_BookingRejectedNotification" />
+    </bpmn:intermediateThrowEvent>
   </bpmn:process>
-  <bpmn:process id="Process_1iubait">
-    <bpmn:laneSet id="LaneSet_1ck0qyp">
-      <bpmn:lane id="Lane_0mkfjf0" name="Клиент">
-        <bpmn:flowNodeRef>Activity_01cn4rw</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Activity_1pktqyg</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_1r948qc</bpmn:flowNodeRef>
+  <bpmn:process id="Process_0a1qbsk">
+    <bpmn:laneSet id="LaneSet_1b5up6a">
+      <bpmn:lane id="Lane_1oze3nm" name="Хост">
+        <bpmn:flowNodeRef>Task_FillPropertyListingRequest</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_PropertyRequestLoop</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>StartEvent_NeedToListProperty</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1fzolii</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_PropertyRequestRejected</bpmn:flowNodeRef>
       </bpmn:lane>
-      <bpmn:lane id="Lane_127f9mq" name="Система">
-        <bpmn:flowNodeRef>Activity_141ejer</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Gateway_1iq9c4c</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_1egyuuz</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_19wzz7c</bpmn:flowNodeRef>
+      <bpmn:lane id="Lane_0zh0y20" name="Модератор">
+        <bpmn:flowNodeRef>Task_ReviewPropertyListingRequest</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_ModeratorApproval</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_AddPropertyToAvailableList</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1dag4ij</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_1dfzf92</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_PropertyRequestRejectedNotification</bpmn:flowNodeRef>
       </bpmn:lane>
     </bpmn:laneSet>
-    <bpmn:task id="Activity_01cn4rw" name="Ввести логин и пароль">
-      <bpmn:incoming>Flow_193s1bs</bpmn:incoming>
-      <bpmn:outgoing>Flow_0fj4wuo</bpmn:outgoing>
+    <bpmn:task id="Task_ReviewPropertyListingRequest" name="Рассмотреть заявку на выставление жилья">
+      <bpmn:incoming>Flow_1nki0q7</bpmn:incoming>
+      <bpmn:outgoing>Flow_ReviewToApprovalGateway</bpmn:outgoing>
     </bpmn:task>
-    <bpmn:task id="Activity_1pktqyg" name="Отправить форму">
-      <bpmn:incoming>Flow_0fj4wuo</bpmn:incoming>
-      <bpmn:outgoing>Flow_0k1xxvd</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:task id="Activity_141ejer" name="Получить форму">
-      <bpmn:incoming>Flow_0k1xxvd</bpmn:incoming>
-      <bpmn:outgoing>Flow_0hknuqk</bpmn:outgoing>
-    </bpmn:task>
-    <bpmn:exclusiveGateway id="Gateway_1iq9c4c" name="Данные валидны?">
-      <bpmn:incoming>Flow_0hknuqk</bpmn:incoming>
-      <bpmn:outgoing>Flow_0x0hfvi</bpmn:outgoing>
-      <bpmn:outgoing>Flow_1pxexzd</bpmn:outgoing>
+    <bpmn:exclusiveGateway id="Gateway_ModeratorApproval" name="Заявка одобрена?">
+      <bpmn:incoming>Flow_ReviewToApprovalGateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_Approved</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Rejected</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:startEvent id="Event_1r948qc" name="Требуется авторизация пользователя">
-      <bpmn:outgoing>Flow_193s1bs</bpmn:outgoing>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_1q7txmi" />
+    <bpmn:task id="Task_AddPropertyToAvailableList" name="Добавить жилье в список доступных для бронирования">
+      <bpmn:incoming>Flow_Approved</bpmn:incoming>
+      <bpmn:outgoing>Flow_0z4rmyx</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Activity_1dag4ij" name="Уведомить хоста об одобрении заявки">
+      <bpmn:incoming>Flow_0z4rmyx</bpmn:incoming>
+      <bpmn:outgoing>Flow_0wnz6aa</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="Event_1dfzf92" name="Жилье доступно для бронирования">
+      <bpmn:incoming>Flow_0wnz6aa</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:task id="Task_FillPropertyListingRequest" name="Отправить заявку на выставление жилья для бронирования">
+      <bpmn:incoming>Flow_RequestGatewayToFillRequest</bpmn:incoming>
+      <bpmn:outgoing>Flow_1nki0q7</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Gateway_PropertyRequestLoop">
+      <bpmn:incoming>Flow_StartToPropertyRequestGateway</bpmn:incoming>
+      <bpmn:incoming>Flow_1na2ar7</bpmn:incoming>
+      <bpmn:outgoing>Flow_RequestGatewayToFillRequest</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:startEvent id="StartEvent_NeedToListProperty" name="Нужно выставить жилье на бронирование">
+      <bpmn:outgoing>Flow_StartToPropertyRequestGateway</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:endEvent id="Event_1egyuuz" name="Запрос на авторизацию">
-      <bpmn:incoming>Flow_1pxexzd</bpmn:incoming>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_0ogfhjm" />
-    </bpmn:endEvent>
-    <bpmn:endEvent id="Event_19wzz7c" name="Пользователь авторизован">
-      <bpmn:incoming>Flow_0x0hfvi</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_193s1bs" sourceRef="Event_1r948qc" targetRef="Activity_01cn4rw" />
-    <bpmn:sequenceFlow id="Flow_0fj4wuo" sourceRef="Activity_01cn4rw" targetRef="Activity_1pktqyg" />
-    <bpmn:sequenceFlow id="Flow_0k1xxvd" sourceRef="Activity_1pktqyg" targetRef="Activity_141ejer" />
-    <bpmn:sequenceFlow id="Flow_0hknuqk" sourceRef="Activity_141ejer" targetRef="Gateway_1iq9c4c" />
-    <bpmn:sequenceFlow id="Flow_0x0hfvi" name="Да" sourceRef="Gateway_1iq9c4c" targetRef="Event_19wzz7c" />
-    <bpmn:sequenceFlow id="Flow_1pxexzd" name="Нет" sourceRef="Gateway_1iq9c4c" targetRef="Event_1egyuuz" />
+    <bpmn:task id="Activity_1fzolii" name="Отредактировать заявку">
+      <bpmn:incoming>Flow_07k363x</bpmn:incoming>
+      <bpmn:outgoing>Flow_1na2ar7</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:intermediateCatchEvent id="Event_PropertyRequestRejected" name="Заявка отклонена">
+      <bpmn:outgoing>Flow_07k363x</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_PropertyRejected" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_1nki0q7" sourceRef="Task_FillPropertyListingRequest" targetRef="Task_ReviewPropertyListingRequest" />
+    <bpmn:sequenceFlow id="Flow_ReviewToApprovalGateway" sourceRef="Task_ReviewPropertyListingRequest" targetRef="Gateway_ModeratorApproval" />
+    <bpmn:sequenceFlow id="Flow_Approved" name="Да" sourceRef="Gateway_ModeratorApproval" targetRef="Task_AddPropertyToAvailableList" />
+    <bpmn:sequenceFlow id="Flow_Rejected" name="Нет" sourceRef="Gateway_ModeratorApproval" targetRef="Event_PropertyRequestRejectedNotification" />
+    <bpmn:sequenceFlow id="Flow_0z4rmyx" sourceRef="Task_AddPropertyToAvailableList" targetRef="Activity_1dag4ij" />
+    <bpmn:sequenceFlow id="Flow_0wnz6aa" sourceRef="Activity_1dag4ij" targetRef="Event_1dfzf92" />
+    <bpmn:sequenceFlow id="Flow_RequestGatewayToFillRequest" sourceRef="Gateway_PropertyRequestLoop" targetRef="Task_FillPropertyListingRequest" />
+    <bpmn:sequenceFlow id="Flow_StartToPropertyRequestGateway" sourceRef="StartEvent_NeedToListProperty" targetRef="Gateway_PropertyRequestLoop" />
+    <bpmn:sequenceFlow id="Flow_1na2ar7" sourceRef="Activity_1fzolii" targetRef="Gateway_PropertyRequestLoop" />
+    <bpmn:sequenceFlow id="Flow_07k363x" sourceRef="Event_PropertyRequestRejected" targetRef="Activity_1fzolii" />
+    <bpmn:intermediateThrowEvent id="Event_PropertyRequestRejectedNotification" name="Отправка уведомления об отклонении заявки">
+      <bpmn:incoming>Flow_Rejected</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_PropertyRejectedNotification" />
+    </bpmn:intermediateThrowEvent>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0qhktwp">
-      <bpmndi:BPMNShape id="Participant_0ahzqhr_di" bpmnElement="Participant_0ahzqhr" isHorizontal="true">
-        <dc:Bounds x="160" y="630" width="1790" height="630" />
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_BookingProcess">
+      <bpmndi:BPMNShape id="Participant_1a5jzsj_di" bpmnElement="Participant_1a5jzsj" isHorizontal="true">
+        <dc:Bounds x="170" y="80" width="1010" height="670" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Lane_041mrj6_di" bpmnElement="Lane_041mrj6" isHorizontal="true">
-        <dc:Bounds x="190" y="900" width="1760" height="150" />
+      <bpmndi:BPMNShape id="Lane_1oze3nm_di" bpmnElement="Lane_1oze3nm" isHorizontal="true">
+        <dc:Bounds x="200" y="80" width="980" height="338" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Lane_01gjwhn_di" bpmnElement="Lane_01gjwhn" isHorizontal="true">
-        <dc:Bounds x="190" y="630" width="1760" height="270" />
+      <bpmndi:BPMNShape id="Lane_0zh0y20_di" bpmnElement="Lane_0zh0y20" isHorizontal="true">
+        <dc:Bounds x="200" y="418" width="980" height="332" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Lane_098cqx1_di" bpmnElement="Lane_098cqx1" isHorizontal="true">
-        <dc:Bounds x="190" y="1050" width="1760" height="210" />
-        <bpmndi:BPMNLabel />
+      <bpmndi:BPMNShape id="Activity_1nz18dd_di" bpmnElement="Task_ReviewPropertyListingRequest">
+        <dc:Bounds x="480" y="468" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_1xft300_di" bpmnElement="Gateway_1xft300" isMarkerVisible="true">
-        <dc:Bounds x="1135" y="1125" width="50" height="50" />
+      <bpmndi:BPMNShape id="Gateway_ModeratorApproval_di" bpmnElement="Gateway_ModeratorApproval" isMarkerVisible="true">
+        <dc:Bounds x="645" y="483" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1134" y="1185" width="51" height="27" />
+          <dc:Bounds x="643" y="446" width="54" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0mk7arc_di" bpmnElement="Event_0mk7arc">
-        <dc:Bounds x="1282" y="1132" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1262" y="1178" width="75" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_0us7zwz">
-        <dc:Bounds x="262" y="722" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="242" y="765" width="78" height="40" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0f80ulh_di" bpmnElement="Activity_0f80ulh">
-        <dc:Bounds x="1270" y="700" width="100" height="80" />
+      <bpmndi:BPMNShape id="Task_AddPropertyToAvailableList_di" bpmnElement="Task_AddPropertyToAvailableList">
+        <dc:Bounds x="750" y="468" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_1h1j3oe_di" bpmnElement="Gateway_1h1j3oe" isMarkerVisible="true">
-        <dc:Bounds x="1445" y="705" width="50" height="50" />
+      <bpmndi:BPMNShape id="Activity_1dag4ij_di" bpmnElement="Activity_1dag4ij">
+        <dc:Bounds x="910" y="468" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1dfzf92_di" bpmnElement="Event_1dfzf92">
+        <dc:Bounds x="1082" y="490" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1429" y="667.5" width="81" height="27" />
+          <dc:Bounds x="1058" y="540" width="84" height="40" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1nqmcl6_di" bpmnElement="Event_1nqmcl6">
-        <dc:Bounds x="1582" y="712" width="36" height="36" />
+      <bpmndi:BPMNShape id="Task_FillPropertyListingRequest_di" bpmnElement="Task_FillPropertyListingRequest">
+        <dc:Bounds x="480" y="260" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_PropertyRequestLoop_di" bpmnElement="Gateway_PropertyRequestLoop" isMarkerVisible="true">
+        <dc:Bounds x="375" y="275" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_NeedToListProperty_di" bpmnElement="StartEvent_NeedToListProperty">
+        <dc:Bounds x="262" y="282" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1562" y="675" width="75" height="27" />
+          <dc:Bounds x="235" y="332" width="90" height="40" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0trpsbs_di" bpmnElement="Event_1d8p3xr">
-        <dc:Bounds x="1452" y="792" width="36" height="36" />
+      <bpmndi:BPMNShape id="Activity_1fzolii_di" bpmnElement="Activity_1fzolii">
+        <dc:Bounds x="350" y="120" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_PropertyRequestRejected_di" bpmnElement="Event_PropertyRequestRejected">
+        <dc:Bounds x="262" y="142" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1429" y="835" width="84" height="40" />
+          <dc:Bounds x="253" y="186" width="54" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0jyhl91_di" bpmnElement="Activity_0jyhl91">
-        <dc:Bounds x="490" y="700" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0e8s1an_di" bpmnElement="Activity_0e8s1an">
-        <dc:Bounds x="900" y="700" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1202rhl_di" bpmnElement="Activity_1202rhl">
-        <dc:Bounds x="900" y="930" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0tkpv8p_di" bpmnElement="Activity_0tkpv8p">
-        <dc:Bounds x="900" y="1110" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1c0fph0_di" bpmnElement="Activity_0zf22gg">
-        <dc:Bounds x="630" y="700" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_07v2hpc_di" bpmnElement="Activity_07v2hpc">
-        <dc:Bounds x="360" y="700" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_08g9322_di" bpmnElement="Activity_0ewg5np">
-        <dc:Bounds x="760" y="700" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1ajp1mg_di" bpmnElement="Activity_1ajp1mg">
-        <dc:Bounds x="1110" y="700" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1dhp0dc_di" bpmnElement="Activity_1dhp0dc">
-        <dc:Bounds x="1110" y="930" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_1ulh7gh_di" bpmnElement="Flow_1ulh7gh">
-        <di:waypoint x="1000" y="1150" />
-        <di:waypoint x="1135" y="1150" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1skb2sz_di" bpmnElement="Flow_1skb2sz">
-        <di:waypoint x="1185" y="1150" />
-        <di:waypoint x="1282" y="1150" />
+      <bpmndi:BPMNShape id="Event_PropertyRequestRejectedNotification_di" bpmnElement="Event_PropertyRequestRejectedNotification">
+        <dc:Bounds x="652" y="622" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1228" y="1128" width="20" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0v7o5o8_di" bpmnElement="Flow_0v7o5o8">
-        <di:waypoint x="298" y="740" />
-        <di:waypoint x="360" y="740" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1jr87cj_di" bpmnElement="Flow_1jr87cj">
-        <di:waypoint x="1210" y="740" />
-        <di:waypoint x="1270" y="740" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_00uyim7_di" bpmnElement="Flow_00uyim7">
-        <di:waypoint x="1370" y="730" />
-        <di:waypoint x="1445" y="730" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0otqvob_di" bpmnElement="Flow_0otqvob">
-        <di:waypoint x="1495" y="730" />
-        <di:waypoint x="1582" y="730" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1522" y="714" width="13" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0p99mmg_di" bpmnElement="Flow_0p99mmg">
-        <di:waypoint x="1470" y="755" />
-        <di:waypoint x="1470" y="792" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1440" y="759" width="20" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1xh3ean_di" bpmnElement="Flow_1xh3ean">
-        <di:waypoint x="460" y="740" />
-        <di:waypoint x="490" y="740" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_11kgow6_di" bpmnElement="Flow_11kgow6">
-        <di:waypoint x="590" y="740" />
-        <di:waypoint x="630" y="740" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1hstwi8_di" bpmnElement="Flow_1hstwi8">
-        <di:waypoint x="860" y="740" />
-        <di:waypoint x="900" y="740" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1f658jy_di" bpmnElement="Flow_1f658jy">
-        <di:waypoint x="950" y="780" />
-        <di:waypoint x="950" y="930" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_04hstp0_di" bpmnElement="Flow_04hstp0">
-        <di:waypoint x="950" y="1010" />
-        <di:waypoint x="950" y="1110" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0zob7md_di" bpmnElement="Flow_0zob7md">
-        <di:waypoint x="730" y="740" />
-        <di:waypoint x="760" y="740" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_09u0iss_di" bpmnElement="Flow_09u0iss">
-        <di:waypoint x="1160" y="930" />
-        <di:waypoint x="1160" y="780" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_03q14bh_di" bpmnElement="Flow_03q14bh">
-        <di:waypoint x="1160" y="1125" />
-        <di:waypoint x="1160" y="1010" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1123" y="1083" width="13" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Participant_1rmnos3_di" bpmnElement="Participant_15kq7h0" isHorizontal="true">
-        <dc:Bounds x="160" y="80" width="880" height="460" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Lane_0mkfjf0_di" bpmnElement="Lane_0mkfjf0" isHorizontal="true">
-        <dc:Bounds x="190" y="80" width="850" height="190" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Lane_127f9mq_di" bpmnElement="Lane_127f9mq" isHorizontal="true">
-        <dc:Bounds x="190" y="270" width="850" height="270" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_01cn4rw_di" bpmnElement="Activity_01cn4rw">
-        <dc:Bounds x="330" y="140" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1pktqyg_di" bpmnElement="Activity_1pktqyg">
-        <dc:Bounds x="490" y="140" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_141ejer_di" bpmnElement="Activity_141ejer">
-        <dc:Bounds x="490" y="310" width="100" height="80" />
-        <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_1iq9c4c_di" bpmnElement="Gateway_1iq9c4c" isMarkerVisible="true">
-        <dc:Bounds x="645" y="325" width="50" height="50" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="644" y="287.5" width="51" height="27" />
+          <dc:Bounds x="629" y="665" width="84" height="53" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1rm6jla_di" bpmnElement="Event_1r948qc">
-        <dc:Bounds x="242" y="162" width="36" height="36" />
+      <bpmndi:BPMNEdge id="Flow_1nki0q7_di" bpmnElement="Flow_1nki0q7">
+        <di:waypoint x="530" y="340" />
+        <di:waypoint x="530" y="468" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ReviewToApprovalGateway_di" bpmnElement="Flow_ReviewToApprovalGateway">
+        <di:waypoint x="580" y="508" />
+        <di:waypoint x="645" y="508" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Approved_di" bpmnElement="Flow_Approved">
+        <di:waypoint x="695" y="508" />
+        <di:waypoint x="750" y="508" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="225" y="210" width="70" height="40" />
+          <dc:Bounds x="713" y="483" width="13" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Rejected_di" bpmnElement="Flow_Rejected">
+        <di:waypoint x="670" y="533" />
+        <di:waypoint x="670" y="622" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="640" y="546" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0z4rmyx_di" bpmnElement="Flow_0z4rmyx">
+        <di:waypoint x="850" y="508" />
+        <di:waypoint x="910" y="508" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0wnz6aa_di" bpmnElement="Flow_0wnz6aa">
+        <di:waypoint x="1010" y="508" />
+        <di:waypoint x="1082" y="508" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RequestGatewayToFillRequest_di" bpmnElement="Flow_RequestGatewayToFillRequest">
+        <di:waypoint x="425" y="300" />
+        <di:waypoint x="480" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_StartToPropertyRequestGateway_di" bpmnElement="Flow_StartToPropertyRequestGateway">
+        <di:waypoint x="298" y="300" />
+        <di:waypoint x="375" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1na2ar7_di" bpmnElement="Flow_1na2ar7">
+        <di:waypoint x="400" y="200" />
+        <di:waypoint x="400" y="275" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07k363x_di" bpmnElement="Flow_07k363x">
+        <di:waypoint x="298" y="160" />
+        <di:waypoint x="350" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Participant_HostBookingProcess_di" bpmnElement="Participant_HostBookingProcess" isHorizontal="true">
+        <dc:Bounds x="170" y="940" width="1240" height="670" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Moderator_di" bpmnElement="Lane_Moderator" isHorizontal="true">
+        <dc:Bounds x="200" y="1283" width="1210" height="327" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Host_di" bpmnElement="Lane_Host" isHorizontal="true">
+        <dc:Bounds x="200" y="940" width="1210" height="343" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0svlfij_di" bpmnElement="Event_0svlfij">
+        <dc:Bounds x="282" y="1109" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="262" y="1152" width="76" height="40" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1c4rqhb_di" bpmnElement="Event_1egyuuz">
-        <dc:Bounds x="652" y="442" width="36" height="36" />
+      <bpmndi:BPMNShape id="Task_SelectAvailableProperty_di" bpmnElement="Task_SelectAvailableProperty">
+        <dc:Bounds x="370" y="1087" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_FillBookingRequest_di" bpmnElement="Task_FillBookingRequest">
+        <dc:Bounds x="660" y="1087" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_BookingRequestLoop_di" bpmnElement="Gateway_BookingRequestLoop" isMarkerVisible="true">
+        <dc:Bounds x="555" y="1102" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_BookingRejected_di" bpmnElement="Event_BookingRejected">
+        <dc:Bounds x="562" y="1019" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="637" y="485" width="68" height="27" />
+          <dc:Bounds x="542" y="981.5" width="75" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0pqa47o_di" bpmnElement="Event_19wzz7c">
-        <dc:Bounds x="782" y="332" width="36" height="36" />
+      <bpmndi:BPMNShape id="Activity_1eqi11s_di" bpmnElement="Task_ReviewGuestBookingRequest">
+        <dc:Bounds x="660" y="1347" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_HostBookingApproval_di" bpmnElement="Gateway_HostBookingApproval" isMarkerVisible="true">
+        <dc:Bounds x="845" y="1362" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="764" y="375" width="72" height="27" />
+          <dc:Bounds x="842" y="1325" width="56" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_193s1bs_di" bpmnElement="Flow_193s1bs">
-        <di:waypoint x="278" y="180" />
-        <di:waypoint x="330" y="180" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0fj4wuo_di" bpmnElement="Flow_0fj4wuo">
-        <di:waypoint x="430" y="180" />
-        <di:waypoint x="490" y="180" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0k1xxvd_di" bpmnElement="Flow_0k1xxvd">
-        <di:waypoint x="540" y="220" />
-        <di:waypoint x="540" y="310" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0hknuqk_di" bpmnElement="Flow_0hknuqk">
-        <di:waypoint x="590" y="350" />
-        <di:waypoint x="645" y="350" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0x0hfvi_di" bpmnElement="Flow_0x0hfvi">
-        <di:waypoint x="695" y="350" />
-        <di:waypoint x="782" y="350" />
+      <bpmndi:BPMNShape id="Task_NotifyGuestBookingApproved_di" bpmnElement="Task_NotifyGuestBookingApproved">
+        <dc:Bounds x="970" y="1347" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0jx33wu_di" bpmnElement="Event_BookingApprovedNotification">
+        <dc:Bounds x="1152" y="1369" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="732" y="332" width="13" height="14" />
+          <dc:Bounds x="1133" y="1412" width="75" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PayForBooking_di" bpmnElement="Task_PayForBooking">
+        <dc:Bounds x="1120" y="1087" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_BookingPaid_di" bpmnElement="Event_BookingPaid">
+        <dc:Bounds x="1302" y="1109" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1283" y="1152" width="75" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_BookingRejectedNotification_di" bpmnElement="Event_BookingRejectedNotification">
+        <dc:Bounds x="852" y="1482" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="828" y="1523" width="84" height="53" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1mzs2m2_di" bpmnElement="Flow_1mzs2m2">
+        <di:waypoint x="318" y="1127" />
+        <di:waypoint x="370" y="1127" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SelectToBookingGateway_di" bpmnElement="Flow_SelectToBookingGateway">
+        <di:waypoint x="470" y="1127" />
+        <di:waypoint x="555" y="1127" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1oho43a_di" bpmnElement="Flow_1oho43a">
+        <di:waypoint x="605" y="1127" />
+        <di:waypoint x="660" y="1127" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0w0s1c4_di" bpmnElement="Flow_0w0s1c4">
+        <di:waypoint x="710" y="1167" />
+        <di:waypoint x="710" y="1347" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RejectionToBookingGateway_di" bpmnElement="Flow_RejectionToBookingGateway">
+        <di:waypoint x="580" y="1055" />
+        <di:waypoint x="580" y="1102" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ReviewToHostApprovalGateway_di" bpmnElement="Flow_ReviewToHostApprovalGateway">
+        <di:waypoint x="760" y="1387" />
+        <di:waypoint x="845" y="1387" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_HostRejected_di" bpmnElement="Flow_HostRejected">
+        <di:waypoint x="870" y="1412" />
+        <di:waypoint x="870" y="1482" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="830" y="1427" width="20" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1pxexzd_di" bpmnElement="Flow_1pxexzd">
-        <di:waypoint x="670" y="375" />
-        <di:waypoint x="670" y="442" />
+      <bpmndi:BPMNEdge id="Flow_HostApproved_di" bpmnElement="Flow_HostApproved">
+        <di:waypoint x="895" y="1387" />
+        <di:waypoint x="970" y="1387" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="630" y="396" width="20" height="14" />
+          <dc:Bounds x="923" y="1365" width="13" height="14" />
         </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ApprovedNotifyToEvent_di" bpmnElement="Flow_ApprovedNotifyToEvent">
+        <di:waypoint x="1070" y="1387" />
+        <di:waypoint x="1152" y="1387" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0vnvs39_di" bpmnElement="Flow_0vnvs39">
+        <di:waypoint x="1170" y="1369" />
+        <di:waypoint x="1170" y="1167" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_PayToVerificationGateway_di" bpmnElement="Flow_PayToVerificationGateway">
+        <di:waypoint x="1220" y="1127" />
+        <di:waypoint x="1302" y="1127" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
