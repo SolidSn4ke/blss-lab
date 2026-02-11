@@ -1,8 +1,6 @@
 package com.example.blsslab.model.dto;
 
 import com.example.blsslab.model.entity.BookingEntity;
-import com.example.blsslab.model.entity.HousingEntity;
-import com.example.blsslab.model.entity.UserEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,8 +15,8 @@ public class BookingDTO {
     Long id;
     LocalDate checkIn;
     LocalDate checkOut;
-    UserEntity guest;
-    HousingEntity housing;
+    UserDTO guest;
+    HousingDTO housing;
     LocalDateTime createdAt;
     BookingStatus status;
     Long totalPrice;
@@ -31,8 +29,8 @@ public class BookingDTO {
         this.id = bookingEntity.getId();
         this.checkIn = bookingEntity.getCheckIn();
         this.checkOut = bookingEntity.getCheckOut();
-        this.guest = bookingEntity.getGuest();
-        this.housing = bookingEntity.getHousing();
+        this.guest = new UserDTO(bookingEntity.getGuest());
+        this.housing = new HousingDTO(bookingEntity.getHousing());
         this.createdAt = bookingEntity.getCreatedAt();
         this.status = bookingEntity.getStatus();
         this.totalPrice = bookingEntity.getTotalPrice();
