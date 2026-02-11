@@ -17,9 +17,9 @@ INSERT INTO address (id, street, location_id) VALUES
 (7, 'Brandenburg Str., 5', 7);
 
 INSERT INTO user_table (username, name, family_name, password, access_token) VALUES
-('Mike', 'Mike', 'Jonson', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846', '550e8400-e29b-41d4-a716-446655440000'),
-('tester', 'tester', 'tester', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846', '123e4567-e89b-12d3-a456-426614174000'),
-('user', 'Vlad', 'Silintsev', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846', '6ba7b810-9dad-11d1-80b4-00c04fd430c8');
+('Mike', 'Mike', 'Jonson', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', '550e8400-e29b-41d4-a716-446655440000'),
+('tester', 'tester', 'tester', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', '123e4567-e89b-12d3-a456-426614174000'),
+('user', 'Vlad', 'Silintsev', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', '6ba7b810-9dad-11d1-80b4-00c04fd430c8');
 
 INSERT INTO housing (price, num_of_beds, rating, type, address_id, belongs_to) VALUES
 (12000, 2, 4.5, 'APPARTMENT', 1, 'Mike'),

@@ -67,7 +67,17 @@ public class BookingService {
 
             return new ResponseDTO<>(new HousingDTO(housing), "Housing requested", 200);
         } else
-            return new ResponseDTO<>(null, "Failed to retrive user by access token",
-                    401);
+            return new ResponseDTO<>(null, "Failed to retrive user by access token", 401);
+    }
+
+    public ResponseDTO<List<BookingDTO>> getAllBookingRequestsByHost(String accessToken) {
+        UserEntity host = userRepo.findByAccessToken(accessToken);
+
+        if (host == null)
+            return new ResponseDTO<>(null, "Failed to retrive user by access token", 401);
+
+        List<BookingEntity> bookings = bookingRepo.findAllByHostName(host.getUsername());
+
+        return new ResponseDTO<List<BookingDTO>>(bookings.stream().map(b -> new BookingDTO(b)).toList(), "", 200);
     }
 }

@@ -20,7 +20,5 @@ public class UserDTO {
         this.username = userEntity.getUsername();
         this.name = userEntity.getName();
         this.familyName = userEntity.getFamilyName();
-        this.password = userEntity.getPassword();
-        this.accessToken = userEntity.getAccessToken();
     }
 }

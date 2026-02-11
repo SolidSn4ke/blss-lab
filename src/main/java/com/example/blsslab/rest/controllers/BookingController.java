@@ -37,4 +37,12 @@ public class BookingController {
         ResponseDTO<HousingDTO> response = bookingService.requireHousing(accessToken, id, booking);
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(response.getCode()));
     }
+
+    @GetMapping("/recieved-requests")
+    public ResponseEntity<ResponseDTO<List<BookingDTO>>> getMethodName(
+            @CookieValue(name = "access-token") String accessToken) {
+        ResponseDTO<List<BookingDTO>> response = bookingService.getAllBookingRequestsByHost(accessToken);
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(response.getCode()));
+    }
+
 }
