@@ -1,6 +1,7 @@
 package com.example.blsslab.rest.controllers;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
@@ -39,10 +40,19 @@ public class BookingController {
     }
 
     @GetMapping("/recieved-requests")
-    public ResponseEntity<ResponseDTO<List<BookingDTO>>> getMethodName(
+    public ResponseEntity<ResponseDTO<List<BookingDTO>>> getRecievedRequests(
             @CookieValue(name = "access-token") String accessToken) {
         ResponseDTO<List<BookingDTO>> response = bookingService.getAllBookingRequestsByHost(accessToken);
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(response.getCode()));
     }
 
+    @PostMapping("/handle-request/{id}")
+    public ResponseEntity<ResponseDTO<BookingDTO>> handleRequest(
+            @PathVariable Long id,
+            @CookieValue(name = "access-token") String accessToken,
+            @RequestBody Map<String, Boolean> body) {
+        Boolean approved = body.get("approved");
+        ResponseDTO<BookingDTO> response = bookingService.handleRequest(accessToken, id, approved);
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(response.getCode()));
+    }
 }
