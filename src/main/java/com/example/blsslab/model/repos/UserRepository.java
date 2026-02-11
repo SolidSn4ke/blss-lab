@@ -7,5 +7,5 @@ import com.example.blsslab.model.entity.UserEntity;
 
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, String> {
-    UserEntity findByAccessToken(String accessToken);
+    
 }

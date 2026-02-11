@@ -6,7 +6,6 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,27 +31,27 @@ public class BookingController {
         return new ResponseEntity<List<HousingDTO>>(response.getEntity(), HttpStatusCode.valueOf(response.getCode()));
     }
 
-    @PostMapping("/require-housing/{id}")
+    @PostMapping("/{username}/require-housing/{id}")
     public ResponseEntity<ResponseDTO<HousingDTO>> requireHousing(@PathVariable Long id,
-            @CookieValue(name = "access-token") String accessToken, @RequestBody BookingDTO booking) {
-        ResponseDTO<HousingDTO> response = bookingService.requireHousing(accessToken, id, booking);
+            @PathVariable String username,
+            @RequestBody BookingDTO booking) {
+        ResponseDTO<HousingDTO> response = bookingService.requireHousing(username, id, booking);
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(response.getCode()));
     }
 
-    @GetMapping("/recieved-requests")
-    public ResponseEntity<ResponseDTO<List<BookingDTO>>> getRecievedRequests(
-            @CookieValue(name = "access-token") String accessToken) {
-        ResponseDTO<List<BookingDTO>> response = bookingService.getAllBookingRequestsByHost(accessToken);
+    @GetMapping("/{username}/recieved-requests")
+    public ResponseEntity<ResponseDTO<List<BookingDTO>>> getRecievedRequests(@PathVariable String username) {
+        ResponseDTO<List<BookingDTO>> response = bookingService.getAllBookingRequestsByHost(username);
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(response.getCode()));
     }
 
-    @PostMapping("/handle-request/{id}")
+    @PostMapping("/{username}/handle-request/{id}")
     public ResponseEntity<ResponseDTO<BookingDTO>> handleRequest(
             @PathVariable Long id,
-            @CookieValue(name = "access-token") String accessToken,
+            @PathVariable String username,
             @RequestBody Map<String, Boolean> body) {
         Boolean approved = body.get("approved");
-        ResponseDTO<BookingDTO> response = bookingService.handleRequest(accessToken, id, approved);
+        ResponseDTO<BookingDTO> response = bookingService.handleRequest(username, id, approved);
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(response.getCode()));
     }
 }

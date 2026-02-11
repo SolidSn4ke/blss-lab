@@ -36,52 +36,53 @@ public class BookingService {
         return new ResponseDTO<List<HousingDTO>>(housings.stream().map(h -> new HousingDTO(h)).toList(), "", 200);
     }
 
-    public ResponseDTO<HousingDTO> requireHousing(String accessToken, Long housingId, BookingDTO booking) {
+    // TODO: добавить проверку корректности дат, расчитывать стоимость правильно
+    public ResponseDTO<HousingDTO> requireHousing(String username, Long housingId, BookingDTO booking) {
 
-        UserEntity user = userRepo.findByAccessToken(accessToken);
-        HousingEntity housing = housingRepo.getReferenceById(housingId);
+        UserEntity user = userRepo.findById(username).orElse(null);
+        HousingEntity housing = housingRepo.findById(housingId).orElse(null);
 
-        if (user != null) {
+        if (user == null)
+            return new ResponseDTO<>(null, "Failed to retrive user by username", 404);
 
-            try {
-                BookingEntity newBooking = new BookingEntity();
-                newBooking.setCheckIn(booking.getCheckIn());
-                newBooking.setCheckOut(booking.getCheckOut());
-                newBooking.setCreatedAt(LocalDateTime.now());
-                newBooking.setStatus(BookingStatus.PENDING);
-                newBooking.setTotalPrice(housing.getPrice());
-                newBooking.setAdultsCount(booking.getAdultsCount());
-                newBooking.setChildCount(booking.getChildCount());
-                newBooking.setInfantsCount(booking.getInfantsCount());
-                newBooking.setPetCount(booking.getPetCount());
+        if (housing == null)
+            return new ResponseDTO<>(null, "Failed to retrive housing by id", 404);
 
-                newBooking.setGuest(user);
-                newBooking.setHousing(housing);
+        BookingEntity newBooking = new BookingEntity();
+        newBooking.setCheckIn(booking.getCheckIn());
+        newBooking.setCheckOut(booking.getCheckOut());
+        newBooking.setCreatedAt(LocalDateTime.now());
+        newBooking.setStatus(BookingStatus.PENDING);
+        newBooking.setTotalPrice(housing.getPrice());
+        newBooking.setAdultsCount(booking.getAdultsCount());
+        newBooking.setChildCount(booking.getChildCount());
+        newBooking.setInfantsCount(booking.getInfantsCount());
+        newBooking.setPetCount(booking.getPetCount());
 
-                bookingRepo.save(newBooking);
-                userRepo.save(user);
-                housingRepo.save(housing);
-            } catch (EntityNotFoundException e) {
-                return new ResponseDTO<>(null, "Failed to retrive housing by id", 404);
-            }
+        newBooking.setGuest(user);
+        newBooking.setHousing(housing);
 
-            return new ResponseDTO<>(new HousingDTO(housing), "Housing requested", 200);
-        } else
-            return new ResponseDTO<>(null, "Failed to retrive user by access token", 401);
+        bookingRepo.save(newBooking);
+        userRepo.save(user);
+        housingRepo.save(housing);
+
+        return new ResponseDTO<>(new HousingDTO(housing), "Housing requested", 200);
     }
 
-    public ResponseDTO<List<BookingDTO>> getAllBookingRequestsByHost(String accessToken) {
-        UserEntity host = userRepo.findByAccessToken(accessToken);
+    public ResponseDTO<List<BookingDTO>> getAllBookingRequestsByHost(String username) {
+        UserEntity host = userRepo.getReferenceById(username);
+        List<BookingEntity> bookings;
 
-        if (host == null)
-            return new ResponseDTO<>(null, "Failed to retrive user by access token", 401);
-
-        List<BookingEntity> bookings = bookingRepo.findAllByHostName(host.getUsername());
+        try {
+            bookings = bookingRepo.findAllByHostName(host.getUsername());
+        } catch (EntityNotFoundException e) {
+            return new ResponseDTO<>(null, "Failed to retrive user by username", 404);
+        }
 
         return new ResponseDTO<List<BookingDTO>>(bookings.stream().map(b -> new BookingDTO(b)).toList(), "", 200);
     }
 
-    public ResponseDTO<BookingDTO> handleRequest(String accessToken, Long id, Boolean approved) {
+    public ResponseDTO<BookingDTO> handleRequest(String username, Long id, Boolean approved) {
         if (approved == null) {
             return new ResponseDTO<>(null, "Field 'approved' is required", 400);
         }
@@ -93,7 +94,7 @@ public class BookingService {
 
         UserEntity owner = booking.getHousing().getOwner();
 
-        if (owner == null || !owner.getAccessToken().equals(accessToken)) {
+        if (owner == null || !owner.getUsername().equals(username)) {
             return new ResponseDTO<>(null, "Only owner can approve or deny request", 403);
         }
 
