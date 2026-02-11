@@ -80,4 +80,35 @@ public class BookingService {
 
         return new ResponseDTO<List<BookingDTO>>(bookings.stream().map(b -> new BookingDTO(b)).toList(), "", 200);
     }
+
+    public ResponseDTO<BookingDTO> handleRequest(String accessToken, Long id, Boolean approved) {
+        if (approved == null) {
+            return new ResponseDTO<>(null, "Field 'approved' is required", 400);
+        }
+
+        BookingEntity booking = bookingRepo.findById(id).orElse(null);
+        if (booking == null) {
+            return new ResponseDTO<>(null, "Failed to retrieve booking by id", 404);
+        }
+
+        UserEntity owner = booking.getHousing().getOwner();
+
+        if (owner == null || !owner.getAccessToken().equals(accessToken)) {
+            return new ResponseDTO<>(null, "Only owner can approve or deny request", 403);
+        }
+
+        if (booking.getStatus() != BookingStatus.PENDING) {
+            return new ResponseDTO<>(null, "Booking request already processed", 409);
+        }
+
+        if (approved) {
+            booking.setStatus(BookingStatus.CONFIRMED);
+        } else {
+            booking.setStatus(BookingStatus.CANCELLED);
+        }
+
+        bookingRepo.save(booking);
+
+        return new ResponseDTO<>(new BookingDTO(booking), approved ? "Booking approved" : "Booking rejected", 200);
+    }
 }
