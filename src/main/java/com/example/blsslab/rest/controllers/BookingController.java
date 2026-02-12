@@ -25,12 +25,6 @@ public class BookingController {
     @Autowired
     BookingService bookingService;
 
-    @GetMapping("/housings")
-    public ResponseEntity<List<HousingDTO>> getHousings() {
-        ResponseDTO<List<HousingDTO>> response = bookingService.getAllHousings();
-        return new ResponseEntity<List<HousingDTO>>(response.getEntity(), HttpStatusCode.valueOf(response.getCode()));
-    }
-
     @PostMapping("/{username}/require-housing/{id}")
     public ResponseEntity<ResponseDTO<HousingDTO>> requireHousing(@PathVariable Long id,
             @PathVariable String username,
@@ -54,4 +48,5 @@ public class BookingController {
         ResponseDTO<BookingDTO> response = bookingService.handleRequest(username, id, approved);
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(response.getCode()));
     }
+
 }

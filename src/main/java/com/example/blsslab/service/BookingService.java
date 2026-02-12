@@ -31,11 +31,6 @@ public class BookingService {
     @Autowired
     BookingRepository bookingRepo;
 
-    public ResponseDTO<List<HousingDTO>> getAllHousings() {
-        List<HousingEntity> housings = housingRepo.findAll();
-        return new ResponseDTO<List<HousingDTO>>(housings.stream().map(h -> new HousingDTO(h)).toList(), "", 200);
-    }
-
     // TODO: добавить проверку корректности дат, расчитывать стоимость правильно
     public ResponseDTO<HousingDTO> requireHousing(String username, Long housingId, BookingDTO booking) {
 
