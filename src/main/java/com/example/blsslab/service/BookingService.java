@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.blsslab.model.dto.BookingDTO;
-import com.example.blsslab.model.dto.BookingStatus;
 import com.example.blsslab.model.dto.HousingDTO;
+import com.example.blsslab.model.dto.RequestStatus;
 import com.example.blsslab.model.dto.ResponseDTO;
 import com.example.blsslab.model.entity.BookingEntity;
 import com.example.blsslab.model.entity.HousingEntity;
@@ -47,7 +47,7 @@ public class BookingService {
         newBooking.setCheckIn(booking.getCheckIn());
         newBooking.setCheckOut(booking.getCheckOut());
         newBooking.setCreatedAt(LocalDateTime.now());
-        newBooking.setStatus(BookingStatus.PENDING);
+        newBooking.setStatus(RequestStatus.PENDING);
         newBooking.setTotalPrice(housing.getPrice());
         newBooking.setAdultsCount(booking.getAdultsCount());
         newBooking.setChildCount(booking.getChildCount());
@@ -93,14 +93,14 @@ public class BookingService {
             return new ResponseDTO<>(null, "Only owner can approve or deny request", 403);
         }
 
-        if (booking.getStatus() != BookingStatus.PENDING) {
+        if (booking.getStatus() != RequestStatus.PENDING) {
             return new ResponseDTO<>(null, "Booking request already processed", 409);
         }
 
         if (approved) {
-            booking.setStatus(BookingStatus.CONFIRMED);
+            booking.setStatus(RequestStatus.CONFIRMED);
         } else {
-            booking.setStatus(BookingStatus.CANCELLED);
+            booking.setStatus(RequestStatus.CANCELLED);
         }
 
         bookingRepo.save(booking);

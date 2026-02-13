@@ -3,6 +3,7 @@ package com.example.blsslab.model.entity;
 import java.util.Set;
 
 import com.example.blsslab.model.dto.HousingType;
+import com.example.blsslab.model.dto.RequestStatus;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
@@ -35,6 +36,9 @@ public class HousingEntity {
 
     @Enumerated(EnumType.STRING)
     private HousingType type;
+
+    @Enumerated(EnumType.STRING)
+    private RequestStatus status;
 
     @ManyToOne
     @JoinColumn(name = "address_id")

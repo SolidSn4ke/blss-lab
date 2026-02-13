@@ -17,7 +17,7 @@ public class BookingDTO {
     UserDTO guest;
     HousingDTO housing;
     LocalDateTime createdAt;
-    BookingStatus status;
+    RequestStatus status;
     Long totalPrice;
     Integer adultsCount;
     Integer childCount;

@@ -1,6 +1,7 @@
 package com.example.blsslab.model.entity;
 
-import com.example.blsslab.model.dto.BookingStatus;
+import com.example.blsslab.model.dto.RequestStatus;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -37,7 +38,7 @@ public class BookingEntity {
     private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
-    private BookingStatus status;
+    private RequestStatus status;
 
     private Long totalPrice;
 

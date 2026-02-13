@@ -30,11 +30,11 @@ public class HousingController {
     }
 
     @PostMapping("/{username}/add-housing")
-    public ResponseEntity<ResponseDTO<HousingDTO>> postMethodName(
+    public ResponseEntity<ResponseDTO<HousingDTO>> addHousing(
             @PathVariable String username,
             @RequestBody HousingDTO housing) {
-
-        return new ResponseEntity<>(HttpStatusCode.valueOf(0));
+        ResponseDTO<HousingDTO> response = housingService.addHousing(username, housing);
+        return new ResponseEntity<ResponseDTO<HousingDTO>>(response, HttpStatusCode.valueOf(response.getCode()));
     }
 
 }

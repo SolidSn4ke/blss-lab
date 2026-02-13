@@ -3,7 +3,6 @@ package com.example.blsslab.model.entity;
 import java.util.Set;
 
 import com.example.blsslab.model.dto.Country;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

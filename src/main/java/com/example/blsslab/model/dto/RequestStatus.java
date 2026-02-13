@@ -1,6 +1,6 @@
 package com.example.blsslab.model.dto;
 
-public enum BookingStatus {
+public enum RequestStatus {
     PENDING,
     CONFIRMED,
     CANCELLED
