@@ -1,6 +1,8 @@
 package com.example.blsslab.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +33,6 @@ public class BookingService {
     @Autowired
     BookingRepository bookingRepo;
 
-    // TODO: добавить проверку корректности дат, расчитывать стоимость правильно
     public ResponseDTO<HousingDTO> requireHousing(String username, Long housingId, BookingDTO booking) {
 
         UserEntity user = userRepo.findById(username).orElse(null);
@@ -43,12 +44,40 @@ public class BookingService {
         if (housing == null)
             return new ResponseDTO<>(null, "Failed to retrive housing by id", 404);
 
+        LocalDate startDate = booking.getCheckIn();
+        LocalDate endDate = booking.getCheckOut();
+        if (LocalDate.now().isAfter(startDate)) {
+            return new ResponseDTO<>(null, "Date of check in must be in the future", 400);
+        }
+
+        if (!startDate.isBefore(endDate)) {
+            return new ResponseDTO<>(null, "Date of check in must be before date of check out", 400);
+        }
+
+        long days = ChronoUnit.DAYS.between(startDate, endDate);
+        if (days <= 0) {
+            return new ResponseDTO<>(null, "Minimum period for booking must be at least 1 day", 400);
+        }
+
+        List<BookingEntity> existingBookings = bookingRepo.findAllByHousingIdAndStatus(
+                housingId, RequestStatus.CONFIRMED);
+
+        for (BookingEntity existingBooking : existingBookings) {
+            LocalDate existingStart = existingBooking.getCheckIn();
+            LocalDate existingEnd = existingBooking.getCheckOut();
+            if (!(endDate.isBefore(existingStart) || startDate.isAfter(existingEnd))) {
+                return new ResponseDTO<>(null,
+                        "Unacceptable period of booking: there are conflicts with other bookings",
+                        409);
+            }
+        }
+
         BookingEntity newBooking = new BookingEntity();
         newBooking.setCheckIn(booking.getCheckIn());
         newBooking.setCheckOut(booking.getCheckOut());
         newBooking.setCreatedAt(LocalDateTime.now());
         newBooking.setStatus(RequestStatus.PENDING);
-        newBooking.setTotalPrice(housing.getPrice());
+        newBooking.setTotalPrice(housing.getPrice() * days);
         newBooking.setAdultsCount(booking.getAdultsCount());
         newBooking.setChildCount(booking.getChildCount());
         newBooking.setInfantsCount(booking.getInfantsCount());
