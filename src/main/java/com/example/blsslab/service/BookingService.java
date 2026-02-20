@@ -47,16 +47,11 @@ public class BookingService {
         LocalDate startDate = booking.getCheckIn();
         LocalDate endDate = booking.getCheckOut();
         if (LocalDate.now().isAfter(startDate)) {
-            return new ResponseDTO<>(null, "Date of check in must be in the future", 400);
+            return new ResponseDTO<>(null, "Date of check in must not be in the past", 400);
         }
 
         if (!startDate.isBefore(endDate)) {
             return new ResponseDTO<>(null, "Date of check in must be before date of check out", 400);
-        }
-
-        long days = ChronoUnit.DAYS.between(startDate, endDate);
-        if (days <= 0) {
-            return new ResponseDTO<>(null, "Minimum period for booking must be at least 1 day", 400);
         }
 
         List<BookingEntity> existingBookings = bookingRepo.findAllByHousingIdAndStatus(
@@ -65,7 +60,7 @@ public class BookingService {
         for (BookingEntity existingBooking : existingBookings) {
             LocalDate existingStart = existingBooking.getCheckIn();
             LocalDate existingEnd = existingBooking.getCheckOut();
-            if (!(endDate.isBefore(existingStart) || startDate.isAfter(existingEnd))) {
+            if (startDate.isBefore(existingEnd) && endDate.isAfter(existingStart)) {
                 return new ResponseDTO<>(null,
                         "Unacceptable period of booking: there are conflicts with other bookings",
                         409);
@@ -77,7 +72,7 @@ public class BookingService {
         newBooking.setCheckOut(booking.getCheckOut());
         newBooking.setCreatedAt(LocalDateTime.now());
         newBooking.setStatus(RequestStatus.PENDING);
-        newBooking.setTotalPrice(housing.getPrice() * days);
+        newBooking.setTotalPrice(housing.getPrice() * ChronoUnit.DAYS.between(startDate, endDate));
         newBooking.setAdultsCount(booking.getAdultsCount());
         newBooking.setChildCount(booking.getChildCount());
         newBooking.setInfantsCount(booking.getInfantsCount());
