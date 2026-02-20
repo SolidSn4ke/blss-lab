@@ -29,6 +29,12 @@ public class HousingController {
         return new ResponseEntity<List<HousingDTO>>(response.getEntity(), HttpStatusCode.valueOf(response.getCode()));
     }
 
+    @GetMapping("/{username}/all-to-handle")
+    public ResponseEntity<List<HousingDTO>> getMethodName(@PathVariable String username) {
+        ResponseDTO<List<HousingDTO>> response = housingService.getAllHousingsToHandle(username);
+        return new ResponseEntity<List<HousingDTO>>(response.getEntity(), HttpStatusCode.valueOf(response.getCode()));
+    }
+
     @PostMapping("/{username}/add-housing")
     public ResponseEntity<ResponseDTO<HousingDTO>> addHousing(
             @PathVariable String username,

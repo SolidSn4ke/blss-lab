@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.example.blsslab.model.dto.HousingDTO;
 import com.example.blsslab.model.dto.RequestStatus;
 import com.example.blsslab.model.dto.ResponseDTO;
+import com.example.blsslab.model.dto.UserRole;
 import com.example.blsslab.model.entity.AddressEntity;
 import com.example.blsslab.model.entity.HousingEntity;
 import com.example.blsslab.model.entity.UserEntity;
@@ -29,6 +30,21 @@ public class HousingService {
 
     public ResponseDTO<List<HousingDTO>> getAllHousings() {
         List<HousingEntity> housings = housingRepo.findAllByStatus(RequestStatus.CONFIRMED);
+        return new ResponseDTO<List<HousingDTO>>(housings.stream().map(h -> new HousingDTO(h)).toList(), "", 200);
+    }
+
+    public ResponseDTO<List<HousingDTO>> getAllHousingsToHandle(String username) {
+        UserEntity user = userRepo.findById(username).orElse(null);
+
+        if (user == null) {
+            return new ResponseDTO<>(null, "Failed to retrieve user by username", 404);
+        }
+
+        if (user.getRole() != UserRole.MODERATOR) {
+            return new ResponseDTO<>(null, "Only moderator has access to this action", 403);
+        }
+
+        List<HousingEntity> housings = housingRepo.findAllByStatus(RequestStatus.PENDING);
         return new ResponseDTO<List<HousingDTO>>(housings.stream().map(h -> new HousingDTO(h)).toList(), "", 200);
     }
 
