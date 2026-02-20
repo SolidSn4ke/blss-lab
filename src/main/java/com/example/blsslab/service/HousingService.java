@@ -10,14 +10,10 @@ import com.example.blsslab.model.dto.RequestStatus;
 import com.example.blsslab.model.dto.ResponseDTO;
 import com.example.blsslab.model.entity.AddressEntity;
 import com.example.blsslab.model.entity.HousingEntity;
-import com.example.blsslab.model.entity.LocationEntity;
 import com.example.blsslab.model.entity.UserEntity;
 import com.example.blsslab.model.repos.AddressRepository;
 import com.example.blsslab.model.repos.HousingRepository;
-import com.example.blsslab.model.repos.LocationRepository;
 import com.example.blsslab.model.repos.UserRepository;
-
-import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class HousingService {
@@ -30,9 +26,6 @@ public class HousingService {
 
     @Autowired
     AddressRepository addressRepo;
-
-    @Autowired
-    LocationRepository locationRepo;
 
     public ResponseDTO<List<HousingDTO>> getAllHousings() {
         List<HousingEntity> housings = housingRepo.findAllByStatus(RequestStatus.CONFIRMED);
@@ -54,20 +47,12 @@ public class HousingService {
         housingEntity.setOwner(owner);
 
         AddressEntity address;
-        LocationEntity location;
 
         if (housing.getAddress().getId() == null) {
             address = new AddressEntity();
             address.setStreet(housing.getAddress().getStreet());
-            location = locationRepo.getReferenceById(housing.getAddress().getLocation().getId());
-
-            try {
-                address.setLocation(location);
-            } catch (EntityNotFoundException e) {
-                return new ResponseDTO<HousingDTO>(null, "Failed to retrieve location by id", 404);
-            }
+            address.setCountry(housing.getAddress().getCountry());
             addressRepo.save(address);
-
         } else {
             address = addressRepo.findById(housing.getAddress().getId()).orElse(null);
 

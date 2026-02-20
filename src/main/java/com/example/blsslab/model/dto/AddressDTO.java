@@ -1,7 +1,6 @@
 package com.example.blsslab.model.dto;
 
 import com.example.blsslab.model.entity.AddressEntity;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,12 +11,12 @@ import lombok.Setter;
 public class AddressDTO {
     Long id;
     String street;
-    LocationDTO location;
+    Country country;
 
     public AddressDTO(AddressEntity addressEntity) {
         this.id = addressEntity.getId();
         this.street = addressEntity.getStreet();
-        this.location = new LocationDTO(addressEntity.getLocation());
+        this.country = addressEntity.getCountry();
     }
 
 }
