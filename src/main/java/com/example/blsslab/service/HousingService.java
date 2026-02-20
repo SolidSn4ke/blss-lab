@@ -48,6 +48,40 @@ public class HousingService {
         return new ResponseDTO<List<HousingDTO>>(housings.stream().map(h -> new HousingDTO(h)).toList(), "", 200);
     }
 
+    public ResponseDTO<HousingDTO> handleRequest(String username, Long id, Boolean approved) {
+        UserEntity user = userRepo.findById(username).orElse(null);
+        if (user == null) {
+            return new ResponseDTO<>(null, "Failed to retrieve user by username", 404);
+        }
+
+        if (user.getRole() != UserRole.MODERATOR) {
+            return new ResponseDTO<>(null, "Only moderator has access to this action", 403);
+        }
+
+        if (approved == null) {
+            return new ResponseDTO<>(null, "Field 'approved' is required", 400);
+        }
+
+        HousingEntity housing = housingRepo.findById(id).orElse(null);
+        if (housing == null) {
+            return new ResponseDTO<>(null, "Failed to retrieve housing by id", 404);
+        }
+
+        if (housing.getStatus() != RequestStatus.PENDING) {
+            return new ResponseDTO<>(null, "Housing request already processed", 409);
+        }
+
+        if (approved) {
+            housing.setStatus(RequestStatus.CONFIRMED);
+        } else {
+            housing.setStatus(RequestStatus.CANCELLED);
+        }
+
+        housingRepo.save(housing);
+
+        return new ResponseDTO<>(new HousingDTO(housing), approved ? "Housing approved" : "Housing rejected", 200);
+    }
+
     public ResponseDTO<HousingDTO> addHousing(String username, HousingDTO housing) {
         UserEntity owner = userRepo.findById(username).orElse(null);
 
