@@ -22,6 +22,11 @@ public class UserService {
         userEntity.setFamilyName(user.getFamilyName());
         userEntity.setRole(user.getRole());
 
+        UserEntity existUser = userRepo.findById(user.getUsername()).orElse(null);
+        if (existUser != null) {
+            return new ResponseDTO<>(null, "User with this username is already exist", 409);
+        }
+
         userRepo.save(userEntity);
 
         return new ResponseDTO<UserDTO>(new UserDTO(userEntity), "User has been added", 200);
