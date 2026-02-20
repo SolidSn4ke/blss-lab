@@ -2,7 +2,11 @@ package com.example.blsslab.model.entity;
 
 import java.util.Set;
 
+import com.example.blsslab.model.dto.UserRole;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -28,6 +32,9 @@ public class UserEntity {
     private String password;
 
     private String accessToken;
+
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
 
     @OneToMany(mappedBy = "owner")
     private Set<HousingEntity> ownedHousings;

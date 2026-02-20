@@ -15,10 +15,12 @@ public class UserDTO {
     String familyName;
     String password;
     String accessToken;
+    UserRole role;
 
     public UserDTO(UserEntity userEntity) {
         this.username = userEntity.getUsername();
         this.name = userEntity.getName();
         this.familyName = userEntity.getFamilyName();
+        this.role = userEntity.getRole();
     }
 }
