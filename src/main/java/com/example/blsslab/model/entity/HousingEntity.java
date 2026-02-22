@@ -35,7 +35,8 @@ public class HousingEntity {
     private Double rating;
 
     @Enumerated(EnumType.STRING)
-    private HousingType type;
+    @Column(name = "type")
+    private HousingType housingType;
 
     @Enumerated(EnumType.STRING)
     private RequestStatus status;

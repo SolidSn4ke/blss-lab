@@ -92,7 +92,7 @@ public class HousingService {
         housingEntity.setPrice(housing.getPrice());
         housingEntity.setNumOfBeds(housing.getNumOfBeds());
         housingEntity.setRating(housing.getRating());
-        housingEntity.setType(housing.getType());
+        housingEntity.setHousingType(housing.getHousingType());
         housingEntity.setStatus(RequestStatus.PENDING);
         housingEntity.setOwner(owner);
 

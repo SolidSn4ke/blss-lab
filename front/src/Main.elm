@@ -14,9 +14,12 @@ import Housing exposing (Housing, HousingType(..), show)
 import Html exposing (..)
 import Html.Attributes exposing (href, style)
 import Html.Events exposing (..)
+import Http exposing (Error(..))
 import List
 import String exposing (fromInt)
 import SvgResources exposing (svgHouse)
+import Time
+import Housing exposing (listHousingDecoder)
 
 
 
@@ -38,7 +41,7 @@ main =
 
 
 type alias Model =
-    { navbarState : Navbar.State, page : Page }
+    { navbarState : Navbar.State, page : Page, housings : List Housing, error : Maybe String }
 
 
 type Page
@@ -53,7 +56,7 @@ init _ =
         ( navbarState, navbarCmd ) =
             Navbar.initialState NavbarMsg
     in
-    ( { navbarState = navbarState, page = Booking }, navbarCmd )
+    ( { navbarState = navbarState, page = Booking, housings = [], error = Nothing }, navbarCmd )
 
 
 
@@ -63,6 +66,9 @@ init _ =
 type Msg
     = NavbarMsg Navbar.State
     | NavTo Page
+    | FetchHousings
+    | ReceiveHousings (Result Error (List Housing))
+    | Tick Time.Posix
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -74,6 +80,34 @@ update msg model =
         NavTo p ->
             ( { model | page = p }, Cmd.none )
 
+        FetchHousings ->
+            Debug.todo "branch 'FetchHousings' not implemented"
+
+        ReceiveHousings result ->
+            case result of
+                Ok housings ->
+                    ( { model | housings = housings }, Cmd.none )
+
+                Err error ->
+                    case error of
+                        Http.BadUrl url ->
+                            ( { model | error = Just <| "Bad URL: " ++ url }, Cmd.none )
+
+                        Timeout ->
+                            ( { model | error = Just <| "Timeout occurred while fetching housings" }, Cmd.none )
+
+                        NetworkError ->
+                            ( { model | error = Just <| "Network error occurred while fetching housings" }, Cmd.none )
+
+                        BadStatus _ ->
+                            ( { model | error = Just <| "Bad status occurred while fetching housings" }, Cmd.none )
+
+                        BadBody _ ->
+                            ( { model | error = Just <| "Bad body occurred while fetching housings" }, Cmd.none )
+
+        Tick _ ->
+            ( model, fetchHousings )
+
 
 
 -- SUBSCRIPTIONS
@@ -81,7 +115,7 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Navbar.subscriptions model.navbarState NavbarMsg
+    Sub.batch [ Navbar.subscriptions model.navbarState NavbarMsg, Time.every 5000 Tick ]
 
 
 
@@ -110,8 +144,16 @@ layoutChooser : Model -> Html Msg
 layoutChooser model =
     case model.page of
         Booking ->
-            Grid.row [ Row.centerLg ] <|
-                List.map housingCard hList
+            div []
+                [ Grid.row [ Row.centerLg ] <|
+                    List.map housingCard model.housings,
+                    text <| case model.error of
+                        Just err ->
+                            "Error: " ++ err
+
+                        Nothing ->
+                            ""
+                ]
 
         Profile ->
             text "Profile page is not yet implemented"
@@ -126,7 +168,7 @@ housingCard h =
         [ Card.config [ Card.align Text.alignXsCenter ]
             |> Card.header [] [ svgHouse ]
             |> Card.block [ Block.align Text.alignLgLeft ]
-                [ Block.titleH3 [] [ text <| show h.hType ]
+                [ Block.titleH3 [] [ text <| show h.housingType ]
                 , Block.text [] [ text <| fromInt h.price ++ " руб./ночь" ]
                 , Block.custom <| Button.button [ Button.outlinePrimary ] [ text "Забронировать" ]
                 ]
@@ -134,23 +176,15 @@ housingCard h =
         ]
 
 
-hList : List Housing
-hList =
-    [ { price = 12, hType = Room }, { price = 23, hType = Appartment }, { price = 315, hType = Hotel }, { price = 1000, hType = House }, { price = 2000, hType = Hotel } ]
-
-
 
 -- HTTP
--- getRandomQuote : Cmd Msg
--- getRandomQuote =
---     Http.get
---         { url = "https://elm-lang.org/api/random-quotes"
---         , expect = Http.expectJson GotQuote quoteDecoder
---         }
--- quoteDecoder : Decoder Quote
--- quoteDecoder =
---     map4 Quote
---         (field "quote" string)
---         (field "source" string)
---         (field "author" string)
---         (field "year" int)
+
+
+fetchHousings : Cmd Msg
+fetchHousings =
+    Http.get
+        { url = "http://localhost:8080/housing/all"
+        , expect = Http.expectJson ReceiveHousings listHousingDecoder
+        }
+
+

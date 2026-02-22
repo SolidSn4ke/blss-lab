@@ -14,7 +14,7 @@ public class HousingDTO {
     Long price;
     Double rating;
     Integer numOfBeds;
-    HousingType type;
+    HousingType housingType;
     AddressDTO address;
 
     public HousingDTO(HousingEntity housingEntity) {
@@ -22,7 +22,7 @@ public class HousingDTO {
         this.price = housingEntity.getPrice();
         this.rating = housingEntity.getRating();
         this.numOfBeds = housingEntity.getNumOfBeds();
-        this.type = housingEntity.getType();
+        this.housingType = housingEntity.getHousingType();
         this.address = new AddressDTO(housingEntity.getAddress());
     }
 }
