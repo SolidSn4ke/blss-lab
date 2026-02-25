@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,6 +30,7 @@ public class AddressEntity {
     private String street;
 
     @Enumerated(EnumType.STRING)
+    @NotNull
     private Country country;
 
     @OneToMany(mappedBy = "address")
