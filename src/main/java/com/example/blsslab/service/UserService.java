@@ -17,12 +17,16 @@ public class UserService {
 
         UserEntity userEntity = new UserEntity();
         userEntity.setUsername(user.getUsername());
-        userEntity.setPassword(user.getPassword());
         userEntity.setName(user.getName());
         userEntity.setFamilyName(user.getFamilyName());
         userEntity.setRole(user.getRole());
 
+        if (user.getUsername() == null) {
+            return new ResponseDTO<>(null, "Username cannot be null", 400);
+        }
+
         UserEntity existUser = userRepo.findById(user.getUsername()).orElse(null);
+
         if (existUser != null) {
             return new ResponseDTO<>(null, "User with this username is already exist", 409);
         }

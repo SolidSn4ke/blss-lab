@@ -20,6 +20,7 @@ import lombok.Setter;
 @Table(name = "user_table")
 public class UserEntity {
     @Id
+    @NotBlank
     private String username;
 
     @NotBlank
@@ -27,11 +28,6 @@ public class UserEntity {
 
     @NotBlank
     private String familyName;
-
-    @NotBlank
-    private String password;
-
-    private String accessToken;
 
     @Enumerated(EnumType.STRING)
     private UserRole role;

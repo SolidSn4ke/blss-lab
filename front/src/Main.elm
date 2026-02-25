@@ -20,7 +20,6 @@ import Html exposing (..)
 import Html.Attributes exposing (class, for, href, style)
 import Html.Events exposing (..)
 import Http exposing (Error(..))
-import Json.Encode exposing (Value)
 import List
 import Response exposing (Response, responseDecoder)
 import String exposing (fromInt)
@@ -149,7 +148,7 @@ update msg model =
 
         ReceiveResponse res ->
             case res of
-                Ok resp ->
+                Ok _ ->
                     ( { model | alertVisibility = Alert.shown }, Cmd.none )
 
                 Err _ ->

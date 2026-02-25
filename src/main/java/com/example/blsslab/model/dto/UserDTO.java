@@ -1,7 +1,6 @@
 package com.example.blsslab.model.dto;
 
 import com.example.blsslab.model.entity.UserEntity;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,8 +12,6 @@ public class UserDTO {
     String username;
     String name;
     String familyName;
-    String password;
-    String accessToken;
     UserRole role;
 
     public UserDTO(UserEntity userEntity) {

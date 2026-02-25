@@ -1,6 +1,5 @@
 module Booking exposing (..)
 
-import Char exposing (toLower)
 import Json.Encode as Encode
 
 
