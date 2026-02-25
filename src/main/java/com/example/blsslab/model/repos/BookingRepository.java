@@ -15,6 +15,9 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
     @Query("select b from BookingEntity b where b.housing.owner.username = :hostUsername")
     List<BookingEntity> findAllByHostName(String hostUsername);
 
+    @Query("select b from BookingEntity b where b.guest.username = :userUsername")
+    List<BookingEntity> findAllByUserName(String userUsername);
+
     @Query("select b from BookingEntity b where b.housing.id = :housingId and b.status = :status")
     List<BookingEntity> findAllByHousingIdAndStatus(Long housingId, RequestStatus status);
 }

@@ -41,6 +41,12 @@ public class BookingController {
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(response.getCode()));
     }
 
+    @GetMapping("/{username}/sent-requests")
+    public ResponseEntity<ResponseDTO<List<BookingDTO>>> getSentRequests(@PathVariable String username) {
+        ResponseDTO<List<BookingDTO>> response = bookingService.getAllBookingRequestsByUser(username);
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(response.getCode()));
+    }
+
     @PostMapping("/{username}/handle-request/{id}")
     public ResponseEntity<ResponseDTO<BookingDTO>> handleRequest(
             @PathVariable Long id,

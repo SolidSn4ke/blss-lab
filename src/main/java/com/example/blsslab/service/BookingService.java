@@ -95,6 +95,19 @@ public class BookingService {
         try {
             bookings = bookingRepo.findAllByHostName(host.getUsername());
         } catch (EntityNotFoundException e) {
+            return new ResponseDTO<>(null, "Failed to retrive host by username", 404);
+        }
+
+        return new ResponseDTO<List<BookingDTO>>(bookings.stream().map(b -> new BookingDTO(b)).toList(), "", 200);
+    }
+
+    public ResponseDTO<List<BookingDTO>> getAllBookingRequestsByUser(String username) {
+        UserEntity user = userRepo.getReferenceById(username);
+        List<BookingEntity> bookings;
+
+        try {
+            bookings = bookingRepo.findAllByUserName(user.getUsername());
+        } catch (EntityNotFoundException e) {
             return new ResponseDTO<>(null, "Failed to retrive user by username", 404);
         }
 
