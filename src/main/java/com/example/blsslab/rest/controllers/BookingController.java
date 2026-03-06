@@ -3,7 +3,6 @@ package com.example.blsslab.rest.controllers;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,8 +21,11 @@ import com.example.blsslab.service.BookingService;
 @RequestMapping("/booking")
 public class BookingController {
 
-    @Autowired
     BookingService bookingService;
+
+    public BookingController(BookingService bookingService) {
+        this.bookingService = bookingService;
+    }
 
     @PostMapping("/{username}/require-housing/{id}")
     public ResponseEntity<ResponseDTO<HousingDTO>> requireHousing(@PathVariable Long id,

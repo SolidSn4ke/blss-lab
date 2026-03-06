@@ -1,6 +1,5 @@
 package com.example.blsslab.rest.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,8 +13,12 @@ import com.example.blsslab.service.UserService;
 @RestController
 @RequestMapping("/user")
 public class UserController {
-    @Autowired
+
     UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping("/add-user")
     public ResponseEntity<ResponseDTO<UserDTO>> addUser(@RequestBody UserDTO user) {

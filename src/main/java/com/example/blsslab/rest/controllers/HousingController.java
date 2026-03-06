@@ -3,7 +3,6 @@ package com.example.blsslab.rest.controllers;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,8 +19,11 @@ import com.example.blsslab.service.HousingService;
 @RequestMapping("/housing")
 public class HousingController {
 
-    @Autowired
     HousingService housingService;
+
+    public HousingController(HousingService housingService) {
+        this.housingService = housingService;
+    }
 
     @GetMapping("/all")
     public ResponseEntity<List<HousingDTO>> getHousings() {

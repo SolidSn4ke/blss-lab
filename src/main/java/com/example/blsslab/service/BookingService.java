@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.blsslab.model.dto.BookingDTO;
@@ -24,14 +23,17 @@ import jakarta.persistence.EntityNotFoundException;
 @Service
 public class BookingService {
 
-    @Autowired
     HousingRepository housingRepo;
 
-    @Autowired
     UserRepository userRepo;
 
-    @Autowired
     BookingRepository bookingRepo;
+
+    public BookingService(HousingRepository housingRepo, UserRepository userRepo, BookingRepository bookingRepo) {
+        this.housingRepo = housingRepo;
+        this.userRepo = userRepo;
+        this.bookingRepo = bookingRepo;
+    }
 
     public ResponseDTO<HousingDTO> requireHousing(String username, Long housingId, BookingDTO booking) {
 

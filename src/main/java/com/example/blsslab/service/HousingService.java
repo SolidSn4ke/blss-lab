@@ -2,7 +2,6 @@ package com.example.blsslab.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.blsslab.model.dto.HousingDTO;
@@ -19,14 +18,17 @@ import com.example.blsslab.model.repos.UserRepository;
 @Service
 public class HousingService {
 
-    @Autowired
     HousingRepository housingRepo;
 
-    @Autowired
     UserRepository userRepo;
 
-    @Autowired
     AddressRepository addressRepo;
+
+    public HousingService(HousingRepository housingRepo, UserRepository userRepo, AddressRepository addressRepo) {
+        this.housingRepo = housingRepo;
+        this.userRepo = userRepo;
+        this.addressRepo = addressRepo;
+    }
 
     public ResponseDTO<List<HousingDTO>> getAllHousings() {
         List<HousingEntity> housings = housingRepo.findAllByStatus(RequestStatus.CONFIRMED);

@@ -1,6 +1,5 @@
 package com.example.blsslab.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.blsslab.model.dto.ResponseDTO;
@@ -10,8 +9,12 @@ import com.example.blsslab.model.repos.UserRepository;
 
 @Service
 public class UserService {
-    @Autowired
+
     UserRepository userRepo;
+
+    public UserService(UserRepository userRepository){
+        this.userRepo = userRepository;
+    }
 
     public ResponseDTO<UserDTO> addUser(UserDTO user) {
 
