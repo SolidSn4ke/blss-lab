@@ -3,6 +3,7 @@ package com.example.blsslab.rest.controllers;
 import java.util.List;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +18,7 @@ import com.example.blsslab.model.dto.HousingDTO;
 import com.example.blsslab.model.dto.ModerationRequest;
 import com.example.blsslab.model.dto.ResponseDTO;
 import com.example.blsslab.service.BookingService;
+import org.springframework.web.bind.annotation.PutMapping;
 
 // TODO: Редактирование, удаление
 @RestController
@@ -33,6 +35,16 @@ public class BookingController {
     public ResponseEntity<ResponseDTO<HousingDTO>> addBooking(@RequestBody BookingDTO booking) {
         ResponseDTO<HousingDTO> response = bookingService.requireHousing(booking);
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(response.getCode()));
+    }
+
+    @PutMapping("/{id}")
+    public void updateBooking(@PathVariable Long id, @RequestBody BookingDTO entity) {
+        bookingService.updateBooking(id, entity);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteBooking(@PathVariable Long id) {
+        bookingService.deleteBooking(id);
     }
 
     // Пейджинг, фильтрация, сортировка

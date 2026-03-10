@@ -90,6 +90,25 @@ public class BookingService {
         return new ResponseDTO<>(new HousingDTO(housing), "Housing requested", 200);
     }
 
+    public void updateBooking(Long id, BookingDTO booking) {
+        BookingEntity bookingEntity = bookingRepo.findById(id).orElse(null);
+        bookingEntity.setCheckIn(booking.getCheckIn());
+        bookingEntity.setCheckOut(booking.getCheckOut());
+        bookingEntity.setCreatedAt(LocalDateTime.now());
+        bookingEntity.setStatus(RequestStatus.PENDING);
+        bookingEntity.setTotalPrice(booking.getTotalPrice());
+        bookingEntity.setAdultsCount(booking.getAdultsCount());
+        bookingEntity.setChildCount(booking.getChildCount());
+        bookingEntity.setInfantsCount(booking.getInfantsCount());
+        bookingEntity.setPetCount(booking.getPetCount());
+
+        bookingRepo.save(bookingEntity);
+    }
+
+    public void deleteBooking(Long id) {
+        bookingRepo.deleteById(id);
+    }
+
     public ResponseDTO<List<BookingDTO>> getAllBookingRequestsByHost(String username) {
         UserEntity host = userRepo.getReferenceById(username);
         List<BookingEntity> bookings;

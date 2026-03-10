@@ -12,7 +12,7 @@ public class UserService {
 
     UserRepository userRepo;
 
-    public UserService(UserRepository userRepository){
+    public UserService(UserRepository userRepository) {
         this.userRepo = userRepository;
     }
 
@@ -37,5 +37,17 @@ public class UserService {
         userRepo.save(userEntity);
 
         return new ResponseDTO<UserDTO>(new UserDTO(userEntity), "User has been added", 200);
+    }
+
+    public void updateUser(String id, UserDTO user) {
+        UserEntity userEntity = userRepo.findById(id).orElse(null);
+        userEntity.setName(user.getName());
+        userEntity.setFamilyName(user.getFamilyName());
+        userEntity.setRole(user.getRole());
+        userRepo.save(userEntity);
+    }
+
+    public void deleteUser(String id) {
+        userRepo.deleteById(id);
     }
 }
