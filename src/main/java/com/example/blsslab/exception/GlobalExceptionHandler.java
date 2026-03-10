@@ -1,5 +1,7 @@
 package com.example.blsslab.exception;
 
+import org.hibernate.type.descriptor.java.CoercionException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -39,4 +41,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleAlreadyProcessedException(AlreadyProcessedException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(CoercionException.class)
+    public ResponseEntity<String> handle(CoercionException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidDataAccessApiUsageException.class)
+    public ResponseEntity<String> handle(InvalidDataAccessApiUsageException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
 }

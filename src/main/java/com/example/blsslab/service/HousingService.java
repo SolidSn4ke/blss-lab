@@ -2,12 +2,14 @@ package com.example.blsslab.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.blsslab.exception.AlreadyProcessedException;
 import com.example.blsslab.exception.BadRequestBodyException;
 import com.example.blsslab.exception.RolePrivilegesViolationException;
 import com.example.blsslab.model.dto.HousingDTO;
+import com.example.blsslab.model.dto.HousingSpecification;
 import com.example.blsslab.model.dto.RequestStatus;
 import com.example.blsslab.model.dto.ResponseDTO;
 import com.example.blsslab.model.dto.UserRole;
@@ -35,8 +37,9 @@ public class HousingService {
         this.addressRepo = addressRepo;
     }
 
-    public ResponseDTO<List<HousingDTO>> getAllHousings() {
-        List<HousingEntity> housings = housingRepo.findAllByStatus(RequestStatus.CONFIRMED);
+    public ResponseDTO<List<HousingDTO>> getAllHousings(Pageable pageable, String searchQuery) {
+        List<HousingEntity> housings = housingRepo.findAll(HousingSpecification.buildFromFilters(searchQuery), pageable)
+                .stream().toList();
         return new ResponseDTO<List<HousingDTO>>(housings.stream().map(h -> new HousingDTO(h)).toList(), "", 200);
     }
 

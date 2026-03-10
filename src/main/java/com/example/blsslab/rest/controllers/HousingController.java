@@ -2,6 +2,7 @@ package com.example.blsslab.rest.controllers;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,7 +17,6 @@ import com.example.blsslab.model.dto.ModerationRequest;
 import com.example.blsslab.model.dto.ResponseDTO;
 import com.example.blsslab.service.HousingService;
 
-// TODO: Редактирование, удаление
 @RestController
 @RequestMapping("/housings")
 public class HousingController {
@@ -27,10 +27,10 @@ public class HousingController {
         this.housingService = housingService;
     }
 
-    // TODO: Фильтрация, Пейджинг, Сортировка
     @GetMapping()
-    public List<HousingDTO> getHousings(@RequestParam(required = false) String username) {
-        ResponseDTO<List<HousingDTO>> response = housingService.getAllHousings();
+    public List<HousingDTO> getHousings(@RequestParam(required = false) String username,
+            @RequestParam(required = false) String search, Pageable pageable) {
+        ResponseDTO<List<HousingDTO>> response = housingService.getAllHousings(pageable, search);
         return response.getEntity();
     }
 
