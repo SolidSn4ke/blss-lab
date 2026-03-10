@@ -7,6 +7,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.example.blsslab.exception.AlreadyProcessedException;
+import com.example.blsslab.exception.BadRequestBodyException;
+import com.example.blsslab.exception.RolePrivilegesViolationException;
 import com.example.blsslab.model.dto.BookingDTO;
 import com.example.blsslab.model.dto.HousingDTO;
 import com.example.blsslab.model.dto.RequestStatus;
@@ -37,23 +40,19 @@ public class BookingService {
 
     public ResponseDTO<HousingDTO> requireHousing(BookingDTO booking) {
 
-        UserEntity user = userRepo.findById(booking.getGuest().getUsername()).orElse(null);
-        HousingEntity housing = housingRepo.findById(booking.getHousing().getId()).orElse(null);
-
-        if (user == null)
-            return new ResponseDTO<>(null, "Failed to retrive user by username", 404);
-
-        if (housing == null)
-            return new ResponseDTO<>(null, "Failed to retrive housing by id", 404);
+        UserEntity user = userRepo.findById(booking.getGuest().getUsername())
+                .orElseThrow(() -> new EntityNotFoundException("Failed to retrive user by username"));
+        HousingEntity housing = housingRepo.findById(booking.getHousing().getId())
+                .orElseThrow(() -> new EntityNotFoundException("Failed to retrive housing by id"));
 
         LocalDate startDate = booking.getCheckIn();
         LocalDate endDate = booking.getCheckOut();
         if (LocalDate.now().isAfter(startDate)) {
-            return new ResponseDTO<>(null, "Date of check in must not be in the past", 400);
+            throw new BadRequestBodyException("Date of check in must not be in the past");
         }
 
         if (!startDate.isBefore(endDate)) {
-            return new ResponseDTO<>(null, "Date of check in must be before date of check out", 400);
+            throw new BadRequestBodyException("Date of check in must be before date of check out");
         }
 
         List<BookingEntity> existingBookings = bookingRepo.findAllByHousingIdAndStatus(
@@ -63,9 +62,8 @@ public class BookingService {
             LocalDate existingStart = existingBooking.getCheckIn();
             LocalDate existingEnd = existingBooking.getCheckOut();
             if (startDate.isBefore(existingEnd) && endDate.isAfter(existingStart)) {
-                return new ResponseDTO<>(null,
-                        "Unacceptable period of booking: there are conflicts with other bookings",
-                        409);
+                throw new BadRequestBodyException(
+                        "Unacceptable period of booking: there are conflicts with other bookings");
             }
         }
 
@@ -94,11 +92,7 @@ public class BookingService {
         UserEntity host = userRepo.getReferenceById(username);
         List<BookingEntity> bookings;
 
-        try {
-            bookings = bookingRepo.findAllByHostName(host.getUsername());
-        } catch (EntityNotFoundException e) {
-            return new ResponseDTO<>(null, "Failed to retrive host by username", 404);
-        }
+        bookings = bookingRepo.findAllByHostName(host.getUsername());
 
         return new ResponseDTO<List<BookingDTO>>(bookings.stream().map(b -> new BookingDTO(b)).toList(), "", 200);
     }
@@ -107,40 +101,33 @@ public class BookingService {
         UserEntity user = userRepo.getReferenceById(username);
         List<BookingEntity> bookings;
 
-        try {
-            bookings = bookingRepo.findAllByUserName(user.getUsername());
-        } catch (EntityNotFoundException e) {
-            return new ResponseDTO<>(null, "Failed to retrive user by username", 404);
-        }
+        bookings = bookingRepo.findAllByUserName(user.getUsername());
 
         return new ResponseDTO<List<BookingDTO>>(bookings.stream().map(b -> new BookingDTO(b)).toList(), "", 200);
     }
 
     public ResponseDTO<BookingDTO> handleRequest(String username, Long id, Boolean approved) {
         if (approved == null) {
-            return new ResponseDTO<>(null, "Field 'approved' is required", 400);
+            throw new BadRequestBodyException("Field 'approved' is required");
         }
 
-        BookingEntity booking = bookingRepo.findById(id).orElse(null);
-        if (booking == null) {
-            return new ResponseDTO<>(null, "Failed to retrieve booking by id", 404);
-        }
+        BookingEntity booking = bookingRepo.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve booking by id"));
 
         UserEntity owner = booking.getHousing().getOwner();
 
         if (owner == null || !owner.getUsername().equals(username)) {
-            return new ResponseDTO<>(null, "Only owner can approve or deny request", 403);
+            throw new RolePrivilegesViolationException("Only owner can approve or deny request");
         }
 
         if (booking.getStatus() != RequestStatus.PENDING) {
-            return new ResponseDTO<>(null, "Booking request already processed", 409);
+            throw new AlreadyProcessedException("Booking request already processed");
         }
 
-        if (approved) {
+        if (approved)
             booking.setStatus(RequestStatus.CONFIRMED);
-        } else {
+        else
             booking.setStatus(RequestStatus.CANCELLED);
-        }
 
         bookingRepo.save(booking);
 

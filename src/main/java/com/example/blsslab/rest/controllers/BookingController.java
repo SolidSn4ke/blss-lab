@@ -1,8 +1,6 @@
 package com.example.blsslab.rest.controllers;
 
 import java.util.List;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,14 +28,14 @@ public class BookingController {
     }
 
     @PostMapping()
-    public ResponseEntity<ResponseDTO<HousingDTO>> addBooking(@RequestBody BookingDTO booking) {
+    public ResponseDTO<HousingDTO> addBooking(@RequestBody BookingDTO booking) {
         ResponseDTO<HousingDTO> response = bookingService.requireHousing(booking);
-        return new ResponseEntity<>(response, HttpStatusCode.valueOf(response.getCode()));
+        return response;
     }
 
     // Пейджинг, фильтрация, сортировка
     @GetMapping()
-    public ResponseEntity<ResponseDTO<List<BookingDTO>>> getBookings(@RequestParam String username,
+    public ResponseDTO<List<BookingDTO>> getBookings(@RequestParam String username,
             @RequestParam(defaultValue = "ALL") BookingType type) {
         ResponseDTO<List<BookingDTO>> response;
         switch (type) {
@@ -45,15 +43,15 @@ public class BookingController {
             case RECIEVED -> response = bookingService.getAllBookingRequestsByHost(username);
             default -> response = null; // TODO: Добавить getAllBookings принадлежащие одному пользователю
         }
-        return new ResponseEntity<>(response, HttpStatusCode.valueOf(response.getCode()));
+        return response;
     }
 
     @PostMapping("/{id}/moderation")
-    public ResponseEntity<ResponseDTO<BookingDTO>> handleRequest(
+    public ResponseDTO<BookingDTO> handleRequest(
             @PathVariable Long id,
             @RequestBody ModerationRequest body) {
         ResponseDTO<BookingDTO> response = bookingService.handleRequest(body.getUser().getUsername(), id,
                 body.getApproved());
-        return new ResponseEntity<>(response, HttpStatusCode.valueOf(response.getCode()));
+        return response;
     }
 }

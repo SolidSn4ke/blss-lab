@@ -1,8 +1,6 @@
 package com.example.blsslab.rest.controllers;
 
 import java.util.List;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,24 +26,24 @@ public class HousingController {
 
     // TODO: Фильтрация, Пейджинг, Сортировка
     @GetMapping()
-    public ResponseEntity<List<HousingDTO>> getHousings(@RequestParam(required = false) String username) {
+    public List<HousingDTO> getHousings(@RequestParam(required = false) String username) {
         ResponseDTO<List<HousingDTO>> response = housingService.getAllHousings();
-        return new ResponseEntity<List<HousingDTO>>(response.getEntity(), HttpStatusCode.valueOf(response.getCode()));
+        return response.getEntity();
     }
 
     @PostMapping("{id}/moderation")
-    public ResponseEntity<ResponseDTO<HousingDTO>> moderateHousing(
+    public ResponseDTO<HousingDTO> moderateHousing(
             @PathVariable Long id,
             @RequestBody ModerationRequest body) {
         ResponseDTO<HousingDTO> response = housingService.handleRequest(body.getUser().getUsername(), id,
                 body.getApproved());
-        return new ResponseEntity<>(response, HttpStatusCode.valueOf(response.getCode()));
+        return response;
     }
 
     @PostMapping()
-    public ResponseEntity<ResponseDTO<HousingDTO>> addHousing(
+    public ResponseDTO<HousingDTO> addHousing(
             @RequestBody HousingDTO housing) {
         ResponseDTO<HousingDTO> response = housingService.addHousing(housing);
-        return new ResponseEntity<ResponseDTO<HousingDTO>>(response, HttpStatusCode.valueOf(response.getCode()));
+        return response;
     }
 }
