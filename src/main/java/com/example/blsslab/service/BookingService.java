@@ -88,6 +88,28 @@ public class BookingService {
         return new ResponseDTO<>(new HousingDTO(housing), "Housing requested", 200);
     }
 
+    // TODO: Убрать void
+    public void updateBooking(Long id, BookingDTO booking) {
+        BookingEntity bookingEntity = bookingRepo.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve booking by id"));
+        bookingEntity.setCheckIn(booking.getCheckIn());
+        bookingEntity.setCheckOut(booking.getCheckOut());
+        bookingEntity.setCreatedAt(LocalDateTime.now());
+        bookingEntity.setStatus(RequestStatus.PENDING);
+        bookingEntity.setTotalPrice(booking.getTotalPrice());
+        bookingEntity.setAdultsCount(booking.getAdultsCount());
+        bookingEntity.setChildCount(booking.getChildCount());
+        bookingEntity.setInfantsCount(booking.getInfantsCount());
+        bookingEntity.setPetCount(booking.getPetCount());
+
+        bookingRepo.save(bookingEntity);
+    }
+
+    // TODO: Убрать void
+    public void deleteBooking(Long id) {
+        bookingRepo.deleteById(id);
+    }
+
     public ResponseDTO<List<BookingDTO>> getAllBookingRequestsByHost(String username) {
         UserEntity host = userRepo.getReferenceById(username);
         List<BookingEntity> bookings;

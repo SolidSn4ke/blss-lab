@@ -1,9 +1,12 @@
 package com.example.blsslab.rest.controllers;
 
 import java.util.List;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -45,5 +48,17 @@ public class HousingController {
             @RequestBody HousingDTO housing) {
         ResponseDTO<HousingDTO> response = housingService.addHousing(housing);
         return response;
+    }
+
+    // TODO: Убрать void
+    @PutMapping("/{id}")
+    public void updateHousing(@PathVariable Long id, @RequestBody HousingDTO entity) {
+        housingService.updateHousing(id, entity);
+    }
+
+    // TODO: Убрать void
+    @DeleteMapping("/{id}")
+    public void deleteHousing(@PathVariable Long id) {
+        housingService.deleteHousing(id);
     }
 }

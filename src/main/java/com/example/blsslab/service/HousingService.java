@@ -121,4 +121,40 @@ public class HousingService {
                 "Housing has been sent, await confirmation by moderator",
                 200);
     }
+
+    // TODO: Убрать void
+    public void updateHousing(Long id, HousingDTO housing) {
+        UserEntity owner = userRepo.findById(housing.getOwner().getUsername())
+                .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username"));
+
+        HousingEntity housingEntity = housingRepo.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve housing by id"));
+        housingEntity.setPrice(housing.getPrice());
+        housingEntity.setNumOfBeds(housing.getNumOfBeds());
+        housingEntity.setRating(housing.getRating());
+        housingEntity.setHousingType(housing.getHousingType());
+        housingEntity.setStatus(RequestStatus.PENDING);
+        housingEntity.setOwner(owner);
+
+        AddressEntity address;
+
+        if (housing.getAddress().getId() == null) {
+            address = new AddressEntity();
+            address.setStreet(housing.getAddress().getStreet());
+            address.setCountry(housing.getAddress().getCountry());
+            addressRepo.save(address);
+        } else {
+            address = addressRepo.findById(housing.getAddress().getId())
+                    .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve address by id"));
+        }
+
+        housingEntity.setAddress(address);
+
+        housingRepo.save(housingEntity);
+    }
+
+    // TODO: Убрать void
+    public void deleteHousing(Long id) {
+        housingRepo.deleteById(id);
+    }
 }

@@ -7,12 +7,14 @@ import com.example.blsslab.model.dto.UserDTO;
 import com.example.blsslab.model.entity.UserEntity;
 import com.example.blsslab.model.repos.UserRepository;
 
+import jakarta.persistence.EntityNotFoundException;
+
 @Service
 public class UserService {
 
     UserRepository userRepo;
 
-    public UserService(UserRepository userRepository){
+    public UserService(UserRepository userRepository) {
         this.userRepo = userRepository;
     }
 
@@ -37,5 +39,20 @@ public class UserService {
         userRepo.save(userEntity);
 
         return new ResponseDTO<UserDTO>(new UserDTO(userEntity), "User has been added", 200);
+    }
+
+    // TODO: Убрать void
+    public void updateUser(String username, UserDTO user) {
+        UserEntity userEntity = userRepo.findById(username)
+                .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username"));
+        userEntity.setName(user.getName());
+        userEntity.setFamilyName(user.getFamilyName());
+        userEntity.setRole(user.getRole());
+        userRepo.save(userEntity);
+    }
+
+    // TODO: Убрать void
+    public void deleteUser(String username) {
+        userRepo.deleteById(username);
     }
 }
