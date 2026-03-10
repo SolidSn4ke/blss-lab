@@ -84,8 +84,8 @@ public class HousingService {
         return new ResponseDTO<>(new HousingDTO(housing), approved ? "Housing approved" : "Housing rejected", 200);
     }
 
-    public ResponseDTO<HousingDTO> addHousing(String username, HousingDTO housing) {
-        UserEntity owner = userRepo.findById(username).orElse(null);
+    public ResponseDTO<HousingDTO> addHousing(HousingDTO housing) {
+        UserEntity owner = userRepo.findById(housing.getOwner().getUsername()).orElse(null);
 
         if (owner == null)
             return new ResponseDTO<>(null, "Failed to retrieve user by username", 404);

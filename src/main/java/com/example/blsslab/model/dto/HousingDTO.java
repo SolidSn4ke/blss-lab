@@ -16,6 +16,7 @@ public class HousingDTO {
     Integer numOfBeds;
     HousingType housingType;
     AddressDTO address;
+    UserDTO owner;
 
     public HousingDTO(HousingEntity housingEntity) {
         this.id = housingEntity.getId();
@@ -24,5 +25,6 @@ public class HousingDTO {
         this.numOfBeds = housingEntity.getNumOfBeds();
         this.housingType = housingEntity.getHousingType();
         this.address = new AddressDTO(housingEntity.getAddress());
+        this.owner = new UserDTO(housingEntity.getOwner());
     }
 }

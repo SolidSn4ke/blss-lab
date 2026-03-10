@@ -11,7 +11,7 @@ import com.example.blsslab.model.dto.UserDTO;
 import com.example.blsslab.service.UserService;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserController {
 
     UserService userService;
@@ -20,7 +20,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/add-user")
+    @PostMapping()
     public ResponseEntity<ResponseDTO<UserDTO>> addUser(@RequestBody UserDTO user) {
         ResponseDTO<UserDTO> response = userService.addUser(user);
         return new ResponseEntity<ResponseDTO<UserDTO>>(response, HttpStatusCode.valueOf(response.getCode()));

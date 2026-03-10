@@ -35,10 +35,10 @@ public class BookingService {
         this.bookingRepo = bookingRepo;
     }
 
-    public ResponseDTO<HousingDTO> requireHousing(String username, Long housingId, BookingDTO booking) {
+    public ResponseDTO<HousingDTO> requireHousing(BookingDTO booking) {
 
-        UserEntity user = userRepo.findById(username).orElse(null);
-        HousingEntity housing = housingRepo.findById(housingId).orElse(null);
+        UserEntity user = userRepo.findById(booking.getGuest().getUsername()).orElse(null);
+        HousingEntity housing = housingRepo.findById(booking.getHousing().getId()).orElse(null);
 
         if (user == null)
             return new ResponseDTO<>(null, "Failed to retrive user by username", 404);
@@ -57,7 +57,7 @@ public class BookingService {
         }
 
         List<BookingEntity> existingBookings = bookingRepo.findAllByHousingIdAndStatus(
-                housingId, RequestStatus.CONFIRMED);
+                booking.getHousing().getId(), RequestStatus.CONFIRMED);
 
         for (BookingEntity existingBooking : existingBookings) {
             LocalDate existingStart = existingBooking.getCheckIn();
