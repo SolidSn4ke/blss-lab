@@ -5,12 +5,15 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.blsslab.exception.AlreadyProcessedException;
 import com.example.blsslab.exception.BadRequestBodyException;
 import com.example.blsslab.exception.RolePrivilegesViolationException;
 import com.example.blsslab.model.dto.BookingDTO;
+import com.example.blsslab.model.dto.BookingType;
 import com.example.blsslab.model.dto.HousingDTO;
 import com.example.blsslab.model.dto.RequestStatus;
 import com.example.blsslab.model.dto.ResponseDTO;
@@ -110,22 +113,25 @@ public class BookingService {
         bookingRepo.deleteById(id);
     }
 
-    public ResponseDTO<List<BookingDTO>> getAllBookingRequestsByHost(String username) {
-        UserEntity host = userRepo.getReferenceById(username);
-        List<BookingEntity> bookings;
+    public ResponseDTO<Page<BookingDTO>> getBookings(
+            String username,
+            BookingType type,
+            Pageable pageable) {
+        Page<BookingEntity> bookings;
 
-        bookings = bookingRepo.findAllByHostName(host.getUsername());
+        switch (type) {
 
-        return new ResponseDTO<List<BookingDTO>>(bookings.stream().map(b -> new BookingDTO(b)).toList(), "", 200);
-    }
+            case SENT -> bookings = bookingRepo.findAllByGuestUsername(username, pageable);
 
-    public ResponseDTO<List<BookingDTO>> getAllBookingRequestsByUser(String username) {
-        UserEntity user = userRepo.getReferenceById(username);
-        List<BookingEntity> bookings;
+            case RECIEVED -> bookings = bookingRepo.findAllByHousingOwnerUsername(username, pageable);
 
-        bookings = bookingRepo.findAllByUserName(user.getUsername());
+            default ->
+                bookings = bookingRepo.findAllByGuestUsernameOrHousingOwnerUsername(username, username, pageable);
+        }
 
-        return new ResponseDTO<List<BookingDTO>>(bookings.stream().map(b -> new BookingDTO(b)).toList(), "", 200);
+        Page<BookingDTO> dtoPage = bookings.map(BookingDTO::new);
+
+        return new ResponseDTO<>(dtoPage, "", 200);
     }
 
     public ResponseDTO<BookingDTO> handleRequest(String username, Long id, Boolean approved) {

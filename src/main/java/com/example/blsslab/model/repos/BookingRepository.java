@@ -2,8 +2,9 @@ package com.example.blsslab.model.repos;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.example.blsslab.model.dto.RequestStatus;
@@ -12,12 +13,20 @@ import com.example.blsslab.model.entity.BookingEntity;
 @Repository
 public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
 
-    @Query("select b from BookingEntity b where b.housing.owner.username = :hostUsername")
-    List<BookingEntity> findAllByHostName(String hostUsername);
+    Page<BookingEntity> findAllByGuestUsername(
+            String username,
+            Pageable pageable);
 
-    @Query("select b from BookingEntity b where b.guest.username = :userUsername")
-    List<BookingEntity> findAllByUserName(String userUsername);
+    Page<BookingEntity> findAllByHousingOwnerUsername(
+            String username,
+            Pageable pageable);
 
-    @Query("select b from BookingEntity b where b.housing.id = :housingId and b.status = :status")
-    List<BookingEntity> findAllByHousingIdAndStatus(Long housingId, RequestStatus status);
+    Page<BookingEntity> findAllByGuestUsernameOrHousingOwnerUsername(
+            String guestUsername,
+            String ownerUsername,
+            Pageable pageable);
+
+    List<BookingEntity> findAllByHousingIdAndStatus(
+            Long housingId,
+            RequestStatus status);
 }

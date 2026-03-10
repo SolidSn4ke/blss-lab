@@ -1,6 +1,9 @@
 package com.example.blsslab.rest.controllers;
 
 import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,7 +21,6 @@ import com.example.blsslab.model.dto.ResponseDTO;
 import com.example.blsslab.service.BookingService;
 import org.springframework.web.bind.annotation.PutMapping;
 
-// TODO: Редактирование, удаление
 @RestController
 @RequestMapping("/bookings")
 public class BookingController {
@@ -47,17 +49,12 @@ public class BookingController {
         bookingService.deleteBooking(id);
     }
 
-    // Пейджинг, фильтрация, сортировка
     @GetMapping()
-    public ResponseDTO<List<BookingDTO>> getBookings(@RequestParam String username,
-            @RequestParam(defaultValue = "ALL") BookingType type) {
-        ResponseDTO<List<BookingDTO>> response;
-        switch (type) {
-            case SENT -> response = bookingService.getAllBookingRequestsByUser(username);
-            case RECIEVED -> response = bookingService.getAllBookingRequestsByHost(username);
-            default -> response = null; // TODO: Добавить getAllBookings принадлежащие одному пользователю
-        }
-        return response;
+    public ResponseDTO<Page<BookingDTO>> getBookings(
+            @RequestParam String username,
+            @RequestParam(defaultValue = "ALL") BookingType type,
+            Pageable pageable) {
+        return bookingService.getBookings(username, type, pageable);
     }
 
     @PostMapping("/{id}/moderation")
