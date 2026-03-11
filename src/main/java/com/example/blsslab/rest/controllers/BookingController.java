@@ -36,16 +36,16 @@ public class BookingController {
         return response;
     }
 
-    // TODO: Убрать void
     @PutMapping("/{id}")
-    public void updateBooking(@PathVariable Long id, @RequestBody BookingDTO entity) {
-        bookingService.updateBooking(id, entity);
+    public BookingDTO updateBooking(@PathVariable Long id, @RequestBody BookingDTO entity) {
+        BookingDTO response = bookingService.updateBooking(id, entity);
+        return response;
     }
 
-    // TODO: Убрать void
     @DeleteMapping("/{id}")
-    public void deleteBooking(@PathVariable Long id) {
-        bookingService.deleteBooking(id);
+    public Boolean deleteBooking(@PathVariable Long id) {
+        Boolean response = bookingService.deleteBooking(id);
+        return response;
     }
 
     @GetMapping()

@@ -92,26 +92,27 @@ public class BookingService {
         return new ResponseDTO<>(new HousingDTO(housing), "Housing requested", 200);
     }
 
-    // TODO: Убрать void
-    public void updateBooking(Long id, BookingDTO booking) {
-        BookingEntity bookingEntity = bookingRepo.findById(id)
+    public BookingDTO updateBooking(Long id, BookingDTO bookingDTO) {
+        BookingEntity existBooking = bookingRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve booking by id"));
-        bookingEntity.setCheckIn(booking.getCheckIn());
-        bookingEntity.setCheckOut(booking.getCheckOut());
-        bookingEntity.setCreatedAt(LocalDateTime.now());
-        bookingEntity.setStatus(RequestStatus.PENDING);
-        bookingEntity.setTotalPrice(booking.getTotalPrice());
-        bookingEntity.setAdultsCount(booking.getAdultsCount());
-        bookingEntity.setChildCount(booking.getChildCount());
-        bookingEntity.setInfantsCount(booking.getInfantsCount());
-        bookingEntity.setPetCount(booking.getPetCount());
+        existBooking.setCheckIn(bookingDTO.getCheckIn());
+        existBooking.setCheckOut(bookingDTO.getCheckOut());
+        existBooking.setCreatedAt(LocalDateTime.now());
+        existBooking.setStatus(RequestStatus.PENDING);
+        existBooking.setTotalPrice(bookingDTO.getTotalPrice());
+        existBooking.setAdultsCount(bookingDTO.getAdultsCount());
+        existBooking.setChildCount(bookingDTO.getChildCount());
+        existBooking.setInfantsCount(bookingDTO.getInfantsCount());
+        existBooking.setPetCount(bookingDTO.getPetCount());
 
-        bookingRepo.save(bookingEntity);
+        bookingRepo.save(existBooking);
+        return new BookingDTO(existBooking);
     }
 
-    // TODO: Убрать void
-    public void deleteBooking(Long id) {
+    public Boolean deleteBooking(Long id) {
+        bookingRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("Failed to retrieve booking by id"));
         bookingRepo.deleteById(id);
+        return true;
     }
 
     @Transactional
