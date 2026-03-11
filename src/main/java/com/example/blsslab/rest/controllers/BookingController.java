@@ -17,7 +17,7 @@ import com.example.blsslab.model.dto.BookingType;
 import com.example.blsslab.model.dto.HousingDTO;
 import com.example.blsslab.model.dto.ModerationRequest;
 import com.example.blsslab.service.BookingService;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 
 @RestController
 @RequestMapping("/bookings")
@@ -35,7 +35,7 @@ public class BookingController {
         return response;
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public BookingDTO updateBooking(@PathVariable Long id, @RequestBody BookingDTO entity) {
         BookingDTO response = bookingService.updateBooking(id, entity);
         return response;
