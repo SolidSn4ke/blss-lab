@@ -42,6 +42,7 @@ public class BookingService {
         this.bookingRepo = bookingRepo;
     }
 
+    @Transactional
     public ResponseDTO<HousingDTO> requireHousing(BookingDTO booking) {
 
         UserEntity user = userRepo.findById(booking.getGuest().getUsername())
@@ -92,6 +93,7 @@ public class BookingService {
         return new ResponseDTO<>(new HousingDTO(housing), "Housing requested", 200);
     }
 
+    @Transactional
     public BookingDTO updateBooking(Long id, BookingDTO bookingDTO) {
         BookingEntity existBooking = bookingRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve booking by id"));
@@ -109,13 +111,14 @@ public class BookingService {
         return new BookingDTO(existBooking);
     }
 
+    @Transactional
     public Boolean deleteBooking(Long id) {
         bookingRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("Failed to retrieve booking by id"));
         bookingRepo.deleteById(id);
         return true;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ResponseDTO<List<BookingDTO>> getBookings(
             String username,
             BookingType type,
@@ -138,6 +141,7 @@ public class BookingService {
         return new ResponseDTO<>(bookings.stream().map(b -> new BookingDTO(b)).toList(), "", 200);
     }
 
+    @Transactional
     public ResponseDTO<BookingDTO> handleRequest(String username, Long id, Boolean approved) {
         if (approved == null) {
             throw new BadRequestBodyException("Field 'approved' is required");

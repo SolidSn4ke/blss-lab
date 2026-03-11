@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.blsslab.exception.AlreadyProcessedException;
 import com.example.blsslab.exception.BadRequestBodyException;
@@ -36,12 +37,14 @@ public class HousingService {
         this.addressRepo = addressRepo;
     }
 
+    @Transactional(readOnly = true)
     public ResponseDTO<List<HousingDTO>> getAllHousings(Pageable pageable, String searchQuery) {
         List<HousingEntity> housings = housingRepo.findAll(CustomSpecification.buildFromFilters(searchQuery), pageable)
                 .stream().toList();
         return new ResponseDTO<List<HousingDTO>>(housings.stream().map(h -> new HousingDTO(h)).toList(), "", 200);
     }
 
+    @Transactional
     public ResponseDTO<HousingDTO> handleRequest(String username, Long id, Boolean approved) {
         UserEntity user = userRepo.findById(username)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username"));
@@ -72,6 +75,7 @@ public class HousingService {
         return new ResponseDTO<>(new HousingDTO(housing), approved ? "Housing approved" : "Housing rejected", 200);
     }
 
+    @Transactional
     public ResponseDTO<HousingDTO> addHousing(HousingDTO housing) {
         UserEntity owner = userRepo.findById(housing.getOwner().getUsername())
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username"));
@@ -105,6 +109,7 @@ public class HousingService {
                 200);
     }
 
+    @Transactional
     public HousingDTO updateHousing(Long id, HousingDTO housingDTO) {
         UserEntity owner = userRepo.findById(housingDTO.getOwner().getUsername())
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username"));
@@ -137,6 +142,7 @@ public class HousingService {
         return new HousingDTO(existHousing);
     }
 
+    @Transactional
     public Boolean deleteHousing(Long id) {
         housingRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve housing by id"));

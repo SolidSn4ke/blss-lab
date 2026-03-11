@@ -1,6 +1,7 @@
 package com.example.blsslab.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.blsslab.model.dto.ResponseDTO;
 import com.example.blsslab.model.dto.UserDTO;
@@ -18,6 +19,7 @@ public class UserService {
         this.userRepo = userRepository;
     }
 
+    @Transactional
     public ResponseDTO<UserDTO> addUser(UserDTO user) {
 
         UserEntity userEntity = new UserEntity();
@@ -41,6 +43,7 @@ public class UserService {
         return new ResponseDTO<UserDTO>(new UserDTO(userEntity), "User has been added", 200);
     }
 
+    @Transactional
     public UserDTO updateUser(String username, UserDTO userDTO) {
         UserEntity existUser = userRepo.findById(username)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username"));
@@ -51,6 +54,7 @@ public class UserService {
         return new UserDTO(existUser);
     }
 
+    @Transactional
     public Boolean deleteUser(String username) {
         userRepo.findById(username)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username"));
