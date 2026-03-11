@@ -29,8 +29,8 @@ public class BookingController {
     }
 
     @PostMapping()
-    public HousingDTO addBooking(@RequestBody BookingDTO booking) {
-        HousingDTO response = bookingService.requireHousing(booking);
+    public BookingDTO addBooking(@RequestBody BookingDTO booking) {
+        BookingDTO response = bookingService.requireHousing(booking);
         return response;
     }
 

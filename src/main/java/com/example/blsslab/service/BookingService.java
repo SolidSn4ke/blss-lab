@@ -68,7 +68,7 @@ public class BookingService {
     }
 
     @Transactional
-    public HousingDTO requireHousing(BookingDTO booking) {
+    public BookingDTO requireHousing(BookingDTO booking) {
 
         UserEntity user = userRepo.findById(booking.getGuest().getUsername())
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrive user by username"));
@@ -97,7 +97,7 @@ public class BookingService {
         userRepo.save(user);
         housingRepo.save(housing);
 
-        return new HousingDTO(housing);
+        return new BookingDTO(newBooking);
     }
 
     @Transactional
