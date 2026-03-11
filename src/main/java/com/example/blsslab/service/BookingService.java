@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.blsslab.exception.AlreadyProcessedException;
@@ -145,7 +146,7 @@ public class BookingService {
         return new PageInfo<BookingDTO>(content, result.getTotalPages(), result.getNumber(), result.getTotalElements());
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public BookingDTO handleRequest(String username, Long id, Boolean approved) {
         if (approved == null) {
             throw new BadRequestBodyException("Field 'approved' is required");

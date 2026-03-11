@@ -55,6 +55,9 @@ public class BookingEntity {
     @Min(0)
     private Integer petCount;
 
+    @Version
+    private Long version;
+
     public void update(BookingDTO bookingDTO) {
         if (bookingDTO.getCheckIn() != null) {
             this.checkIn = bookingDTO.getCheckIn();
