@@ -1,7 +1,5 @@
 package com.example.blsslab.exception;
 
-import org.hibernate.type.descriptor.java.CoercionException;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -34,7 +32,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadRequestBodyException.class)
     public ResponseEntity<String> handleBadRequestBodyException(BadRequestBodyException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(AlreadyProcessedException.class)
@@ -42,14 +40,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(CoercionException.class)
-    public ResponseEntity<String> handle(CoercionException e) {
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handle(RuntimeException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
-
-    @ExceptionHandler(InvalidDataAccessApiUsageException.class)
-    public ResponseEntity<String> handle(InvalidDataAccessApiUsageException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
 }

@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.blsslab.exception.AlreadyProcessedException;
 import com.example.blsslab.exception.BadRequestBodyException;
@@ -113,6 +114,7 @@ public class BookingService {
         bookingRepo.deleteById(id);
     }
 
+    @Transactional
     public ResponseDTO<List<BookingDTO>> getBookings(
             String username,
             BookingType type,
@@ -129,6 +131,7 @@ public class BookingService {
 
             default -> sb.append("");
         }
+
         bookings = bookingRepo.findAll(CustomSpecification.buildFromFilters(sb.toString()), pageable).toList();
 
         return new ResponseDTO<>(bookings.stream().map(b -> new BookingDTO(b)).toList(), "", 200);
