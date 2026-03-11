@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.blsslab.exception.AlreadyProcessedException;
@@ -54,7 +55,7 @@ public class HousingService {
         return new PageInfo<HousingDTO>(content, result.getTotalPages(), result.getNumber(), result.getTotalElements());
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public HousingDTO handleRequest(String username, Long id, Boolean approved) {
         UserEntity user = userRepo.findById(username)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username"));

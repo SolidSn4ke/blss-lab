@@ -35,6 +35,9 @@ public class HousingEntity {
     @Max(5)
     private Double rating;
 
+    @Version
+    private Long version;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
     private HousingType housingType;
