@@ -1,5 +1,6 @@
 package com.example.blsslab.model.entity;
 
+import com.example.blsslab.model.dto.BookingDTO;
 import com.example.blsslab.model.dto.RequestStatus;
 
 import jakarta.persistence.*;
@@ -53,4 +54,31 @@ public class BookingEntity {
 
     @Min(0)
     private Integer petCount;
+
+    public void update(BookingDTO bookingDTO) {
+        if (bookingDTO.getCheckIn() != null) {
+            this.checkIn = bookingDTO.getCheckIn();
+        }
+        if (bookingDTO.getCheckOut() != null) {
+            this.checkOut = bookingDTO.getCheckOut();
+        }
+        if (bookingDTO.getStatus() != null) {
+            this.status = bookingDTO.getStatus();
+        }
+        if (bookingDTO.getTotalPrice() != null) {
+            this.totalPrice = bookingDTO.getTotalPrice();
+        }
+        if (bookingDTO.getAdultsCount() != null) {
+            this.adultsCount = bookingDTO.getAdultsCount();
+        }
+        if (bookingDTO.getChildCount() != null) {
+            this.childCount = bookingDTO.getChildCount();
+        }
+        if (bookingDTO.getInfantsCount() != null) {
+            this.infantsCount = bookingDTO.getInfantsCount();
+        }
+        if (bookingDTO.getPetCount() != null) {
+            this.petCount = bookingDTO.getPetCount();
+        }
+    }
 }

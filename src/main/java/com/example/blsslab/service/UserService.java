@@ -2,8 +2,6 @@ package com.example.blsslab.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.example.blsslab.exception.BadRequestBodyException;
 import com.example.blsslab.model.dto.ResponseDTO;
 import com.example.blsslab.model.dto.UserDTO;
 import com.example.blsslab.model.entity.UserEntity;
@@ -49,13 +47,7 @@ public class UserService {
         UserEntity existUser = userRepo.findById(username)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username"));
 
-        if (!userDTO.validate()) {
-            throw new BadRequestBodyException("Required fields are missing");
-        }
-
-        existUser.setName(userDTO.getName());
-        existUser.setFamilyName(userDTO.getFamilyName());
-        existUser.setRole(userDTO.getRole());
+        existUser.update(userDTO);
         userRepo.save(existUser);
         return new UserDTO(existUser);
     }

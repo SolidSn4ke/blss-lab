@@ -117,17 +117,6 @@ public class HousingService {
         HousingEntity existHousing = housingRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve housing by id"));
 
-        if (!housingDTO.validate()) {
-            throw new BadRequestBodyException("Required fields are missing");
-        }
-
-        existHousing.setPrice(housingDTO.getPrice());
-        existHousing.setNumOfBeds(housingDTO.getNumOfBeds());
-        existHousing.setRating(housingDTO.getRating());
-        existHousing.setHousingType(housingDTO.getHousingType());
-        existHousing.setStatus(RequestStatus.PENDING);
-        existHousing.setOwner(owner);
-
         AddressEntity address;
 
         if (housingDTO.getAddress().getId() == null) {
@@ -140,7 +129,10 @@ public class HousingService {
                     .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve address by id"));
         }
 
+        existHousing.update(housingDTO);
+        existHousing.setOwner(owner);
         existHousing.setAddress(address);
+        existHousing.setStatus(RequestStatus.PENDING);
 
         housingRepo.save(existHousing);
         return new HousingDTO(existHousing);

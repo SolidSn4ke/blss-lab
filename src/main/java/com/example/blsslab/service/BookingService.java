@@ -98,19 +98,9 @@ public class BookingService {
         BookingEntity existBooking = bookingRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve booking by id"));
 
-        if (!bookingDTO.validate()) {
-            throw new BadRequestBodyException("Required fields are missing");
-        }
-
-        existBooking.setCheckIn(bookingDTO.getCheckIn());
-        existBooking.setCheckOut(bookingDTO.getCheckOut());
+        existBooking.update(bookingDTO);
         existBooking.setCreatedAt(LocalDateTime.now());
         existBooking.setStatus(RequestStatus.PENDING);
-        existBooking.setTotalPrice(bookingDTO.getTotalPrice());
-        existBooking.setAdultsCount(bookingDTO.getAdultsCount());
-        existBooking.setChildCount(bookingDTO.getChildCount());
-        existBooking.setInfantsCount(bookingDTO.getInfantsCount());
-        existBooking.setPetCount(bookingDTO.getPetCount());
 
         bookingRepo.save(existBooking);
         return new BookingDTO(existBooking);
