@@ -2,6 +2,7 @@ package com.example.blsslab.model.entity;
 
 import java.util.Set;
 
+import com.example.blsslab.model.dto.UserDTO;
 import com.example.blsslab.model.dto.UserRole;
 
 import jakarta.persistence.Entity;
@@ -37,4 +38,26 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "guest")
     private Set<BookingEntity> bookingRequests;
+
+    public void setUsername(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            throw new IllegalArgumentException("Username cannot be empty");
+        }
+        if (!username.matches("^[a-zA-Z0-9_]+$")) {
+            throw new IllegalArgumentException("Username can contain only Latin letters, numbers, and a symbol '_'");
+        }
+        this.username = username;
+    }
+
+    public void update(UserDTO userDTO) {
+        if (userDTO.getName() != null) {
+            this.name = userDTO.getName();
+        }
+        if (userDTO.getFamilyName() != null) {
+            this.familyName = userDTO.getFamilyName();
+        }
+        if (userDTO.getRole() != null) {
+            this.role = userDTO.getRole();
+        }
+    }
 }

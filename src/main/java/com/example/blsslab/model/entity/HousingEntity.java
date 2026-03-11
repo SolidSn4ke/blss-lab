@@ -2,6 +2,7 @@ package com.example.blsslab.model.entity;
 
 import java.util.Set;
 
+import com.example.blsslab.model.dto.HousingDTO;
 import com.example.blsslab.model.dto.HousingType;
 import com.example.blsslab.model.dto.RequestStatus;
 
@@ -51,4 +52,19 @@ public class HousingEntity {
 
     @OneToMany(mappedBy = "housing")
     private Set<BookingEntity> bookingRequests;
+
+    public void update(HousingDTO housingDTO) {
+        if (housingDTO.getPrice() != null) {
+            this.price = housingDTO.getPrice();
+        }
+        if (housingDTO.getNumOfBeds() != null) {
+            this.numOfBeds = housingDTO.getNumOfBeds();
+        }
+        if (housingDTO.getRating() != null) {
+            this.rating = housingDTO.getRating();
+        }
+        if (housingDTO.getHousingType() != null) {
+            this.housingType = housingDTO.getHousingType();
+        }
+    }
 }

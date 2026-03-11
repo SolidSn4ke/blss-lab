@@ -49,13 +49,7 @@ public class UserService {
         UserEntity existUser = userRepo.findById(username)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username"));
 
-        if (!userDTO.validate()) {
-            throw new BadRequestBodyException("Required fields are missing");
-        }
-
-        existUser.setName(userDTO.getName());
-        existUser.setFamilyName(userDTO.getFamilyName());
-        existUser.setRole(userDTO.getRole());
+        existUser.update(userDTO);
         userRepo.save(existUser);
         return new UserDTO(existUser);
     }

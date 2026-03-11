@@ -1,21 +1,27 @@
 package com.example.blsslab.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.blsslab.exception.AlreadyProcessedException;
 import com.example.blsslab.exception.BadRequestBodyException;
+import com.example.blsslab.exception.DependencyViolationException;
 import com.example.blsslab.exception.RolePrivilegesViolationException;
 import com.example.blsslab.model.dto.HousingDTO;
+import com.example.blsslab.model.dto.PageInfo;
 import com.example.blsslab.model.dto.RequestStatus;
 import com.example.blsslab.model.dto.UserRole;
 import com.example.blsslab.model.entity.AddressEntity;
+import com.example.blsslab.model.entity.BookingEntity;
 import com.example.blsslab.model.entity.HousingEntity;
 import com.example.blsslab.model.entity.UserEntity;
 import com.example.blsslab.model.repos.AddressRepository;
+import com.example.blsslab.model.repos.BookingRepository;
 import com.example.blsslab.model.repos.HousingRepository;
 import com.example.blsslab.model.repos.UserRepository;
 import com.example.blsslab.specs.CustomSpecification;
@@ -30,18 +36,22 @@ public class HousingService {
 
     AddressRepository addressRepo;
 
-    public HousingService(HousingRepository housingRepo, UserRepository userRepo, AddressRepository addressRepo) {
+    BookingRepository bookingRepo;
+
+    public HousingService(HousingRepository housingRepo, UserRepository userRepo, AddressRepository addressRepo,
+            BookingRepository bookingRepo) {
         this.housingRepo = housingRepo;
         this.userRepo = userRepo;
         this.addressRepo = addressRepo;
+        this.bookingRepo = bookingRepo;
     }
 
     @Transactional(readOnly = true)
-    public List<HousingDTO> getAllHousings(Pageable pageable, String searchQuery) {
-        List<HousingEntity> housings = housingRepo
-                .findAllWithJoinFetch(CustomSpecification.buildFromFilters(searchQuery), pageable)
-                .stream().toList();
-        return housings.stream().map(h -> new HousingDTO(h)).toList();
+    public PageInfo<HousingDTO> getAllHousings(Pageable pageable, String searchQuery) {
+        Page<HousingEntity> result = housingRepo.findAllWithJoinFetch(CustomSpecification.buildFromFilters(searchQuery),
+                pageable);
+        List<HousingDTO> content = result.toList().stream().map(h -> new HousingDTO(h)).toList();
+        return new PageInfo<HousingDTO>(content, result.getTotalPages(), result.getNumber(), result.getTotalElements());
     }
 
     @Transactional
@@ -109,37 +119,39 @@ public class HousingService {
 
     @Transactional
     public HousingDTO updateHousing(Long id, HousingDTO housingDTO) {
-        UserEntity owner = userRepo.findById(housingDTO.getOwner().getUsername())
-                .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username"));
-
         HousingEntity existHousing = housingRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve housing by id"));
 
-        if (!housingDTO.validate()) {
-            throw new BadRequestBodyException("Required fields are missing");
+        List<BookingEntity> confirmedBookings = bookingRepo.findAllByHousingIdAndStatus(id, RequestStatus.CONFIRMED);
+        if (confirmedBookings.stream()
+                .filter(booking -> booking.getCheckOut().isAfter(LocalDate.now()))
+                .count() > 0) {
+            throw new DependencyViolationException("There are already confirmed bookings for this housing");
         }
 
-        existHousing.setPrice(housingDTO.getPrice());
-        existHousing.setNumOfBeds(housingDTO.getNumOfBeds());
-        existHousing.setRating(housingDTO.getRating());
-        existHousing.setHousingType(housingDTO.getHousingType());
+        existHousing.update(housingDTO);
+
+        if (housingDTO.getOwner() != null) {
+            UserEntity owner = userRepo.findById(housingDTO.getOwner().getUsername())
+                    .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username"));
+            existHousing.setOwner(owner);
+        }
+
+        if (housingDTO.getAddress() != null) {
+            AddressEntity address;
+            if (housingDTO.getAddress().getId() == null) {
+                address = new AddressEntity();
+                address.setStreet(housingDTO.getAddress().getStreet());
+                address.setCountry(housingDTO.getAddress().getCountry());
+                addressRepo.save(address);
+            } else {
+                address = addressRepo.findById(housingDTO.getAddress().getId())
+                        .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve address by id"));
+            }
+            existHousing.setAddress(address);
+        }
+
         existHousing.setStatus(RequestStatus.PENDING);
-        existHousing.setOwner(owner);
-
-        AddressEntity address;
-
-        if (housingDTO.getAddress().getId() == null) {
-            address = new AddressEntity();
-            address.setStreet(housingDTO.getAddress().getStreet());
-            address.setCountry(housingDTO.getAddress().getCountry());
-            addressRepo.save(address);
-        } else {
-            address = addressRepo.findById(housingDTO.getAddress().getId())
-                    .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve address by id"));
-        }
-
-        existHousing.setAddress(address);
-
         housingRepo.save(existHousing);
         return new HousingDTO(existHousing);
     }
@@ -148,6 +160,14 @@ public class HousingService {
     public Boolean deleteHousing(Long id) {
         housingRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve housing by id"));
+
+        List<BookingEntity> confirmedBookings = bookingRepo.findAllByHousingIdAndStatus(id, RequestStatus.CONFIRMED);
+        if (confirmedBookings.stream()
+                .filter(booking -> booking.getCheckOut().isAfter(LocalDate.now()))
+                .count() > 0) {
+            throw new DependencyViolationException("There are already confirmed bookings for this housing");
+        }
+
         housingRepo.deleteById(id);
         return true;
     }

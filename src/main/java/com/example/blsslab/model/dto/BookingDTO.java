@@ -6,8 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Objects;
-import java.util.stream.Stream;
 
 @Getter
 @Setter
@@ -39,10 +37,5 @@ public class BookingDTO {
         this.childCount = bookingEntity.getChildCount();
         this.infantsCount = bookingEntity.getInfantsCount();
         this.petCount = bookingEntity.getPetCount();
-    }
-
-    public boolean validate() {
-        return Stream.of(id, checkIn, checkOut, createdAt)
-                .allMatch(Objects::nonNull);
     }
 }

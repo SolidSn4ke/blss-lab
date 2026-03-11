@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import com.example.blsslab.exception.RolePrivilegesViolationException;
 import com.example.blsslab.model.dto.BookingDTO;
 import com.example.blsslab.model.dto.BookingType;
 import com.example.blsslab.model.dto.HousingDTO;
+import com.example.blsslab.model.dto.PageInfo;
 import com.example.blsslab.model.dto.RequestStatus;
 import com.example.blsslab.model.entity.BookingEntity;
 import com.example.blsslab.model.entity.HousingEntity;
@@ -41,14 +43,7 @@ public class BookingService {
         this.bookingRepo = bookingRepo;
     }
 
-    @Transactional
-    public HousingDTO requireHousing(BookingDTO booking) {
-
-        UserEntity user = userRepo.findById(booking.getGuest().getUsername())
-                .orElseThrow(() -> new EntityNotFoundException("Failed to retrive user by username"));
-        HousingEntity housing = housingRepo.findById(booking.getHousing().getId())
-                .orElseThrow(() -> new EntityNotFoundException("Failed to retrive housing by id"));
-
+    private void checkBookingPeriod(BookingDTO booking) {
         LocalDate startDate = booking.getCheckIn();
         LocalDate endDate = booking.getCheckOut();
         if (LocalDate.now().isAfter(startDate)) {
@@ -70,6 +65,19 @@ public class BookingService {
                         "Unacceptable period of booking: there are conflicts with other bookings");
             }
         }
+    }
+
+    @Transactional
+    public HousingDTO requireHousing(BookingDTO booking) {
+
+        UserEntity user = userRepo.findById(booking.getGuest().getUsername())
+                .orElseThrow(() -> new EntityNotFoundException("Failed to retrive user by username"));
+        HousingEntity housing = housingRepo.findById(booking.getHousing().getId())
+                .orElseThrow(() -> new EntityNotFoundException("Failed to retrive housing by id"));
+
+        LocalDate startDate = booking.getCheckIn();
+        LocalDate endDate = booking.getCheckOut();
+        checkBookingPeriod(booking);
 
         BookingEntity newBooking = new BookingEntity();
         newBooking.setCheckIn(booking.getCheckIn());
@@ -97,22 +105,14 @@ public class BookingService {
         BookingEntity existBooking = bookingRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve booking by id"));
 
-        if (!bookingDTO.validate()) {
-            throw new BadRequestBodyException("Required fields are missing");
-        }
-
-        existBooking.setCheckIn(bookingDTO.getCheckIn());
-        existBooking.setCheckOut(bookingDTO.getCheckOut());
+        existBooking.update(bookingDTO);
         existBooking.setCreatedAt(LocalDateTime.now());
         existBooking.setStatus(RequestStatus.PENDING);
-        existBooking.setTotalPrice(bookingDTO.getTotalPrice());
-        existBooking.setAdultsCount(bookingDTO.getAdultsCount());
-        existBooking.setChildCount(bookingDTO.getChildCount());
-        existBooking.setInfantsCount(bookingDTO.getInfantsCount());
-        existBooking.setPetCount(bookingDTO.getPetCount());
 
         bookingRepo.save(existBooking);
-        return new BookingDTO(existBooking);
+        BookingDTO response = new BookingDTO(existBooking);
+        checkBookingPeriod(response);
+        return response;
     }
 
     @Transactional
@@ -123,12 +123,11 @@ public class BookingService {
     }
 
     @Transactional(readOnly = true)
-    public List<BookingDTO> getBookings(
+    public PageInfo<BookingDTO> getBookings(
             String username,
             BookingType type,
             String searchQuery,
             Pageable pageable) {
-        List<BookingEntity> bookings;
         StringBuilder sb = new StringBuilder(searchQuery == null ? "" : searchQuery);
 
         switch (type) {
@@ -140,10 +139,10 @@ public class BookingService {
             default -> sb.append("");
         }
 
-        bookings = bookingRepo.findAllWithJoinFetch(CustomSpecification.buildFromFilters(sb.toString()), pageable)
-                .toList();
-
-        return bookings.stream().map(b -> new BookingDTO(b)).toList();
+        Page<BookingEntity> result = bookingRepo
+                .findAllWithJoinFetch(CustomSpecification.buildFromFilters(sb.toString()), pageable);
+        List<BookingDTO> content = result.toList().stream().map(b -> new BookingDTO(b)).toList();
+        return new PageInfo<BookingDTO>(content, result.getTotalPages(), result.getNumber(), result.getTotalElements());
     }
 
     @Transactional
