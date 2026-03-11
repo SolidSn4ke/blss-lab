@@ -11,7 +11,6 @@ import com.example.blsslab.exception.BadRequestBodyException;
 import com.example.blsslab.exception.RolePrivilegesViolationException;
 import com.example.blsslab.model.dto.HousingDTO;
 import com.example.blsslab.model.dto.RequestStatus;
-import com.example.blsslab.model.dto.ResponseDTO;
 import com.example.blsslab.model.dto.UserRole;
 import com.example.blsslab.model.entity.AddressEntity;
 import com.example.blsslab.model.entity.HousingEntity;
@@ -38,14 +37,14 @@ public class HousingService {
     }
 
     @Transactional(readOnly = true)
-    public ResponseDTO<List<HousingDTO>> getAllHousings(Pageable pageable, String searchQuery) {
+    public List<HousingDTO> getAllHousings(Pageable pageable, String searchQuery) {
         List<HousingEntity> housings = housingRepo.findAll(CustomSpecification.buildFromFilters(searchQuery), pageable)
                 .stream().toList();
-        return new ResponseDTO<List<HousingDTO>>(housings.stream().map(h -> new HousingDTO(h)).toList(), "", 200);
+        return housings.stream().map(h -> new HousingDTO(h)).toList();
     }
 
     @Transactional
-    public ResponseDTO<HousingDTO> handleRequest(String username, Long id, Boolean approved) {
+    public HousingDTO handleRequest(String username, Long id, Boolean approved) {
         UserEntity user = userRepo.findById(username)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username"));
 
@@ -72,11 +71,11 @@ public class HousingService {
 
         housingRepo.save(housing);
 
-        return new ResponseDTO<>(new HousingDTO(housing), approved ? "Housing approved" : "Housing rejected", 200);
+        return new HousingDTO(housing);
     }
 
     @Transactional
-    public ResponseDTO<HousingDTO> addHousing(HousingDTO housing) {
+    public HousingDTO addHousing(HousingDTO housing) {
         UserEntity owner = userRepo.findById(housing.getOwner().getUsername())
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username"));
 
@@ -104,9 +103,7 @@ public class HousingService {
 
         housingRepo.save(housingEntity);
 
-        return new ResponseDTO<HousingDTO>(new HousingDTO(housingEntity),
-                "Housing has been sent, await confirmation by moderator",
-                200);
+        return new HousingDTO(housingEntity);
     }
 
     @Transactional

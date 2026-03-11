@@ -2,7 +2,9 @@ package com.example.blsslab.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.blsslab.model.dto.ResponseDTO;
+
+import com.example.blsslab.exception.AlreadyProcessedException;
+import com.example.blsslab.exception.BadRequestBodyException;
 import com.example.blsslab.model.dto.UserDTO;
 import com.example.blsslab.model.entity.UserEntity;
 import com.example.blsslab.model.repos.UserRepository;
@@ -19,7 +21,7 @@ public class UserService {
     }
 
     @Transactional
-    public ResponseDTO<UserDTO> addUser(UserDTO user) {
+    public UserDTO addUser(UserDTO user) {
 
         UserEntity userEntity = new UserEntity();
         userEntity.setUsername(user.getUsername());
@@ -28,18 +30,18 @@ public class UserService {
         userEntity.setRole(user.getRole());
 
         if (user.getUsername() == null) {
-            return new ResponseDTO<>(null, "Username cannot be null", 400);
+            throw new BadRequestBodyException("Username cannot be null");
         }
 
         UserEntity existUser = userRepo.findById(user.getUsername()).orElse(null);
 
         if (existUser != null) {
-            return new ResponseDTO<>(null, "User with this username is already exist", 409);
+            throw new AlreadyProcessedException("User with this username is already exist");
         }
 
         userRepo.save(userEntity);
 
-        return new ResponseDTO<UserDTO>(new UserDTO(userEntity), "User has been added", 200);
+        return new UserDTO(userEntity);
     }
 
     @Transactional

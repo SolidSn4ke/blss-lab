@@ -16,7 +16,6 @@ import com.example.blsslab.model.dto.BookingDTO;
 import com.example.blsslab.model.dto.BookingType;
 import com.example.blsslab.model.dto.HousingDTO;
 import com.example.blsslab.model.dto.RequestStatus;
-import com.example.blsslab.model.dto.ResponseDTO;
 import com.example.blsslab.model.entity.BookingEntity;
 import com.example.blsslab.model.entity.HousingEntity;
 import com.example.blsslab.model.entity.UserEntity;
@@ -43,7 +42,7 @@ public class BookingService {
     }
 
     @Transactional
-    public ResponseDTO<HousingDTO> requireHousing(BookingDTO booking) {
+    public HousingDTO requireHousing(BookingDTO booking) {
 
         UserEntity user = userRepo.findById(booking.getGuest().getUsername())
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrive user by username"));
@@ -90,7 +89,7 @@ public class BookingService {
         userRepo.save(user);
         housingRepo.save(housing);
 
-        return new ResponseDTO<>(new HousingDTO(housing), "Housing requested", 200);
+        return new HousingDTO(housing);
     }
 
     @Transactional
@@ -114,7 +113,7 @@ public class BookingService {
     }
 
     @Transactional(readOnly = true)
-    public ResponseDTO<List<BookingDTO>> getBookings(
+    public List<BookingDTO> getBookings(
             String username,
             BookingType type,
             String searchQuery,
@@ -133,11 +132,11 @@ public class BookingService {
 
         bookings = bookingRepo.findAll(CustomSpecification.buildFromFilters(sb.toString()), pageable).toList();
 
-        return new ResponseDTO<>(bookings.stream().map(b -> new BookingDTO(b)).toList(), "", 200);
+        return bookings.stream().map(b -> new BookingDTO(b)).toList();
     }
 
     @Transactional
-    public ResponseDTO<BookingDTO> handleRequest(String username, Long id, Boolean approved) {
+    public BookingDTO handleRequest(String username, Long id, Boolean approved) {
         if (approved == null) {
             throw new BadRequestBodyException("Field 'approved' is required");
         }
@@ -162,6 +161,6 @@ public class BookingService {
 
         bookingRepo.save(booking);
 
-        return new ResponseDTO<>(new BookingDTO(booking), approved ? "Booking approved" : "Booking rejected", 200);
+        return new BookingDTO(booking);
     }
 }
