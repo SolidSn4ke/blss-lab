@@ -44,21 +44,20 @@ public class HousingController {
     }
 
     @PostMapping()
-    public ResponseDTO<HousingDTO> addHousing(
-            @RequestBody HousingDTO housing) {
+    public ResponseDTO<HousingDTO> addHousing(@RequestBody HousingDTO housing) {
         ResponseDTO<HousingDTO> response = housingService.addHousing(housing);
         return response;
     }
 
-    // TODO: Убрать void
     @PutMapping("/{id}")
-    public void updateHousing(@PathVariable Long id, @RequestBody HousingDTO entity) {
-        housingService.updateHousing(id, entity);
+    public HousingDTO updateHousing(@PathVariable Long id, @RequestBody HousingDTO entity) {
+        HousingDTO response = housingService.updateHousing(id, entity);
+        return response;
     }
 
-    // TODO: Убрать void
     @DeleteMapping("/{id}")
-    public void deleteHousing(@PathVariable Long id) {
-        housingService.deleteHousing(id);
+    public Boolean deleteHousing(@PathVariable Long id) {
+        Boolean response = housingService.deleteHousing(id);
+        return response;
     }
 }

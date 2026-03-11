@@ -42,25 +42,6 @@ public class HousingService {
         return new ResponseDTO<List<HousingDTO>>(housings.stream().map(h -> new HousingDTO(h)).toList(), "", 200);
     }
 
-    // public ResponseDTO<List<HousingDTO>> getAllHousingsToHandle(String username)
-    // {
-    // UserEntity user = userRepo.findById(username).orElse(null);
-
-    // if (user == null) {
-    // return new ResponseDTO<>(null, "Failed to retrieve user by username", 404);
-    // }
-
-    // if (user.getRole() != UserRole.MODERATOR) {
-    // return new ResponseDTO<>(null, "Only moderator has access to this action",
-    // 403);
-    // }
-
-    // List<HousingEntity> housings =
-    // housingRepo.findAllByStatus(RequestStatus.PENDING);
-    // return new ResponseDTO<List<HousingDTO>>(housings.stream().map(h -> new
-    // HousingDTO(h)).toList(), "", 200);
-    // }
-
     public ResponseDTO<HousingDTO> handleRequest(String username, Long id, Boolean approved) {
         UserEntity user = userRepo.findById(username)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username"));
@@ -124,39 +105,42 @@ public class HousingService {
                 200);
     }
 
-    // TODO: Убрать void
-    public void updateHousing(Long id, HousingDTO housing) {
-        UserEntity owner = userRepo.findById(housing.getOwner().getUsername())
+    public HousingDTO updateHousing(Long id, HousingDTO housingDTO) {
+        UserEntity owner = userRepo.findById(housingDTO.getOwner().getUsername())
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username"));
 
-        HousingEntity housingEntity = housingRepo.findById(id)
+        HousingEntity existHousing = housingRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve housing by id"));
-        housingEntity.setPrice(housing.getPrice());
-        housingEntity.setNumOfBeds(housing.getNumOfBeds());
-        housingEntity.setRating(housing.getRating());
-        housingEntity.setHousingType(housing.getHousingType());
-        housingEntity.setStatus(RequestStatus.PENDING);
-        housingEntity.setOwner(owner);
+
+        existHousing.setPrice(housingDTO.getPrice());
+        existHousing.setNumOfBeds(housingDTO.getNumOfBeds());
+        existHousing.setRating(housingDTO.getRating());
+        existHousing.setHousingType(housingDTO.getHousingType());
+        existHousing.setStatus(RequestStatus.PENDING);
+        existHousing.setOwner(owner);
 
         AddressEntity address;
 
-        if (housing.getAddress().getId() == null) {
+        if (housingDTO.getAddress().getId() == null) {
             address = new AddressEntity();
-            address.setStreet(housing.getAddress().getStreet());
-            address.setCountry(housing.getAddress().getCountry());
+            address.setStreet(housingDTO.getAddress().getStreet());
+            address.setCountry(housingDTO.getAddress().getCountry());
             addressRepo.save(address);
         } else {
-            address = addressRepo.findById(housing.getAddress().getId())
+            address = addressRepo.findById(housingDTO.getAddress().getId())
                     .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve address by id"));
         }
 
-        housingEntity.setAddress(address);
+        existHousing.setAddress(address);
 
-        housingRepo.save(housingEntity);
+        housingRepo.save(existHousing);
+        return new HousingDTO(existHousing);
     }
 
-    // TODO: Убрать void
-    public void deleteHousing(Long id) {
+    public Boolean deleteHousing(Long id) {
+        housingRepo.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve housing by id"));
         housingRepo.deleteById(id);
+        return true;
     }
 }
