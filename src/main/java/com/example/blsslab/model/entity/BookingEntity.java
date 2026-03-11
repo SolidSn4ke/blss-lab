@@ -26,11 +26,11 @@ public class BookingEntity {
     @NotNull
     private LocalDate checkOut;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "booked_by")
     private UserEntity guest;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "housing_id")
     private HousingEntity housing;
 

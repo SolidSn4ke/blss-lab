@@ -41,11 +41,11 @@ public class HousingEntity {
     @Enumerated(EnumType.STRING)
     private RequestStatus status;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id")
     private AddressEntity address;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "belongs_to")
     private UserEntity owner;
 

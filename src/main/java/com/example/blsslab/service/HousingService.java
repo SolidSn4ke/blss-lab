@@ -38,7 +38,8 @@ public class HousingService {
 
     @Transactional(readOnly = true)
     public List<HousingDTO> getAllHousings(Pageable pageable, String searchQuery) {
-        List<HousingEntity> housings = housingRepo.findAll(CustomSpecification.buildFromFilters(searchQuery), pageable)
+        List<HousingEntity> housings = housingRepo
+                .findAllWithJoinFetch(CustomSpecification.buildFromFilters(searchQuery), pageable)
                 .stream().toList();
         return housings.stream().map(h -> new HousingDTO(h)).toList();
     }

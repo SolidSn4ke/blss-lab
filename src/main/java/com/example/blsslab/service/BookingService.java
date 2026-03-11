@@ -140,7 +140,8 @@ public class BookingService {
             default -> sb.append("");
         }
 
-        bookings = bookingRepo.findAll(CustomSpecification.buildFromFilters(sb.toString()), pageable).toList();
+        bookings = bookingRepo.findAllWithJoinFetch(CustomSpecification.buildFromFilters(sb.toString()), pageable)
+                .toList();
 
         return bookings.stream().map(b -> new BookingDTO(b)).toList();
     }
