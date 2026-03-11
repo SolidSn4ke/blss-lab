@@ -97,6 +97,11 @@ public class BookingService {
     public BookingDTO updateBooking(Long id, BookingDTO bookingDTO) {
         BookingEntity existBooking = bookingRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve booking by id"));
+
+        if (!bookingDTO.validate()) {
+            throw new BadRequestBodyException("Required fields are missing");
+        }
+
         existBooking.setCheckIn(bookingDTO.getCheckIn());
         existBooking.setCheckOut(bookingDTO.getCheckOut());
         existBooking.setCreatedAt(LocalDateTime.now());

@@ -1,5 +1,8 @@
 package com.example.blsslab.model.dto;
 
+import java.util.Objects;
+import java.util.stream.Stream;
+
 import com.example.blsslab.model.entity.UserEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,5 +22,10 @@ public class UserDTO {
         this.name = userEntity.getName();
         this.familyName = userEntity.getFamilyName();
         this.role = userEntity.getRole();
+    }
+
+    public boolean validate() {
+        return Stream.of(username, name, familyName, role)
+                .allMatch(Objects::nonNull);
     }
 }

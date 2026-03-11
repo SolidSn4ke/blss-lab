@@ -117,6 +117,10 @@ public class HousingService {
         HousingEntity existHousing = housingRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve housing by id"));
 
+        if (!housingDTO.validate()) {
+            throw new BadRequestBodyException("Required fields are missing");
+        }
+
         existHousing.setPrice(housingDTO.getPrice());
         existHousing.setNumOfBeds(housingDTO.getNumOfBeds());
         existHousing.setRating(housingDTO.getRating());

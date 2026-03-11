@@ -1,5 +1,8 @@
 package com.example.blsslab.model.dto;
 
+import java.util.Objects;
+import java.util.stream.Stream;
+
 import com.example.blsslab.model.entity.HousingEntity;
 
 import lombok.Getter;
@@ -26,5 +29,10 @@ public class HousingDTO {
         this.housingType = housingEntity.getHousingType();
         this.address = new AddressDTO(housingEntity.getAddress());
         this.owner = new UserDTO(housingEntity.getOwner());
+    }
+
+    public boolean validate() {
+        return Stream.of(id, price, rating, numOfBeds)
+                .allMatch(Objects::nonNull);
     }
 }
