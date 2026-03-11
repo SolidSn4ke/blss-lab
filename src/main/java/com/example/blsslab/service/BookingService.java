@@ -130,7 +130,7 @@ public class BookingService {
             String searchQuery,
             Pageable pageable) {
         List<BookingEntity> bookings;
-        StringBuilder sb = new StringBuilder(searchQuery);
+        StringBuilder sb = new StringBuilder(searchQuery == null ? "" : searchQuery);
 
         switch (type) {
             case SENT ->
