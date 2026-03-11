@@ -16,7 +16,6 @@ import com.example.blsslab.model.dto.BookingDTO;
 import com.example.blsslab.model.dto.BookingType;
 import com.example.blsslab.model.dto.HousingDTO;
 import com.example.blsslab.model.dto.ModerationRequest;
-import com.example.blsslab.model.dto.ResponseDTO;
 import com.example.blsslab.service.BookingService;
 import org.springframework.web.bind.annotation.PutMapping;
 
@@ -31,8 +30,8 @@ public class BookingController {
     }
 
     @PostMapping()
-    public ResponseDTO<HousingDTO> addBooking(@RequestBody BookingDTO booking) {
-        ResponseDTO<HousingDTO> response = bookingService.requireHousing(booking);
+    public HousingDTO addBooking(@RequestBody BookingDTO booking) {
+        HousingDTO response = bookingService.requireHousing(booking);
         return response;
     }
 
@@ -49,7 +48,7 @@ public class BookingController {
     }
 
     @GetMapping()
-    public ResponseDTO<List<BookingDTO>> getBookings(
+    public List<BookingDTO> getBookings(
             @RequestParam String username,
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "SENT") BookingType type,
@@ -58,10 +57,10 @@ public class BookingController {
     }
 
     @PostMapping("/{id}/moderation")
-    public ResponseDTO<BookingDTO> handleRequest(
+    public BookingDTO handleRequest(
             @PathVariable Long id,
             @RequestBody ModerationRequest body) {
-        ResponseDTO<BookingDTO> response = bookingService.handleRequest(body.getUser().getUsername(), id,
+        BookingDTO response = bookingService.handleRequest(body.getUser().getUsername(), id,
                 body.getApproved());
         return response;
     }
