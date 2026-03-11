@@ -52,7 +52,7 @@ public class BookingController {
     public ResponseDTO<List<BookingDTO>> getBookings(
             @RequestParam String username,
             @RequestParam(required = false) String search,
-            @RequestParam(defaultValue = "ALL") BookingType type,
+            @RequestParam(defaultValue = "SENT") BookingType type,
             Pageable pageable) {
         return bookingService.getBookings(username, type, search, pageable);
     }

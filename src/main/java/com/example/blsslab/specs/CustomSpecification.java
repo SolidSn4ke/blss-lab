@@ -1,5 +1,6 @@
 package com.example.blsslab.specs;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +58,9 @@ public class CustomSpecification {
         try {
             if (value.contains(".")) {
                 return Double.parseDouble(value);
+            }
+            if (value.matches("\\d{4}-\\d{2}-\\d{2}")) {
+                return LocalDate.parse(value);
             } else {
                 return Long.parseLong(value);
             }
