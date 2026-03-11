@@ -41,14 +41,7 @@ public class BookingService {
         this.bookingRepo = bookingRepo;
     }
 
-    @Transactional
-    public HousingDTO requireHousing(BookingDTO booking) {
-
-        UserEntity user = userRepo.findById(booking.getGuest().getUsername())
-                .orElseThrow(() -> new EntityNotFoundException("Failed to retrive user by username"));
-        HousingEntity housing = housingRepo.findById(booking.getHousing().getId())
-                .orElseThrow(() -> new EntityNotFoundException("Failed to retrive housing by id"));
-
+    private void checkBookingPeriod(BookingDTO booking) {
         LocalDate startDate = booking.getCheckIn();
         LocalDate endDate = booking.getCheckOut();
         if (LocalDate.now().isAfter(startDate)) {
@@ -70,6 +63,19 @@ public class BookingService {
                         "Unacceptable period of booking: there are conflicts with other bookings");
             }
         }
+    }
+
+    @Transactional
+    public HousingDTO requireHousing(BookingDTO booking) {
+
+        UserEntity user = userRepo.findById(booking.getGuest().getUsername())
+                .orElseThrow(() -> new EntityNotFoundException("Failed to retrive user by username"));
+        HousingEntity housing = housingRepo.findById(booking.getHousing().getId())
+                .orElseThrow(() -> new EntityNotFoundException("Failed to retrive housing by id"));
+
+        LocalDate startDate = booking.getCheckIn();
+        LocalDate endDate = booking.getCheckOut();
+        checkBookingPeriod(booking);
 
         BookingEntity newBooking = new BookingEntity();
         newBooking.setCheckIn(booking.getCheckIn());
@@ -102,7 +108,9 @@ public class BookingService {
         existBooking.setStatus(RequestStatus.PENDING);
 
         bookingRepo.save(existBooking);
-        return new BookingDTO(existBooking);
+        BookingDTO response = new BookingDTO(existBooking);
+        checkBookingPeriod(response);
+        return response;
     }
 
     @Transactional
