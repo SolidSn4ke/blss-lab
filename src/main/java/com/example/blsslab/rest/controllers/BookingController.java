@@ -1,7 +1,5 @@
 package com.example.blsslab.rest.controllers;
 
-import java.util.List;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +14,7 @@ import com.example.blsslab.model.dto.BookingDTO;
 import com.example.blsslab.model.dto.BookingType;
 import com.example.blsslab.model.dto.HousingDTO;
 import com.example.blsslab.model.dto.ModerationRequest;
+import com.example.blsslab.model.dto.PageInfo;
 import com.example.blsslab.service.BookingService;
 import org.springframework.web.bind.annotation.PatchMapping;
 
@@ -48,7 +47,7 @@ public class BookingController {
     }
 
     @GetMapping()
-    public List<BookingDTO> getBookings(
+    public PageInfo<BookingDTO> getBookings(
             @RequestParam String username,
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "SENT") BookingType type,

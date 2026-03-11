@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import com.example.blsslab.exception.RolePrivilegesViolationException;
 import com.example.blsslab.model.dto.BookingDTO;
 import com.example.blsslab.model.dto.BookingType;
 import com.example.blsslab.model.dto.HousingDTO;
+import com.example.blsslab.model.dto.PageInfo;
 import com.example.blsslab.model.dto.RequestStatus;
 import com.example.blsslab.model.entity.BookingEntity;
 import com.example.blsslab.model.entity.HousingEntity;
@@ -121,12 +123,11 @@ public class BookingService {
     }
 
     @Transactional(readOnly = true)
-    public List<BookingDTO> getBookings(
+    public PageInfo<BookingDTO> getBookings(
             String username,
             BookingType type,
             String searchQuery,
             Pageable pageable) {
-        List<BookingEntity> bookings;
         StringBuilder sb = new StringBuilder(searchQuery == null ? "" : searchQuery);
 
         switch (type) {
@@ -138,9 +139,9 @@ public class BookingService {
             default -> sb.append("");
         }
 
-        bookings = bookingRepo.findAll(CustomSpecification.buildFromFilters(sb.toString()), pageable).toList();
-
-        return bookings.stream().map(b -> new BookingDTO(b)).toList();
+        Page<BookingEntity> result = bookingRepo.findAll(CustomSpecification.buildFromFilters(sb.toString()), pageable);
+        List<BookingDTO> content = result.toList().stream().map(b -> new BookingDTO(b)).toList();
+        return new PageInfo<BookingDTO>(content, result.getTotalPages(), result.getNumber(), result.getTotalElements());
     }
 
     @Transactional

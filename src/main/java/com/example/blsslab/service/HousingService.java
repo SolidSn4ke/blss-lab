@@ -3,6 +3,7 @@ package com.example.blsslab.service;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,7 @@ import com.example.blsslab.exception.BadRequestBodyException;
 import com.example.blsslab.exception.DependencyViolationException;
 import com.example.blsslab.exception.RolePrivilegesViolationException;
 import com.example.blsslab.model.dto.HousingDTO;
+import com.example.blsslab.model.dto.PageInfo;
 import com.example.blsslab.model.dto.RequestStatus;
 import com.example.blsslab.model.dto.UserRole;
 import com.example.blsslab.model.entity.AddressEntity;
@@ -45,10 +47,10 @@ public class HousingService {
     }
 
     @Transactional(readOnly = true)
-    public List<HousingDTO> getAllHousings(Pageable pageable, String searchQuery) {
-        List<HousingEntity> housings = housingRepo.findAll(CustomSpecification.buildFromFilters(searchQuery), pageable)
-                .stream().toList();
-        return housings.stream().map(h -> new HousingDTO(h)).toList();
+    public PageInfo<HousingDTO> getAllHousings(Pageable pageable, String searchQuery) {
+        Page<HousingEntity> result = housingRepo.findAll(CustomSpecification.buildFromFilters(searchQuery), pageable);
+        List<HousingDTO> content = result.toList().stream().map(h -> new HousingDTO(h)).toList();
+        return new PageInfo<HousingDTO>(content, result.getTotalPages(), result.getNumber(), result.getTotalElements());
     }
 
     @Transactional
