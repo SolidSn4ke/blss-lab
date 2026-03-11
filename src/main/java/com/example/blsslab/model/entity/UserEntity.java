@@ -39,6 +39,16 @@ public class UserEntity {
     @OneToMany(mappedBy = "guest")
     private Set<BookingEntity> bookingRequests;
 
+    public void setUsername(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            throw new IllegalArgumentException("Username cannot be empty");
+        }
+        if (!username.matches("^[a-zA-Z0-9_]+$")) {
+            throw new IllegalArgumentException("Username can contain only Latin letters, numbers, and a symbol '_'");
+        }
+        this.username = username;
+    }
+
     public void update(UserDTO userDTO) {
         if (userDTO.getName() != null) {
             this.name = userDTO.getName();
