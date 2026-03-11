@@ -29,15 +29,15 @@ public class UserController {
         return new ResponseEntity<ResponseDTO<UserDTO>>(response, HttpStatusCode.valueOf(response.getCode()));
     }
 
-    // TODO: Убрать void
     @PutMapping("/{username}")
-    public void updateUser(@PathVariable String username, @RequestBody UserDTO entity) {
-        userService.updateUser(username, entity);
+    public UserDTO updateUser(@PathVariable String username, @RequestBody UserDTO entity) {
+        UserDTO response = userService.updateUser(username, entity);
+        return response;
     }
 
-    // TODO: Убрать void
     @DeleteMapping("/{username}")
-    public void deleteUser(@PathVariable String username) {
-        userService.deleteUser(username);
+    public Boolean deleteUser(@PathVariable String username) {
+        Boolean response = userService.deleteUser(username);
+        return response;
     }
 }

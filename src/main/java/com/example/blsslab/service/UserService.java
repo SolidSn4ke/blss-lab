@@ -41,18 +41,20 @@ public class UserService {
         return new ResponseDTO<UserDTO>(new UserDTO(userEntity), "User has been added", 200);
     }
 
-    // TODO: Убрать void
-    public void updateUser(String username, UserDTO user) {
-        UserEntity userEntity = userRepo.findById(username)
+    public UserDTO updateUser(String username, UserDTO userDTO) {
+        UserEntity existUser = userRepo.findById(username)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username"));
-        userEntity.setName(user.getName());
-        userEntity.setFamilyName(user.getFamilyName());
-        userEntity.setRole(user.getRole());
-        userRepo.save(userEntity);
+        existUser.setName(userDTO.getName());
+        existUser.setFamilyName(userDTO.getFamilyName());
+        existUser.setRole(userDTO.getRole());
+        userRepo.save(existUser);
+        return new UserDTO(existUser);
     }
 
-    // TODO: Убрать void
-    public void deleteUser(String username) {
+    public Boolean deleteUser(String username) {
+        userRepo.findById(username)
+                .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username"));
         userRepo.deleteById(username);
+        return true;
     }
 }
