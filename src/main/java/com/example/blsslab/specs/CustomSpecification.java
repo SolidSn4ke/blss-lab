@@ -1,4 +1,4 @@
-package com.example.blsslab.model.dto;
+package com.example.blsslab.specs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,23 +6,21 @@ import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.example.blsslab.exception.BadRequestBodyException;
-import com.example.blsslab.model.entity.HousingEntity;
-
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
 
-public class HousingSpecification {
+public class CustomSpecification {
 
-    public static Specification<HousingEntity> buildFromFilters(String searchQuery) {
+    public static <T> Specification<T> buildFromFilters(String searchQuery) {
         if (searchQuery == null || searchQuery.isEmpty()) {
             return null;
         }
 
         String[] filters = searchQuery.split(";");
-        List<Specification<HousingEntity>> specs = new ArrayList<>();
+        List<Specification<T>> specs = new ArrayList<>();
 
         for (String filter : filters) {
-            Specification<HousingEntity> spec = parseFilter(filter.trim());
+            Specification<T> spec = parseFilter(filter.trim());
             if (spec != null) {
                 specs.add(spec);
             }
@@ -31,7 +29,7 @@ public class HousingSpecification {
         return Specification.allOf(specs);
     }
 
-    private static Specification<HousingEntity> parseFilter(String filter) {
+    private static <T> Specification<T> parseFilter(String filter) {
         if (filter.contains(">=")) {
             String[] parts = filter.split(">=");
             return ge(parts[0].trim(), parseNumber(parts[1].trim()));
@@ -79,7 +77,7 @@ public class HousingSpecification {
         }
     }
 
-    private static Path<Object> getPath(Root<HousingEntity> root, String fieldPath) {
+    private static <T> Path<Object> getPath(Root<T> root, String fieldPath) {
         String[] fields = fieldPath.split("[.]");
         Path<Object> path = root.get(fields[0]);
 
@@ -90,27 +88,27 @@ public class HousingSpecification {
         return path;
     }
 
-    public static <T> Specification<HousingEntity> eq(String fieldName, T value) {
+    public static <T, C> Specification<C> eq(String fieldName, T value) {
         return (root, query, cb) -> cb.equal(getPath(root, fieldName), value);
     }
 
-    public static <T extends Number> Specification<HousingEntity> gt(String fieldName, T value) {
+    public static <T extends Number, C> Specification<C> gt(String fieldName, T value) {
         return (root, query, cb) -> cb.gt(getPath(root, fieldName).as((Class<T>) value.getClass()), value);
     }
 
-    public static <T extends Number> Specification<HousingEntity> lt(String fieldName, T value) {
+    public static <T extends Number, C> Specification<C> lt(String fieldName, T value) {
         return (root, query, cb) -> cb.lt(getPath(root, fieldName).as((Class<T>) value.getClass()), value);
     }
 
-    public static <T extends Number> Specification<HousingEntity> ge(String fieldName, T value) {
+    public static <T extends Number, C> Specification<C> ge(String fieldName, T value) {
         return (root, query, cb) -> cb.ge(getPath(root, fieldName).as((Class<T>) value.getClass()), value);
     }
 
-    public static <T extends Number> Specification<HousingEntity> le(String fieldName, T value) {
+    public static <T extends Number, C> Specification<C> le(String fieldName, T value) {
         return (root, query, cb) -> cb.le(getPath(root, fieldName).as((Class<T>) value.getClass()), value);
     }
 
-    public static Specification<HousingEntity> like(String fieldName, String pattern) {
+    public static <C> Specification<C> like(String fieldName, String pattern) {
         return (root, query, cb) -> cb.like(
                 cb.lower(getPath(root, fieldName).as(String.class)),
                 "%" + pattern.toLowerCase() + "%");

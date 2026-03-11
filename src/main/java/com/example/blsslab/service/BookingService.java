@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +22,7 @@ import com.example.blsslab.model.entity.UserEntity;
 import com.example.blsslab.model.repos.BookingRepository;
 import com.example.blsslab.model.repos.HousingRepository;
 import com.example.blsslab.model.repos.UserRepository;
+import com.example.blsslab.specs.CustomSpecification;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -113,25 +113,25 @@ public class BookingService {
         bookingRepo.deleteById(id);
     }
 
-    public ResponseDTO<Page<BookingDTO>> getBookings(
+    public ResponseDTO<List<BookingDTO>> getBookings(
             String username,
             BookingType type,
+            String searchQuery,
             Pageable pageable) {
-        Page<BookingEntity> bookings;
+        List<BookingEntity> bookings;
+        StringBuilder sb = new StringBuilder(searchQuery);
 
         switch (type) {
+            case SENT ->
+                sb.append(String.format(";guest.username=%s", username));
 
-            case SENT -> bookings = bookingRepo.findAllByGuestUsername(username, pageable);
+            case RECIEVED -> sb.append(String.format(";housing.owner.username=%s", username));
 
-            case RECIEVED -> bookings = bookingRepo.findAllByHousingOwnerUsername(username, pageable);
-
-            default ->
-                bookings = bookingRepo.findAllByGuestUsernameOrHousingOwnerUsername(username, username, pageable);
+            default -> sb.append("");
         }
+        bookings = bookingRepo.findAll(CustomSpecification.buildFromFilters(sb.toString()), pageable).toList();
 
-        Page<BookingDTO> dtoPage = bookings.map(BookingDTO::new);
-
-        return new ResponseDTO<>(dtoPage, "", 200);
+        return new ResponseDTO<>(bookings.stream().map(b -> new BookingDTO(b)).toList(), "", 200);
     }
 
     public ResponseDTO<BookingDTO> handleRequest(String username, Long id, Boolean approved) {

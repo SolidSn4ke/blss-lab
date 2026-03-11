@@ -9,7 +9,6 @@ import com.example.blsslab.exception.AlreadyProcessedException;
 import com.example.blsslab.exception.BadRequestBodyException;
 import com.example.blsslab.exception.RolePrivilegesViolationException;
 import com.example.blsslab.model.dto.HousingDTO;
-import com.example.blsslab.model.dto.HousingSpecification;
 import com.example.blsslab.model.dto.RequestStatus;
 import com.example.blsslab.model.dto.ResponseDTO;
 import com.example.blsslab.model.dto.UserRole;
@@ -19,7 +18,7 @@ import com.example.blsslab.model.entity.UserEntity;
 import com.example.blsslab.model.repos.AddressRepository;
 import com.example.blsslab.model.repos.HousingRepository;
 import com.example.blsslab.model.repos.UserRepository;
-
+import com.example.blsslab.specs.CustomSpecification;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
@@ -38,7 +37,7 @@ public class HousingService {
     }
 
     public ResponseDTO<List<HousingDTO>> getAllHousings(Pageable pageable, String searchQuery) {
-        List<HousingEntity> housings = housingRepo.findAll(HousingSpecification.buildFromFilters(searchQuery), pageable)
+        List<HousingEntity> housings = housingRepo.findAll(CustomSpecification.buildFromFilters(searchQuery), pageable)
                 .stream().toList();
         return new ResponseDTO<List<HousingDTO>>(housings.stream().map(h -> new HousingDTO(h)).toList(), "", 200);
     }
