@@ -16,7 +16,6 @@ import com.example.blsslab.exception.BadRequestBodyException;
 import com.example.blsslab.exception.RolePrivilegesViolationException;
 import com.example.blsslab.model.dto.BookingDTO;
 import com.example.blsslab.model.dto.BookingType;
-import com.example.blsslab.model.dto.HousingDTO;
 import com.example.blsslab.model.dto.PageInfo;
 import com.example.blsslab.model.dto.RequestStatus;
 import com.example.blsslab.model.entity.BookingEntity;
@@ -110,9 +109,9 @@ public class BookingService {
         existBooking.setCreatedAt(LocalDateTime.now());
         existBooking.setStatus(RequestStatus.PENDING);
 
-        bookingRepo.save(existBooking);
         BookingDTO response = new BookingDTO(existBooking);
         checkBookingPeriod(response);
+        bookingRepo.save(existBooking);
         return response;
     }
 
