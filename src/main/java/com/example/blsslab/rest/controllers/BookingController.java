@@ -15,17 +15,17 @@ import com.example.blsslab.model.dto.BookingType;
 import com.example.blsslab.model.dto.ModerationRequest;
 import com.example.blsslab.model.dto.PageInfo;
 import com.example.blsslab.service.BookingService;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.web.bind.annotation.PatchMapping;
 
 @RestController
 @RequestMapping("/bookings")
+@RequiredArgsConstructor
 public class BookingController {
 
-    BookingService bookingService;
-
-    public BookingController(BookingService bookingService) {
-        this.bookingService = bookingService;
-    }
+    final BookingService bookingService;
 
     @PostMapping()
     public BookingDTO addBooking(@RequestBody BookingDTO booking) {

@@ -10,15 +10,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.blsslab.model.dto.UserDTO;
 import com.example.blsslab.service.UserService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
 
-    UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+    final UserService userService;
 
     @PostMapping()
     public UserDTO addUser(@RequestBody UserDTO user) {

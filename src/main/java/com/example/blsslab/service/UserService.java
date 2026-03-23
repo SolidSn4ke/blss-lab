@@ -10,15 +10,13 @@ import com.example.blsslab.model.entity.UserEntity;
 import com.example.blsslab.model.repos.UserRepository;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    UserRepository userRepo;
-
-    public UserService(UserRepository userRepository) {
-        this.userRepo = userRepository;
-    }
+    final UserRepository userRepo;
 
     @Transactional
     public UserDTO addUser(UserDTO user) {

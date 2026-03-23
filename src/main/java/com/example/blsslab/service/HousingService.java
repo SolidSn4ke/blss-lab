@@ -27,25 +27,19 @@ import com.example.blsslab.model.repos.HousingRepository;
 import com.example.blsslab.model.repos.UserRepository;
 import com.example.blsslab.specs.CustomSpecification;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class HousingService {
 
-    HousingRepository housingRepo;
+    final HousingRepository housingRepo;
 
-    UserRepository userRepo;
+    final UserRepository userRepo;
 
-    AddressRepository addressRepo;
+    final AddressRepository addressRepo;
 
-    BookingRepository bookingRepo;
-
-    public HousingService(HousingRepository housingRepo, UserRepository userRepo, AddressRepository addressRepo,
-            BookingRepository bookingRepo) {
-        this.housingRepo = housingRepo;
-        this.userRepo = userRepo;
-        this.addressRepo = addressRepo;
-        this.bookingRepo = bookingRepo;
-    }
+    final BookingRepository bookingRepo;
 
     @Transactional(readOnly = true)
     public PageInfo<HousingDTO> getAllHousings(Pageable pageable, String searchQuery) {

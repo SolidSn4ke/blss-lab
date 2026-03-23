@@ -27,21 +27,17 @@ import com.example.blsslab.model.repos.UserRepository;
 import com.example.blsslab.specs.CustomSpecification;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class BookingService {
 
-    HousingRepository housingRepo;
+    final HousingRepository housingRepo;
 
-    UserRepository userRepo;
+    final UserRepository userRepo;
 
-    BookingRepository bookingRepo;
-
-    public BookingService(HousingRepository housingRepo, UserRepository userRepo, BookingRepository bookingRepo) {
-        this.housingRepo = housingRepo;
-        this.userRepo = userRepo;
-        this.bookingRepo = bookingRepo;
-    }
+    final BookingRepository bookingRepo;
 
     private void checkBookingPeriod(BookingDTO booking) {
         LocalDate startDate = booking.getCheckIn();

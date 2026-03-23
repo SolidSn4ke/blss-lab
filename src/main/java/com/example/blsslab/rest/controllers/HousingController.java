@@ -15,15 +15,14 @@ import com.example.blsslab.model.dto.ModerationRequest;
 import com.example.blsslab.model.dto.PageInfo;
 import com.example.blsslab.service.HousingService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/housings")
+@RequiredArgsConstructor
 public class HousingController {
 
-    HousingService housingService;
-
-    public HousingController(HousingService housingService) {
-        this.housingService = housingService;
-    }
+    final HousingService housingService;
 
     @GetMapping()
     public PageInfo<HousingDTO> getHousings(@RequestParam(required = false) String username,
