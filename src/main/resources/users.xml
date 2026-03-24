@@ -1,9 +1,9 @@
 <users>
-    <user>
-        <username>user</username>
-        <password>qwerty</password>
-        <name />
-        <familyName />
-        <role>USER</role>
-    </user>
+  <user>
+    <username>user</username>
+    <password>{bcrypt}$2a$10$3rPOdgVh/RcbjCAUwffAjOWpv0.PQm5oo3dWTknIcovjO.3x9j4ym</password>
+    <name></name>
+    <familyName></familyName>
+    <role>USER</role>
+  </user>
 </users>

@@ -13,7 +13,6 @@ import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
 import com.example.blsslab.config.ApplicationContextHolder;
-import com.example.blsslab.model.dto.UserDTO;
 import com.example.blsslab.service.XmlUserService;
 
 import lombok.NoArgsConstructor;
@@ -48,8 +47,8 @@ public class JaasLoginModule implements LoginModule {
         try {
             callbackHandler.handle(new Callback[] { nameCallback, passwordCallback });
             String username = nameCallback.getName();
-            UserDTO user = xmlUserService.getUserByUsername(username);
-            if (user != null && user.getPassword().equals(new String(passwordCallback.getPassword()))) {
+            String password = new String(passwordCallback.getPassword());
+            if (xmlUserService.verifyPassword(username, password)) {
                 loginSuccess = true;
             }
         } catch (IOException e) {

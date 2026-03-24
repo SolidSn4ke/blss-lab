@@ -7,11 +7,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.blsslab.model.dto.UserDTO;
 import com.example.blsslab.model.dto.UserXmlWrapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -22,19 +24,17 @@ public class XmlUserService {
     Map<String, UserDTO> users;
     XmlMapper mapper;
     UserXmlWrapper wrapper;
+    PasswordEncoder encoder;
 
     @Value("${users.xml.path}")
     String pathToXmlUsers;
-
-    public XmlUserService() {
-        this.users = new HashMap<>();
-        mapper = new XmlMapper();
-    }
 
     @PostConstruct
     void init() {
         users = new HashMap<>();
         mapper = new XmlMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
         File xmlFile = new File(pathToXmlUsers);
 
         if (xmlFile.exists()) {
@@ -62,6 +62,14 @@ public class XmlUserService {
         return users.containsKey(username);
     }
 
+    public boolean verifyPassword(String username, String password) {
+        UserDTO user = getUserByUsername(username);
+        if (user == null || !encoder.matches(password, user.getPassword())) {
+            return false;
+        } else
+            return true;
+    }
+
     public UserDTO getUserByUsername(String username) {
         if (checkIfPresent(username)) {
             return users.get(username);
@@ -73,6 +81,7 @@ public class XmlUserService {
         if (checkIfPresent(user.getUsername())) {
             return false;
         }
+        user.setPassword(encoder.encode(user.getPassword()));
         users.put(user.getUsername(), user);
         return true;
     }
