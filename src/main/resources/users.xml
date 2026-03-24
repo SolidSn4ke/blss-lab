@@ -1,0 +1,9 @@
+<users>
+    <user>
+        <username>user</username>
+        <password>qwerty</password>
+        <name />
+        <familyName />
+        <role>USER</role>
+    </user>
+</users>

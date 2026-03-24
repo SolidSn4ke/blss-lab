@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.springframework.security.authentication.jaas.AuthorityGranter;
 
-public class JAASAuthorityGranter implements AuthorityGranter {
+public class JaasAuthorityGranter implements AuthorityGranter {
 
     @Override
     public Set<String> grant(Principal principal) {

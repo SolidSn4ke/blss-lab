@@ -21,7 +21,7 @@ public class JwtService {
     @Value("${jwt.sign.key}")
     private String signKey;
 
-    String generateToken(UserDTO user) {
+    public String generateToken(UserDTO user) {
         Map<String, Object> claims = Map.of("role", user.getRole());
         return Jwts.builder().setClaims(claims).setSubject(user.getUsername())
                 .setExpiration(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000))

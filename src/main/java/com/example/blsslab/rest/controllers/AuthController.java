@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.blsslab.model.dto.UserDTO;
 import com.example.blsslab.service.JwtService;
+import com.example.blsslab.service.XmlUserService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,11 +21,18 @@ public class AuthController {
 
     final JwtService jwtService;
 
+    final XmlUserService xmlUserService;
+
     @PostMapping("/login")
-    public String postMethodName(@RequestBody UserDTO userCredentials) {
+    public String login(@RequestBody UserDTO userCredentials) {
         UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(
                 userCredentials.getUsername(), userCredentials.getPassword());
         provider.authenticate(credentials);
-        return "true";
+        return jwtService.generateToken(userCredentials);
+    }
+
+    @PostMapping("/sign-up")
+    public Boolean signUp(@RequestBody UserDTO userCredentials) {
+        return xmlUserService.addUser(userCredentials);
     }
 }

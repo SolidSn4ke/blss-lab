@@ -1,44 +1,85 @@
 package com.example.blsslab.security;
 
+import java.io.IOException;
 import java.util.Map;
 
 import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
+
+import com.example.blsslab.config.ApplicationContextHolder;
+import com.example.blsslab.model.dto.UserDTO;
+import com.example.blsslab.service.XmlUserService;
 
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class JAASLoginModule implements LoginModule {
+public class JaasLoginModule implements LoginModule {
+
+    XmlUserService xmlUserService;
 
     Subject subject;
     CallbackHandler callbackHandler;
+    Map<String, ?> sharedState;
+    Map<String, ?> options;
+
+    boolean loginSuccess = false;
 
     @Override
     public void initialize(Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState,
             Map<String, ?> options) {
         this.subject = subject;
         this.callbackHandler = callbackHandler;
+        this.sharedState = sharedState;
+        this.options = options;
+        xmlUserService = ApplicationContextHolder.getBean(XmlUserService.class);
     }
 
     @Override
     public boolean login() throws LoginException {
-        return true;
+        System.out.println("Login attempt");
+        NameCallback nameCallback = new NameCallback("username: ");
+        PasswordCallback passwordCallback = new PasswordCallback("password: ", false);
+        try {
+            callbackHandler.handle(new Callback[] { nameCallback, passwordCallback });
+            String username = nameCallback.getName();
+            UserDTO user = xmlUserService.getUserByUsername(username);
+            if (user != null && user.getPassword().equals(new String(passwordCallback.getPassword()))) {
+                loginSuccess = true;
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (UnsupportedCallbackException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return loginSuccess;
     }
 
     @Override
     public boolean commit() throws LoginException {
+        System.out.println("Commit attempt");
+        if (!loginSuccess) {
+            return false;
+        }
         return true;
     }
 
     @Override
     public boolean abort() throws LoginException {
+        System.out.println("Abort attempt");
         return true;
     }
 
     @Override
     public boolean logout() throws LoginException {
+        System.out.println("Logout attempt");
         return true;
     }
 }

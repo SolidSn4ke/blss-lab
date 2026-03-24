@@ -13,7 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.example.blsslab.security.JAASAuthorityGranter;
+import com.example.blsslab.security.JaasAuthorityGranter;
 
 @Configuration
 @EnableWebSecurity
@@ -21,12 +21,9 @@ public class SecurityConfig {
     @Bean
     JaasAuthenticationProvider jaasAuthenticationProvider() {
         JaasAuthenticationProvider provider = new JaasAuthenticationProvider();
-        // Set the JAAS login configuration file location
         provider.setLoginConfig(new ClassPathResource("login.conf"));
-        // Set the context name as defined in login.conf
         provider.setLoginContextName("BlssLab");
-        // Add the AuthorityGranter
-        provider.setAuthorityGranters(new AuthorityGranter[] { new JAASAuthorityGranter() });
+        provider.setAuthorityGranters(new AuthorityGranter[] { new JaasAuthorityGranter() });
         provider.setCallbackHandlers(new JaasAuthenticationCallbackHandler[] { new JaasNameCallbackHandler(),
                 new JaasPasswordCallbackHandler() });
         return provider;
