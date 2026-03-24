@@ -4,9 +4,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.authentication.jaas.AuthorityGranter;
+import org.springframework.security.authentication.jaas.JaasAuthenticationCallbackHandler;
 import org.springframework.security.authentication.jaas.JaasAuthenticationProvider;
+import org.springframework.security.authentication.jaas.JaasNameCallbackHandler;
+import org.springframework.security.authentication.jaas.JaasPasswordCallbackHandler;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.example.blsslab.security.JAASAuthorityGranter;
@@ -23,14 +27,18 @@ public class SecurityConfig {
         provider.setLoginContextName("BlssLab");
         // Add the AuthorityGranter
         provider.setAuthorityGranters(new AuthorityGranter[] { new JAASAuthorityGranter() });
+        provider.setCallbackHandlers(new JaasAuthenticationCallbackHandler[] { new JaasNameCallbackHandler(),
+                new JaasPasswordCallbackHandler() });
         return provider;
     }
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("auth/**").permitAll()
+                        .requestMatchers("/auth/**").permitAll()
                         .anyRequest().authenticated())
                 .authenticationProvider(jaasAuthenticationProvider());
 

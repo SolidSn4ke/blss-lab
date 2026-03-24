@@ -7,37 +7,38 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
 public class JAASLoginModule implements LoginModule {
+
+    Subject subject;
+    CallbackHandler callbackHandler;
 
     @Override
     public void initialize(Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState,
             Map<String, ?> options) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'initialize'");
+        this.subject = subject;
+        this.callbackHandler = callbackHandler;
     }
 
     @Override
     public boolean login() throws LoginException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'login'");
+        return true;
     }
 
     @Override
     public boolean commit() throws LoginException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'commit'");
+        return true;
     }
 
     @Override
     public boolean abort() throws LoginException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'abort'");
+        return true;
     }
 
     @Override
     public boolean logout() throws LoginException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'logout'");
+        return true;
     }
-
 }
