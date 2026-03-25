@@ -1,9 +1,10 @@
 package com.example.blsslab.rest.filters;
 
 import java.io.IOException;
-
+import java.util.Collection;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -42,16 +43,17 @@ public class JwtFilter extends OncePerRequestFilter {
 
         header = header.substring(BEARER_PREFIX.length());
         String username = jwtService.extractUsername(header);
+        Collection<? extends GrantedAuthority> authorities = jwtService.extractAuthorities(header);
 
         if (SecurityContextHolder.getContext().getAuthentication() == null && userService.checkIfPresent(username)) {
             SecurityContext context = SecurityContextHolder.createEmptyContext();
 
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, null,
-                    null);
+                    authorities);
+
             context.setAuthentication(authToken);
             SecurityContextHolder.setContext(context);
         }
         filterChain.doFilter(request, response);
     }
 }
-

@@ -1,11 +1,16 @@
 package com.example.blsslab.service;
 
 import java.security.Key;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import com.example.blsslab.model.dto.UserDTO;
@@ -22,7 +27,8 @@ public class JwtService {
     private String signKey;
 
     public String generateToken(UserDTO user) {
-        Map<String, Object> claims = Map.of("role", user.getRole());
+        Map<String, Object> claims = Map.of("authorities",
+                user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(",")));
         return Jwts.builder().setClaims(claims).setSubject(user.getUsername())
                 .setExpiration(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256).compact();
@@ -39,6 +45,11 @@ public class JwtService {
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    public Collection<? extends GrantedAuthority> extractAuthorities(String token) {
+        return Arrays.stream(extractClaim(token, claims -> claims.get("authorities")).toString().split(","))
+                .map(a -> new SimpleGrantedAuthority(a)).toList();
     }
 
     private boolean isTokenExpired(String token) {

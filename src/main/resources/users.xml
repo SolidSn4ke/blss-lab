@@ -1,5 +1,19 @@
 <users>
   <user>
+    <username>moder12</username>
+    <password>{bcrypt}$2a$10$29bpnxn.KaPuMRbQet56xOQIg9S3y0rGD6vkrm0rlrwIYToe7GkHy</password>
+    <name></name>
+    <familyName></familyName>
+    <role>MODERATOR</role>
+  </user>
+  <user>
+    <username>moder</username>
+    <password>{bcrypt}$2a$10$swqsl.8q8oHxLt8UV3nFje/p5vvDZcGqruB0QsNZRQPO32fqG0ZV6</password>
+    <name></name>
+    <familyName></familyName>
+    <role>MODERATOR</role>
+  </user>
+  <user>
     <username>user</username>
     <password>{bcrypt}$2a$10$3rPOdgVh/RcbjCAUwffAjOWpv0.PQm5oo3dWTknIcovjO.3x9j4ym</password>
     <name></name>
