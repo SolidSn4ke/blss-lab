@@ -11,6 +11,7 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
+import com.example.blsslab.security.principals.*;
 
 import com.example.blsslab.config.ApplicationContextHolder;
 import com.example.blsslab.service.XmlUserService;
@@ -22,6 +23,7 @@ public class JaasLoginModule implements LoginModule {
 
     XmlUserService xmlUserService;
 
+    private String username;
     Subject subject;
     CallbackHandler callbackHandler;
     Map<String, ?> sharedState;
@@ -46,7 +48,7 @@ public class JaasLoginModule implements LoginModule {
         PasswordCallback passwordCallback = new PasswordCallback("password: ", false);
         try {
             callbackHandler.handle(new Callback[] { nameCallback, passwordCallback });
-            String username = nameCallback.getName();
+            username = nameCallback.getName();
             String password = new String(passwordCallback.getPassword());
             if (xmlUserService.verifyPassword(username, password)) {
                 loginSuccess = true;
@@ -66,6 +68,13 @@ public class JaasLoginModule implements LoginModule {
         System.out.println("Commit attempt");
         if (!loginSuccess) {
             return false;
+        }
+        subject.getPrincipals().add(new UserPrincipal(username));
+
+        if (username.contains("moder")) {
+            subject.getPrincipals().add(new RolePrincipal("ROLE_MODER"));
+        } else {
+            subject.getPrincipals().add(new RolePrincipal("ROLE_USER"));
         }
         return true;
     }
