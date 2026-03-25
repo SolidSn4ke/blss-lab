@@ -1,10 +1,12 @@
-package com.example.blsslab.model.entity;
+package com.example.blsslab.model.db2.entity;
 
+import com.example.blsslab.model.db1.entity.HousingEntity;
 import com.example.blsslab.model.dto.BookingDTO;
 import com.example.blsslab.model.dto.RequestStatus;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,13 +29,11 @@ public class BookingEntity {
     @NotNull
     private LocalDate checkOut;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "booked_by")
-    private UserEntity guest;
+    @NotBlank
+    private String guest;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "housing_id")
-    private HousingEntity housing;
+    @Column(name = "housingId")
+    private Long housing;
 
     @NotNull
     private LocalDateTime createdAt;

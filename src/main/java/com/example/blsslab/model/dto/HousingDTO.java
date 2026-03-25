@@ -1,6 +1,6 @@
 package com.example.blsslab.model.dto;
 
-import com.example.blsslab.model.entity.HousingEntity;
+import com.example.blsslab.model.db1.entity.HousingEntity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +16,7 @@ public class HousingDTO {
     Integer numOfBeds;
     HousingType housingType;
     AddressDTO address;
-    UserDTO owner;
+    String owner;
 
     public HousingDTO(HousingEntity housingEntity) {
         this.id = housingEntity.getId();
@@ -25,6 +25,6 @@ public class HousingDTO {
         this.numOfBeds = housingEntity.getNumOfBeds();
         this.housingType = housingEntity.getHousingType();
         this.address = new AddressDTO(housingEntity.getAddress());
-        this.owner = new UserDTO(housingEntity.getOwner());
+        this.owner = housingEntity.getOwner();
     }
 }

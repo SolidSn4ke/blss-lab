@@ -1,4 +1,4 @@
-package com.example.blsslab.model.repos;
+package com.example.blsslab.model.db1.repos;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.example.blsslab.model.entity.HousingEntity;
+import com.example.blsslab.model.db1.entity.HousingEntity;
 import com.example.blsslab.model.dto.RequestStatus;
 
 @Repository

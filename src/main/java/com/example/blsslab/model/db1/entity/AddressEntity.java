@@ -1,4 +1,4 @@
-package com.example.blsslab.model.entity;
+package com.example.blsslab.model.db1.entity;
 
 import java.util.Set;
 

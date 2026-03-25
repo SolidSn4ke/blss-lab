@@ -1,6 +1,4 @@
-package com.example.blsslab.model.entity;
-
-import java.util.Set;
+package com.example.blsslab.model.db1.entity;
 
 import com.example.blsslab.model.dto.HousingDTO;
 import com.example.blsslab.model.dto.HousingType;
@@ -9,6 +7,7 @@ import com.example.blsslab.model.dto.RequestStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -49,12 +48,9 @@ public class HousingEntity {
     @JoinColumn(name = "address_id")
     private AddressEntity address;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "belongs_to")
-    private UserEntity owner;
-
-    @OneToMany(mappedBy = "housing")
-    private Set<BookingEntity> bookingRequests;
+    @Column(name = "owner")
+    @NotBlank
+    private String owner;
 
     public void update(HousingDTO housingDTO) {
         if (housingDTO.getPrice() != null) {

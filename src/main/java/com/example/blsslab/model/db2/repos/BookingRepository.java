@@ -1,4 +1,4 @@
-package com.example.blsslab.model.repos;
+package com.example.blsslab.model.db2.repos;
 
 import java.util.List;
 
@@ -10,8 +10,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import com.example.blsslab.model.db2.entity.BookingEntity;
 import com.example.blsslab.model.dto.RequestStatus;
-import com.example.blsslab.model.entity.BookingEntity;
 
 @Repository
 public interface BookingRepository extends JpaRepository<BookingEntity, Long>, JpaSpecificationExecutor<BookingEntity> {

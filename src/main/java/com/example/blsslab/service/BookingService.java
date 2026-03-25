@@ -14,16 +14,15 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.blsslab.exception.AlreadyProcessedException;
 import com.example.blsslab.exception.BadRequestBodyException;
 import com.example.blsslab.exception.RolePrivilegesViolationException;
+import com.example.blsslab.model.db1.entity.HousingEntity;
+import com.example.blsslab.model.db1.repos.HousingRepository;
+import com.example.blsslab.model.db2.entity.BookingEntity;
+import com.example.blsslab.model.db2.repos.BookingRepository;
 import com.example.blsslab.model.dto.BookingDTO;
 import com.example.blsslab.model.dto.BookingType;
 import com.example.blsslab.model.dto.PageInfo;
 import com.example.blsslab.model.dto.RequestStatus;
-import com.example.blsslab.model.entity.BookingEntity;
-import com.example.blsslab.model.entity.HousingEntity;
-import com.example.blsslab.model.entity.UserEntity;
-import com.example.blsslab.model.repos.BookingRepository;
-import com.example.blsslab.model.repos.HousingRepository;
-import com.example.blsslab.model.repos.UserRepository;
+import com.example.blsslab.model.dto.UserDTO;
 import com.example.blsslab.specs.CustomSpecification;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -35,9 +34,9 @@ public class BookingService {
 
     final HousingRepository housingRepo;
 
-    final UserRepository userRepo;
-
     final BookingRepository bookingRepo;
+
+    final XmlUserService xmlUserService;
 
     private void checkBookingPeriod(BookingDTO booking) {
         LocalDate startDate = booking.getCheckIn();
@@ -51,7 +50,7 @@ public class BookingService {
         }
 
         List<BookingEntity> existingBookings = bookingRepo.findAllByHousingIdAndStatus(
-                booking.getHousing().getId(), RequestStatus.CONFIRMED);
+                booking.getHousingId(), RequestStatus.CONFIRMED);
 
         for (BookingEntity existingBooking : existingBookings) {
             LocalDate existingStart = existingBooking.getCheckIn();
@@ -66,9 +65,11 @@ public class BookingService {
     @Transactional
     public BookingDTO requireHousing(BookingDTO booking) {
 
-        UserEntity user = userRepo.findById(booking.getGuest().getUsername())
-                .orElseThrow(() -> new EntityNotFoundException("Failed to retrive user by username"));
-        HousingEntity housing = housingRepo.findById(booking.getHousing().getId())
+        UserDTO user = xmlUserService.getUserByUsername(booking.getGuest());
+        if (user == null) {
+            throw new EntityNotFoundException("Failed to retrieve user by username");
+        }
+        HousingEntity housing = housingRepo.findById(booking.getHousingId())
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrive housing by id"));
 
         LocalDate startDate = booking.getCheckIn();
@@ -86,11 +87,10 @@ public class BookingService {
         newBooking.setInfantsCount(booking.getInfantsCount());
         newBooking.setPetCount(booking.getPetCount());
 
-        newBooking.setGuest(user);
-        newBooking.setHousing(housing);
+        newBooking.setGuest(user.getUsername());
+        newBooking.setHousing(housing.getId());
 
         bookingRepo.save(newBooking);
-        userRepo.save(user);
         housingRepo.save(housing);
 
         return new BookingDTO(newBooking);
@@ -150,7 +150,10 @@ public class BookingService {
         BookingEntity booking = bookingRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve booking by id"));
 
-        UserEntity owner = booking.getHousing().getOwner();
+        UserDTO owner = xmlUserService.getUserByUsername(housingRepo.findById(booking.getHousing()).orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username")).getOwner());
+        if (owner == null) {
+            throw new EntityNotFoundException("Failed to retrieve user by username");
+        }
 
         if (owner == null || !owner.getUsername().equals(username)) {
             throw new RolePrivilegesViolationException("Only owner can approve or deny request");

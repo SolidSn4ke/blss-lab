@@ -1,6 +1,5 @@
 package com.example.blsslab.model.dto;
 
-import com.example.blsslab.model.entity.UserEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,11 +13,4 @@ public class UserDTO {
     String name;
     String familyName;
     UserRole role;
-
-    public UserDTO(UserEntity userEntity) {
-        this.username = userEntity.getUsername();
-        this.name = userEntity.getName();
-        this.familyName = userEntity.getFamilyName();
-        this.role = userEntity.getRole();
-    }
 }

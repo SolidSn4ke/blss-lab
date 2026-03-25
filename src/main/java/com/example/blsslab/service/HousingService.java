@@ -13,18 +13,17 @@ import com.example.blsslab.exception.AlreadyProcessedException;
 import com.example.blsslab.exception.BadRequestBodyException;
 import com.example.blsslab.exception.DependencyViolationException;
 import com.example.blsslab.exception.RolePrivilegesViolationException;
+import com.example.blsslab.model.db1.entity.AddressEntity;
+import com.example.blsslab.model.db1.entity.HousingEntity;
+import com.example.blsslab.model.db1.repos.AddressRepository;
+import com.example.blsslab.model.db1.repos.HousingRepository;
+import com.example.blsslab.model.db2.entity.BookingEntity;
+import com.example.blsslab.model.db2.repos.BookingRepository;
 import com.example.blsslab.model.dto.HousingDTO;
 import com.example.blsslab.model.dto.PageInfo;
 import com.example.blsslab.model.dto.RequestStatus;
+import com.example.blsslab.model.dto.UserDTO;
 import com.example.blsslab.model.dto.UserRole;
-import com.example.blsslab.model.entity.AddressEntity;
-import com.example.blsslab.model.entity.BookingEntity;
-import com.example.blsslab.model.entity.HousingEntity;
-import com.example.blsslab.model.entity.UserEntity;
-import com.example.blsslab.model.repos.AddressRepository;
-import com.example.blsslab.model.repos.BookingRepository;
-import com.example.blsslab.model.repos.HousingRepository;
-import com.example.blsslab.model.repos.UserRepository;
 import com.example.blsslab.specs.CustomSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +32,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class HousingService {
 
-    final HousingRepository housingRepo;
+    final XmlUserService xmlUserService;
 
-    final UserRepository userRepo;
+    final HousingRepository housingRepo;
 
     final AddressRepository addressRepo;
 
@@ -51,8 +50,10 @@ public class HousingService {
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public HousingDTO handleRequest(String username, Long id, Boolean approved) {
-        UserEntity user = userRepo.findById(username)
-                .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username"));
+        UserDTO user = xmlUserService.getUserByUsername(username);
+        if (user == null) {
+            throw new EntityNotFoundException("Failed to retrieve user by username");
+        }
 
         if (user.getRole() != UserRole.MODERATOR) {
             throw new RolePrivilegesViolationException("Only moderator has access to this action");
@@ -82,8 +83,10 @@ public class HousingService {
 
     @Transactional
     public HousingDTO addHousing(HousingDTO housing) {
-        UserEntity owner = userRepo.findById(housing.getOwner().getUsername())
-                .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username"));
+        UserDTO owner = xmlUserService.getUserByUsername(housing.getOwner());
+        if (owner == null) {
+            throw new EntityNotFoundException("Failed to retrieve user by username");
+        }
 
         HousingEntity housingEntity = new HousingEntity();
         housingEntity.setPrice(housing.getPrice());
@@ -91,7 +94,7 @@ public class HousingService {
         housingEntity.setRating(housing.getRating());
         housingEntity.setHousingType(housing.getHousingType());
         housingEntity.setStatus(RequestStatus.PENDING);
-        housingEntity.setOwner(owner);
+        housingEntity.setOwner(owner.getUsername());
 
         AddressEntity address;
 
@@ -127,9 +130,11 @@ public class HousingService {
         existHousing.update(housingDTO);
 
         if (housingDTO.getOwner() != null) {
-            UserEntity owner = userRepo.findById(housingDTO.getOwner().getUsername())
-                    .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username"));
-            existHousing.setOwner(owner);
+            UserDTO owner = xmlUserService.getUserByUsername(housingDTO.getOwner());
+            if (owner == null) {
+                throw new EntityNotFoundException("Failed to retrieve user by username");
+            }
+            existHousing.setOwner(owner.getUsername());
         }
 
         if (housingDTO.getAddress() != null) {
