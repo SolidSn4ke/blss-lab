@@ -87,10 +87,12 @@ public class XmlUserService {
     }
 
     public boolean deleteUser() {
+        // TODO: delete user
         return true;
     }
 
     public boolean updateUser() {
+        // TODO: update user
         return true;
     }
 }
