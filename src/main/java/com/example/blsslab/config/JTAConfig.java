@@ -2,6 +2,7 @@ package com.example.blsslab.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.jta.JtaTransactionManager;
 
@@ -33,6 +34,7 @@ public class JTAConfig {
     }
 
     @Bean(name = "transactionManager")
+    @Primary
     PlatformTransactionManager platformTransactionManager() throws SystemException {
         JtaTransactionManager jtaTransactionManager = new JtaTransactionManager();
 

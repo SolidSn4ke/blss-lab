@@ -2,6 +2,7 @@ package com.example.blsslab.config;
 
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +13,7 @@ import org.postgresql.xa.PGXADataSource;
 import com.atomikos.jdbc.AtomikosDataSourceBean;
 
 @Configuration
-@EnableJpaRepositories(basePackages = "com.example.blsslab.model.db2.repos", entityManagerFactoryRef = "db2EntityManagerFactory")
+@EnableJpaRepositories(basePackages = "com.example.blsslab.model.db2.repos", entityManagerFactoryRef = "db2EntityManagerFactory", transactionManagerRef = "transactionManager")
 public class DB2Config {
 
     @Bean
@@ -31,7 +32,7 @@ public class DB2Config {
 
     @Bean
     public LocalContainerEntityManagerFactoryBean db2EntityManagerFactory(
-            EntityManagerFactoryBuilder builder, DataSource dataSource) {
+            EntityManagerFactoryBuilder builder, @Qualifier("db2DataSource") DataSource dataSource) {
 
         return builder
                 .dataSource(dataSource)
