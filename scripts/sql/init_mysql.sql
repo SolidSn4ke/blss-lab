@@ -1,0 +1,1 @@
+CREATE DATABASE blss_db2;
