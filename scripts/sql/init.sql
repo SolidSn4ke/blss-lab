@@ -1,0 +1,3 @@
+CREATE DATABASE blss_db1;
+
+CREATE DATABASE blss_db2;

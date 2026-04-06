@@ -30,7 +30,7 @@ public class BookingDTO {
         this.checkIn = bookingEntity.getCheckIn();
         this.checkOut = bookingEntity.getCheckOut();
         this.guest = bookingEntity.getGuest();
-        this.housingId = bookingEntity.getHousing();
+        this.housingId = bookingEntity.getHousingId();
         this.createdAt = bookingEntity.getCreatedAt();
         this.status = bookingEntity.getStatus();
         this.totalPrice = bookingEntity.getTotalPrice();

@@ -23,7 +23,6 @@ import com.example.blsslab.model.dto.BookingType;
 import com.example.blsslab.model.dto.PageInfo;
 import com.example.blsslab.model.dto.RequestStatus;
 import com.example.blsslab.model.dto.UserDTO;
-import com.example.blsslab.specs.CustomSpecification;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -88,7 +87,7 @@ public class BookingService {
         newBooking.setPetCount(booking.getPetCount());
 
         newBooking.setGuest(user.getUsername());
-        newBooking.setHousing(housing.getId());
+        newBooking.setHousingId(housing.getId());
 
         bookingRepo.save(newBooking);
         housingRepo.save(housing);
@@ -135,8 +134,12 @@ public class BookingService {
             default -> sb.append("");
         }
 
-        Page<BookingEntity> result = bookingRepo
-                .findAllWithJoinFetch(CustomSpecification.buildFromFilters(sb.toString()), pageable);
+        // TODO: Изменить получение bookings
+        // Page<BookingEntity> result = bookingRepo
+        // .findAllWithJoinFetch(CustomSpecification.buildFromFilters(sb.toString()),
+        // pageable);
+        Page<BookingEntity> result = Page.empty();
+
         List<BookingDTO> content = result.toList().stream().map(b -> new BookingDTO(b)).toList();
         return new PageInfo<BookingDTO>(content, result.getTotalPages(), result.getNumber(), result.getTotalElements());
     }
@@ -150,7 +153,8 @@ public class BookingService {
         BookingEntity booking = bookingRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve booking by id"));
 
-        UserDTO owner = xmlUserService.getUserByUsername(housingRepo.findById(booking.getHousing()).orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username")).getOwner());
+        UserDTO owner = xmlUserService.getUserByUsername(housingRepo.findById(booking.getHousingId())
+                .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username")).getOwner());
         if (owner == null) {
             throw new EntityNotFoundException("Failed to retrieve user by username");
         }

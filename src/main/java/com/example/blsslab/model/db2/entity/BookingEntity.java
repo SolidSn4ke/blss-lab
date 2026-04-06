@@ -1,6 +1,5 @@
 package com.example.blsslab.model.db2.entity;
 
-import com.example.blsslab.model.db1.entity.HousingEntity;
 import com.example.blsslab.model.dto.BookingDTO;
 import com.example.blsslab.model.dto.RequestStatus;
 
@@ -32,8 +31,8 @@ public class BookingEntity {
     @NotBlank
     private String guest;
 
-    @Column(name = "housingId")
-    private Long housing;
+    @NotNull
+    private Long housingId;
 
     @NotNull
     private LocalDateTime createdAt;
