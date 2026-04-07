@@ -3,7 +3,9 @@ package com.example.blsslab.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -151,21 +153,29 @@ public class BookingService {
             String searchQuery,
             Pageable pageable) {
         StringBuilder sb = new StringBuilder(searchQuery == null ? "" : searchQuery);
+        final List<Long> ownedHousings = new ArrayList<>();
 
         switch (type) {
             case SENT ->
-                sb.append(String.format(";guest.username=%s", username));
+                sb.append(String.format(";guest=%s", username));
 
-            case RECIEVED -> sb.append(String.format(";housing.owner.username=%s", username));
+            case RECIEVED -> {
+                housingRepo
+                        .findAll(CustomSpecification.buildFromFilters(String.format("owner=%s", username)), pageable)
+                        .forEach(e -> ownedHousings.add(e.getId()));
+            }
 
             default -> sb.append("");
         }
 
-        Page<BookingEntity> result = bookingRepo
-                .findAllWithJoinFetch(CustomSpecification.buildFromFilters(sb.toString()),
-                        pageable);
+        Page<BookingEntity> result = bookingRepo.findAll(CustomSpecification.buildFromFilters(sb.toString()), pageable);
+        Stream<BookingEntity> stream = result.stream();
 
-        List<BookingDTO> content = result.toList().stream().map(b -> new BookingDTO(b)).toList();
+        if (type == BookingType.RECIEVED) {
+            stream = stream.filter(e -> ownedHousings.contains(e.getHousingId()));
+        }
+
+        List<BookingDTO> content = stream.map(b -> new BookingDTO(b)).toList();
         return new PageInfo<BookingDTO>(content, result.getTotalPages(), result.getNumber(), result.getTotalElements());
     }
 
