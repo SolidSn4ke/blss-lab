@@ -1,5 +1,7 @@
 package com.example.blsslab.config;
 
+import java.util.HashMap;
+
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -34,10 +36,14 @@ public class MySQLConfig {
     public LocalContainerEntityManagerFactoryBean MySQLEntityManagerFactory(
             EntityManagerFactoryBuilder builder, @Qualifier("MySQLDataSource") DataSource dataSource) {
 
+        HashMap<String, Object> properties = new HashMap<>();
+        properties.put("hibernate.hbm2ddl.auto", "create");
+
         return builder
                 .dataSource(dataSource)
                 .packages("com.example.blsslab.model.mysql.entity")
                 .persistenceUnit("MySQLPU")
+                .properties(properties)
                 .build();
     }
 }

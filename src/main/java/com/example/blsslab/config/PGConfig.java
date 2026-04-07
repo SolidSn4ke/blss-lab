@@ -1,5 +1,7 @@
 package com.example.blsslab.config;
 
+import java.util.HashMap;
+
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -36,10 +38,14 @@ public class PGConfig {
     public LocalContainerEntityManagerFactoryBean PgEntityManagerFactory(
             EntityManagerFactoryBuilder builder, @Qualifier("PgDataSource") DataSource dataSource) {
 
+        HashMap<String, Object> properties = new HashMap<>();
+        properties.put("hibernate.hbm2ddl.auto", "create");
+
         return builder
                 .dataSource(dataSource)
                 .packages("com.example.blsslab.model.postgres.entity")
                 .persistenceUnit("PostgresPU")
+                .properties(properties)
                 .build();
     }
 }
