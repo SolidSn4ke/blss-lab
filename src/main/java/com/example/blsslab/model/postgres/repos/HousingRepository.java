@@ -16,7 +16,7 @@ import com.example.blsslab.model.postgres.entity.HousingEntity;
 @Repository
 public interface HousingRepository extends JpaRepository<HousingEntity, Long>, JpaSpecificationExecutor<HousingEntity> {
 
-    @Query("select h from HousingEntity h join fetch h.owner join fetch h.address")
+    @Query("select h from HousingEntity h join fetch h.address")
     Page<HousingEntity> findAllWithJoinFetch(Specification<HousingEntity> spec, Pageable pageable);
 
     @Query("select h from HousingEntity h where h.status = :status")

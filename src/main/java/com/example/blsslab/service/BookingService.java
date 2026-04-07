@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import com.example.blsslab.model.mysql.entity.BookingEntity;
 import com.example.blsslab.model.mysql.repos.BookingRepository;
 import com.example.blsslab.model.postgres.entity.HousingEntity;
 import com.example.blsslab.model.postgres.repos.HousingRepository;
+import com.example.blsslab.specs.CustomSpecification;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -64,7 +66,8 @@ public class BookingService {
     @Transactional
     public BookingDTO requireHousing(BookingDTO booking) {
 
-        UserDTO user = xmlUserService.getUserByUsername(booking.getGuest());
+        UserDTO user = xmlUserService
+                .getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
         if (user == null) {
             throw new EntityNotFoundException("Failed to retrieve user by username");
         }
@@ -90,7 +93,6 @@ public class BookingService {
         newBooking.setHousingId(housing.getId());
 
         bookingRepo.save(newBooking);
-        housingRepo.save(housing);
 
         return new BookingDTO(newBooking);
     }
@@ -134,11 +136,9 @@ public class BookingService {
             default -> sb.append("");
         }
 
-        // TODO: Изменить получение bookings
-        // Page<BookingEntity> result = bookingRepo
-        // .findAllWithJoinFetch(CustomSpecification.buildFromFilters(sb.toString()),
-        // pageable);
-        Page<BookingEntity> result = Page.empty();
+        Page<BookingEntity> result = bookingRepo
+                .findAllWithJoinFetch(CustomSpecification.buildFromFilters(sb.toString()),
+                        pageable);
 
         List<BookingDTO> content = result.toList().stream().map(b -> new BookingDTO(b)).toList();
         return new PageInfo<BookingDTO>(content, result.getTotalPages(), result.getNumber(), result.getTotalElements());

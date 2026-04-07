@@ -41,6 +41,10 @@ public class PGConfig {
         HashMap<String, Object> properties = new HashMap<>();
         properties.put("hibernate.hbm2ddl.auto", "create");
 
+        properties.put("hibernate.transaction.jta.platform",
+                "org.hibernate.engine.transaction.jta.platform.internal.AtomikosJtaPlatform");
+        properties.put("javax.persistence.transactionType", "JTA");
+
         return builder
                 .dataSource(dataSource)
                 .packages("com.example.blsslab.model.postgres.entity")

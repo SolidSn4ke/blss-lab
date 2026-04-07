@@ -1,5 +1,6 @@
 package com.example.blsslab.config;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 
 import javax.sql.DataSource;
@@ -19,7 +20,7 @@ import com.mysql.cj.jdbc.MysqlXADataSource;
 public class MySQLConfig {
 
     @Bean
-    public DataSource MySQLDataSource(Environment env) {
+    public DataSource MySQLDataSource(Environment env) throws SQLException {
         MysqlXADataSource xaDataSource = new MysqlXADataSource();
         xaDataSource.setUrl(env.getProperty("app.datasource.mysql.url"));
         xaDataSource.setUser(env.getProperty("app.datasource.mysql.username"));
@@ -38,6 +39,10 @@ public class MySQLConfig {
 
         HashMap<String, Object> properties = new HashMap<>();
         properties.put("hibernate.hbm2ddl.auto", "create");
+
+        properties.put("hibernate.transaction.jta.platform",
+                "org.hibernate.engine.transaction.jta.platform.internal.AtomikosJtaPlatform");
+        properties.put("javax.persistence.transactionType", "JTA");
 
         return builder
                 .dataSource(dataSource)

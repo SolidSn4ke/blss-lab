@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.validation.ConstraintViolationException;
@@ -44,6 +45,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(OptimisticLockException.class)
     public ResponseEntity<String> handleOptimisticLockException(OptimisticLockException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<String> handleExpiredjwtException(ExpiredJwtException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(RuntimeException.class)
