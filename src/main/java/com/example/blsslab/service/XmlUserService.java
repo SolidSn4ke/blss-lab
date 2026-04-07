@@ -11,8 +11,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.example.blsslab.model.dto.UserDTO;
 import com.example.blsslab.model.dto.UserXmlWrapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
