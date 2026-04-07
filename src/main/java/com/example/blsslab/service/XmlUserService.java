@@ -7,9 +7,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.blsslab.model.dto.UserDTO;
 import com.example.blsslab.model.dto.UserXmlWrapper;
@@ -86,13 +88,24 @@ public class XmlUserService {
         return true;
     }
 
-    public boolean deleteUser() {
-        // TODO: delete user
-        return true;
+    public boolean deleteUser(String username) {
+        return users.remove(username) == null ? false : true;
     }
 
-    public boolean updateUser() {
-        // TODO: update user
+    public boolean updateUser(String username, UserDTO newInfo) {
+        if (users.get(newInfo.getUsername()) != null && !username.equals(newInfo.getUsername())) {
+            throw new DataIntegrityViolationException("This username is already taken. No changes has been done");
+        }
+
+        UserDTO user = users.get(username);
+        user.update(newInfo);
+
+        if (newInfo.getPassword() != null) {
+            user.setPassword(encoder.encode(user.getPassword()));
+        }
+
+        users.remove(username);
+        users.put(user.getUsername(), user);
         return true;
     }
 }
