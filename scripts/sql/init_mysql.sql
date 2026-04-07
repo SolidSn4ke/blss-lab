@@ -1,1 +1,1 @@
-CREATE DATABASE blss_db2;
+CREATE DATABASE blss;

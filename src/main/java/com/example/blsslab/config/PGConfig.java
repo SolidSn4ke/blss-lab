@@ -14,18 +14,18 @@ import org.postgresql.xa.PGXADataSource;
 import com.atomikos.jdbc.AtomikosDataSourceBean;
 
 @Configuration
-@EnableJpaRepositories(basePackages = "com.example.blsslab.model.db1.repos", entityManagerFactoryRef = "db1EntityManagerFactory", transactionManagerRef = "transactionManager")
-public class DB1Config {
+@EnableJpaRepositories(basePackages = "com.example.blsslab.model.postgres.repos", entityManagerFactoryRef = "PgEntityManagerFactory", transactionManagerRef = "transactionManager")
+public class PGConfig {
     @Bean
     @Primary
-    public DataSource db1DataSource(Environment env) {
+    public DataSource PgDataSource(Environment env) {
         PGXADataSource xaDataSource = new PGXADataSource();
-        xaDataSource.setUrl(env.getProperty("app.datasource.db1.url"));
-        xaDataSource.setUser(env.getProperty("app.datasource.db1.username"));
-        xaDataSource.setPassword(env.getProperty("app.datasource.db1.password"));
+        xaDataSource.setUrl(env.getProperty("app.datasource.postgres.url"));
+        xaDataSource.setUser(env.getProperty("app.datasource.postgres.username"));
+        xaDataSource.setPassword(env.getProperty("app.datasource.postgres.password"));
 
         AtomikosDataSourceBean ds = new AtomikosDataSourceBean();
-        ds.setUniqueResourceName("db1");
+        ds.setUniqueResourceName("PgDataSource");
         ds.setXaDataSource(xaDataSource);
 
         return ds;
@@ -33,13 +33,13 @@ public class DB1Config {
 
     @Bean
     @Primary
-    public LocalContainerEntityManagerFactoryBean db1EntityManagerFactory(
-            EntityManagerFactoryBuilder builder, @Qualifier("db1DataSource") DataSource dataSource) {
+    public LocalContainerEntityManagerFactoryBean PgEntityManagerFactory(
+            EntityManagerFactoryBuilder builder, @Qualifier("PgDataSource") DataSource dataSource) {
 
         return builder
                 .dataSource(dataSource)
-                .packages("com.example.blsslab.model.db1.entity")
-                .persistenceUnit("db1")
+                .packages("com.example.blsslab.model.postgres.entity")
+                .persistenceUnit("PostgresPU")
                 .build();
     }
 }

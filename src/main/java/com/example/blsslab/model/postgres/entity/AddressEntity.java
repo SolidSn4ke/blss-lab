@@ -1,4 +1,4 @@
-package com.example.blsslab.model.db1.entity;
+package com.example.blsslab.model.postgres.entity;
 
 import java.util.Set;
 

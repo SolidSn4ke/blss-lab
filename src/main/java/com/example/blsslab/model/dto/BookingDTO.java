@@ -6,7 +6,7 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import com.example.blsslab.model.db2.entity.BookingEntity;
+import com.example.blsslab.model.mysql.entity.BookingEntity;
 
 @Getter
 @Setter

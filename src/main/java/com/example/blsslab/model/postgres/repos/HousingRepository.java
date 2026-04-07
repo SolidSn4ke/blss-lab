@@ -1,4 +1,4 @@
-package com.example.blsslab.model.db1.repos;
+package com.example.blsslab.model.postgres.repos;
 
 import java.util.List;
 
@@ -10,8 +10,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.example.blsslab.model.db1.entity.HousingEntity;
 import com.example.blsslab.model.dto.RequestStatus;
+import com.example.blsslab.model.postgres.entity.HousingEntity;
 
 @Repository
 public interface HousingRepository extends JpaRepository<HousingEntity, Long>, JpaSpecificationExecutor<HousingEntity> {

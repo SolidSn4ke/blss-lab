@@ -1,4 +1,4 @@
-package com.example.blsslab.model.db2.entity;
+package com.example.blsslab.model.mysql.entity;
 
 import com.example.blsslab.model.dto.BookingDTO;
 import com.example.blsslab.model.dto.RequestStatus;

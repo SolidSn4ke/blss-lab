@@ -1,6 +1,6 @@
 package com.example.blsslab.model.dto;
 
-import com.example.blsslab.model.db1.entity.HousingEntity;
+import com.example.blsslab.model.postgres.entity.HousingEntity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
