@@ -9,5 +9,4 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ModerationRequest {
     Boolean approved;
-    UserDTO user;
 }

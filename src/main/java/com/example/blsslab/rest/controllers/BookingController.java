@@ -1,6 +1,7 @@
 package com.example.blsslab.rest.controllers;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,18 +48,19 @@ public class BookingController {
 
     @GetMapping()
     public PageInfo<BookingDTO> getBookings(
-            @RequestParam String username,
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "SENT") BookingType type,
             Pageable pageable) {
-        return bookingService.getBookings(username, type, search, pageable);
+        return bookingService.getBookings(SecurityContextHolder.getContext().getAuthentication().getName(), type,
+                search, pageable);
     }
 
     @PostMapping("/{id}/moderation")
     public BookingDTO handleRequest(
             @PathVariable Long id,
             @RequestBody ModerationRequest body) {
-        BookingDTO response = bookingService.handleRequest(body.getUser().getUsername(), id,
+        BookingDTO response = bookingService.handleRequest(
+                SecurityContextHolder.getContext().getAuthentication().getName(), id,
                 body.getApproved());
         return response;
     }

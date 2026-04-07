@@ -1,6 +1,7 @@
 package com.example.blsslab.rest.controllers;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,8 +26,7 @@ public class HousingController {
     final HousingService housingService;
 
     @GetMapping()
-    public PageInfo<HousingDTO> getHousings(@RequestParam(required = false) String username,
-            @RequestParam(required = false) String search, Pageable pageable) {
+    public PageInfo<HousingDTO> getHousings(@RequestParam(required = false) String search, Pageable pageable) {
         PageInfo<HousingDTO> response = housingService.getAllHousings(pageable, search);
         return response;
     }
@@ -35,7 +35,8 @@ public class HousingController {
     public HousingDTO moderateHousing(
             @PathVariable Long id,
             @RequestBody ModerationRequest body) {
-        HousingDTO response = housingService.handleRequest(body.getUser().getUsername(), id,
+        HousingDTO response = housingService.handleRequest(
+                SecurityContextHolder.getContext().getAuthentication().getName(), id,
                 body.getApproved());
         return response;
     }
