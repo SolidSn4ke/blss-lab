@@ -7,6 +7,13 @@
     <role>MODERATOR</role>
   </user>
   <user>
+    <username>user2</username>
+    <password>{bcrypt}$2a$10$kelgq8ENAQ6c8uvjQWd1e.xDthFhBgL.HtioKwsUfLKZwckk/mzyG</password>
+    <name>test</name>
+    <familyName>test</familyName>
+    <role>USER</role>
+  </user>
+  <user>
     <username>moder</username>
     <password>{bcrypt}$2a$10$swqsl.8q8oHxLt8UV3nFje/p5vvDZcGqruB0QsNZRQPO32fqG0ZV6</password>
     <name></name>

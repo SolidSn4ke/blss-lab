@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -102,6 +103,17 @@ public class BookingService {
         BookingEntity existBooking = bookingRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve booking by id"));
 
+        HousingEntity bookedHousing = housingRepo.findById(existBooking.getHousingId())
+                .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve housing by id"));
+
+        String callerUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!callerUsername.equals(existBooking.getGuest()) && !callerUsername.equals(bookedHousing.getOwner()) &&
+                !SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                        .contains(new SimpleGrantedAuthority("ROLE_MODER"))) {
+            throw new RolePrivilegesViolationException(
+                    "Only an owner, a guest or a moderator can change booking information");
+        }
+
         existBooking.update(bookingDTO);
         existBooking.setCreatedAt(LocalDateTime.now());
         existBooking.setStatus(RequestStatus.PENDING);
@@ -114,7 +126,20 @@ public class BookingService {
 
     @Transactional
     public Boolean deleteBooking(Long id) {
-        bookingRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("Failed to retrieve booking by id"));
+        BookingEntity booking = bookingRepo.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve booking by id"));
+
+        HousingEntity bookedHousing = housingRepo.findById(booking.getHousingId())
+                .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve housing by id"));
+
+        String callerUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!callerUsername.equals(booking.getGuest()) && !callerUsername.equals(bookedHousing.getOwner()) &&
+                !SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                        .contains(new SimpleGrantedAuthority("ROLE_MODER"))) {
+            throw new RolePrivilegesViolationException(
+                    "Only an owner, a guest or a moderator can change booking information");
+        }
+
         bookingRepo.deleteById(id);
         return true;
     }

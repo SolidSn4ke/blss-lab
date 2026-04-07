@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -123,6 +124,12 @@ public class HousingService {
         HousingEntity existHousing = housingRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve housing by id"));
 
+        if (!existHousing.getOwner().equals(SecurityContextHolder.getContext().getAuthentication().getName())
+                && !SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                        .contains(new SimpleGrantedAuthority("ROLE_MODER"))) {
+            throw new RolePrivilegesViolationException("Only owner or a moderator can update this housing");
+        }
+
         List<BookingEntity> confirmedBookings = bookingRepo.findAllByHousingIdAndStatus(id, RequestStatus.CONFIRMED);
         if (confirmedBookings.stream()
                 .filter(booking -> booking.getCheckOut().isAfter(LocalDate.now()))
@@ -161,8 +168,14 @@ public class HousingService {
 
     @Transactional
     public Boolean deleteHousing(Long id) {
-        housingRepo.findById(id)
+        HousingEntity housing = housingRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve housing by id"));
+
+        if (!housing.getOwner().equals(SecurityContextHolder.getContext().getAuthentication().getName())
+                && !SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                        .contains(new SimpleGrantedAuthority("ROLE_MODER"))) {
+            throw new RolePrivilegesViolationException("Only owner or a moderator can update this housing");
+        }
 
         List<BookingEntity> confirmedBookings = bookingRepo.findAllByHousingIdAndStatus(id, RequestStatus.CONFIRMED);
         if (confirmedBookings.stream()
