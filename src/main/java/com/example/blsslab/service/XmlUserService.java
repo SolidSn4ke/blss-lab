@@ -2,9 +2,13 @@ package com.example.blsslab.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.WatchService;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -26,12 +30,14 @@ public class XmlUserService {
     UserXmlWrapper wrapper;
     PasswordEncoder encoder;
 
+    WatchService watchService;
+
     @Value("${users.xml.path}")
     String pathToXmlUsers;
 
     @PostConstruct
     void init() {
-        users = new HashMap<>();
+        users = new ConcurrentHashMap<>();
         mapper = new XmlMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
         encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
@@ -48,6 +54,37 @@ public class XmlUserService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+        try {
+            watchService = FileSystems.getDefault().newWatchService();
+            Path whatchDir = Paths.get("./src/main/resources");
+            whatchDir.register(watchService, java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY);
+            new Thread(() -> {
+                while (true) {
+                    try {
+                        var key = watchService.take();
+                        var events = key.pollEvents();
+                        for (var event : events) {
+                            if (event.context().toString().equals("users.xml")) {
+                                File modifiedFile = new File(pathToXmlUsers);
+                                wrapper = mapper.readValue(modifiedFile, UserXmlWrapper.class);
+                                users.clear();
+                                if (wrapper.getUsers() != null) {
+                                    for (UserDTO user : wrapper.getUsers()) {
+                                        users.put(user.getUsername(), user);
+                                    }
+                                }
+                            }
+                        }
+                        key.reset();
+                    } catch (InterruptedException | IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
