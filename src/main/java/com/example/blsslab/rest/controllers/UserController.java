@@ -11,12 +11,18 @@ import com.example.blsslab.model.dto.UserDTO;
 import com.example.blsslab.service.XmlUserService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
     final XmlUserService xmlUserService;
+
+    @GetMapping()
+    public UserDTO getInfo() {
+        return xmlUserService.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+    }
 
     @PatchMapping()
     public boolean update(@RequestBody UserDTO newInfo) {
