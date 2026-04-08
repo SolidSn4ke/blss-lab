@@ -14,6 +14,13 @@
     <role>USER</role>
   </user>
   <user>
+    <username>client</username>
+    <password>{bcrypt}$2a$10$hgcBsbe3.lXTiX8y1rF7JOkG5k3a9t92izOIUlK21t1W5rGYa2qyW</password>
+    <name/>
+    <familyName/>
+    <role>USER</role>
+  </user>
+  <user>
     <username>moder</username>
     <password>{bcrypt}$2a$10$swqsl.8q8oHxLt8UV3nFje/p5vvDZcGqruB0QsNZRQPO32fqG0ZV6</password>
     <name></name>

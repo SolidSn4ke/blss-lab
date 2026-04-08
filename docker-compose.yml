@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   postgres:
@@ -11,6 +11,9 @@ services:
       POSTGRES_PASSWORD: postgres
     volumes:
       - ./scripts/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: >
+      postgres
+      -c max_prepared_transactions=100
 
   mysql:
     image: mysql:8
