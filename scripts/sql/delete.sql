@@ -1,1 +1,0 @@
-TRUNCATE TABLE booking, housing, address, location, user_table CASCADE;
