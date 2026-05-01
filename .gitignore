@@ -37,3 +37,4 @@ build/
 front/elm-stuff
 
 logs/
+docker/rabbitmq/data
