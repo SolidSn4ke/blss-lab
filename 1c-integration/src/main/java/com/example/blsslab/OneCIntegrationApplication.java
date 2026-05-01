@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class BlssLabApplication {
+public class OneCIntegrationApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(BlssLabApplication.class, args);
+		SpringApplication.run(OneCIntegrationApplication.class, args);
 	}
 
 }

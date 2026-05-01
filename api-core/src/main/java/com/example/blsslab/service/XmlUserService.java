@@ -128,8 +128,11 @@ public class XmlUserService {
     }
 
     public boolean updateUser(String username, UserDTO newInfo) {
-        if (users.get(newInfo.getUsername()) != null && !username.equals(newInfo.getUsername())) {
-            throw new DataIntegrityViolationException("This username is already taken. No changes has been done");
+
+        if (newInfo.getUsername() != null) {
+            if (users.get(newInfo.getUsername()) != null && !username.equals(newInfo.getUsername())) {
+                throw new DataIntegrityViolationException("This username is already taken. No changes has been done");
+            }
         }
 
         UserDTO user = users.get(username);

@@ -16,8 +16,8 @@
   <user>
     <username>client</username>
     <password>{bcrypt}$2a$10$hgcBsbe3.lXTiX8y1rF7JOkG5k3a9t92izOIUlK21t1W5rGYa2qyW</password>
-    <name/>
-    <familyName/>
+    <name></name>
+    <familyName></familyName>
     <role>USER</role>
   </user>
   <user>
@@ -30,8 +30,8 @@
   <user>
     <username>user</username>
     <password>{bcrypt}$2a$10$3rPOdgVh/RcbjCAUwffAjOWpv0.PQm5oo3dWTknIcovjO.3x9j4ym</password>
-    <name></name>
-    <familyName></familyName>
+    <name>user3</name>
+    <familyName>wkugefouewg</familyName>
     <role>USER</role>
   </user>
 </users>
