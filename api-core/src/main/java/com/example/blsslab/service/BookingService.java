@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.blsslab.config.MqttConfig.MqttGateway;
 import com.example.blsslab.exception.AlreadyProcessedException;
 import com.example.blsslab.exception.BadRequestBodyException;
 import com.example.blsslab.exception.RolePrivilegesViolationException;
@@ -41,6 +42,8 @@ public class BookingService {
     final BookingRepository bookingRepo;
 
     final XmlUserService xmlUserService;
+
+    final MqttGateway gateway;
 
     private void checkBookingPeriod(BookingDTO booking) {
         LocalDate startDate = booking.getCheckIn();

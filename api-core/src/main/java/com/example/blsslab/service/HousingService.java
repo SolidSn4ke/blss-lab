@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.blsslab.config.MqttConfig.MqttGateway;
 import com.example.blsslab.exception.AlreadyProcessedException;
 import com.example.blsslab.exception.BadRequestBodyException;
 import com.example.blsslab.exception.DependencyViolationException;
@@ -41,6 +42,8 @@ public class HousingService {
     final AddressRepository addressRepo;
 
     final BookingRepository bookingRepo;
+
+    final MqttGateway gateway;
 
     @Transactional(readOnly = true)
     public PageInfo<HousingDTO> getAllHousings(Pageable pageable, String searchQuery) {
