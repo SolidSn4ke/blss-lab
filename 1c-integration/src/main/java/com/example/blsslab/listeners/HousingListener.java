@@ -20,5 +20,4 @@ public class HousingListener implements MessageListener {
             e.printStackTrace();
         }
     }
-
 }
