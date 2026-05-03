@@ -1,9 +1,10 @@
-package com.example.blsslab.consumers;
+package com.example.blsslab.jms.consumers;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.example.blsslab.listeners.HousingListener;
+import com.example.blsslab.jms.listeners.HousingListener;
+
 import jakarta.annotation.PostConstruct;
 import jakarta.jms.Connection;
 import jakarta.jms.ConnectionFactory;

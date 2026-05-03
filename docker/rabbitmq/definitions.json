@@ -22,7 +22,7 @@
     ],
     "queues": [
         {
-            "name": "testTopic.queue",
+            "name": "moderation.housing.queue",
             "vhost": "/",
             "durable": true,
             "auto_delete": false,
@@ -33,9 +33,9 @@
         {
             "source": "amq.topic",
             "vhost": "/",
-            "destination": "testTopic.queue",
+            "destination": "moderation.housing.queue",
             "destination_type": "queue",
-            "routing_key": "testTopic",
+            "routing_key": "housingTopic",
             "arguments": {}
         }
     ]

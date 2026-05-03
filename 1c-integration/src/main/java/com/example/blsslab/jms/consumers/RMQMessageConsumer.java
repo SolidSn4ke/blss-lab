@@ -1,4 +1,4 @@
-package com.example.blsslab.consumers;
+package com.example.blsslab.jms.consumers;
 
 import com.rabbitmq.jms.admin.RMQDestination;
 

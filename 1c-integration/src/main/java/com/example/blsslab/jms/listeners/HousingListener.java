@@ -1,4 +1,4 @@
-package com.example.blsslab.listeners;
+package com.example.blsslab.jms.listeners;
 
 import jakarta.jms.BytesMessage;
 import jakarta.jms.JMSException;

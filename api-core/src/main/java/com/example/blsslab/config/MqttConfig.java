@@ -47,7 +47,7 @@ public class MqttConfig {
     @Bean
     @ServiceActivator(inputChannel = "mqttOutboundChannel")
     MessageHandler mqttOutbound() {
-        MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler("testClient", mqttClientFactory());
+        MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler("coreAPI", mqttClientFactory());
         messageHandler.setAsync(true);
         messageHandler.setDefaultTopic("testTopic");
         return messageHandler;
