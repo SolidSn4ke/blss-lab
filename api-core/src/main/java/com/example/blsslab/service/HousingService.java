@@ -75,6 +75,8 @@ public class HousingService {
             throw new AlreadyProcessedException("Housing request already processed");
         }
 
+        gateway.sendToMqtt("testTopic", "testMessage");
+
         if (approved) {
             housing.setStatus(RequestStatus.CONFIRMED);
         } else {
