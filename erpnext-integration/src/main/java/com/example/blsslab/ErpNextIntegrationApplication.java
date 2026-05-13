@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class OneCIntegrationApplication {
+public class ErpNextIntegrationApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(OneCIntegrationApplication.class, args);
+		SpringApplication.run(ErpNextIntegrationApplication.class, args);
 	}
 
 }

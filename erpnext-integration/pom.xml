@@ -10,10 +10,10 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>1c-integration</artifactId>
+	<artifactId>erpnext-integration</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>1c-integration</name>
-	<description>1c-integration</description>
+	<name>erpnext-integration</name>
+	<description>erpnext-integration</description>
 
 	<dependencies>
 		<dependency>
@@ -44,6 +44,13 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>jakarta.resource</groupId>
+			<artifactId>jakarta.resource-api</artifactId>
+			<version>2.1.0</version>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 

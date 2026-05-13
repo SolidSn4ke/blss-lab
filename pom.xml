@@ -12,7 +12,7 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>api-core</module>
-		<module>1c-integration</module>
+		<module>erpnext-integration</module>
 	</modules>
 	<groupId>com.example</groupId>
 	<artifactId>blss-lab</artifactId>
@@ -100,6 +100,12 @@
 			<dependency>
 				<groupId>org.springframework.integration</groupId>
 				<artifactId>spring-integration-mqtt</artifactId>
+			</dependency>
+			<dependency>
+				<groupId>jakarta.resource</groupId>
+				<artifactId>jakarta.resource-api</artifactId>
+				<version>2.1.0</version>
+				<scope>compile</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
