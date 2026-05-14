@@ -1,5 +1,7 @@
 package com.example.blsslab.jms.listeners;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.jms.BytesMessage;
 import jakarta.jms.JMSException;
 import jakarta.jms.Message;
@@ -15,6 +17,13 @@ public class HousingListener implements MessageListener {
             raw.readBytes(buf);
             String payload = new String(buf);
             System.out.println("Recieved: " + payload);
+
+            ObjectMapper mapper = new ObjectMapper();
+            // TODO: Импортировать класс HousingDTO
+            // HousingDTO housingDTO = mapper.readValue(payload, HousingDTO.class);
+
+            // } catch (JsonProcessingException e) {
+            // e.printStackTrace();
         } catch (JMSException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

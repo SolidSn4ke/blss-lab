@@ -3,6 +3,8 @@ package com.example.blsslab.service;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -75,7 +77,14 @@ public class HousingService {
             throw new AlreadyProcessedException("Housing request already processed");
         }
 
-        gateway.sendToMqtt("housingTopic", "testMessage");
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            HousingDTO housingDTO = new HousingDTO(housing);
+            String jsonString = mapper.writeValueAsString(housingDTO);
+            gateway.sendToMqtt("housingTopic", jsonString);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to convert HousingDTO");
+        }
 
         if (approved) {
             housing.setStatus(RequestStatus.CONFIRMED);
@@ -131,7 +140,7 @@ public class HousingService {
 
         if (!existHousing.getOwner().equals(SecurityContextHolder.getContext().getAuthentication().getName())
                 && !SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-                        .contains(new SimpleGrantedAuthority("ROLE_MODER"))) {
+                .contains(new SimpleGrantedAuthority("ROLE_MODER"))) {
             throw new RolePrivilegesViolationException("Only owner or a moderator can update this housing");
         }
 
@@ -178,7 +187,7 @@ public class HousingService {
 
         if (!housing.getOwner().equals(SecurityContextHolder.getContext().getAuthentication().getName())
                 && !SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-                        .contains(new SimpleGrantedAuthority("ROLE_MODER"))) {
+                .contains(new SimpleGrantedAuthority("ROLE_MODER"))) {
             throw new RolePrivilegesViolationException("Only owner or a moderator can update this housing");
         }
 
