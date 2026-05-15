@@ -7,7 +7,10 @@ import java.util.List;
 import javax.security.auth.Subject;
 import javax.transaction.xa.XAResource;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
+
+import com.example.blsslab.model.doctype.DocTypes;
 
 import jakarta.resource.ResourceException;
 import jakarta.resource.spi.ConnectionEvent;
@@ -20,14 +23,10 @@ import jakarta.resource.spi.ManagedConnectionMetaData;
 public class ErpNextManagedConnection implements ManagedConnection {
 
     private ErpNextManagedConnectionFactory managedConnectionFactory;
-    private final String apiKey;
-    private final String apiSecret;
     RestClient restClient;
     private final List<ConnectionEventListener> listeners = new ArrayList<>();
 
     public ErpNextManagedConnection(ErpNextManagedConnectionFactory mcf, String apiKey, String apiSecret) {
-        this.apiKey = apiKey;
-        this.apiSecret = apiSecret;
         this.managedConnectionFactory = mcf;
         this.restClient = RestClient.builder()
                 .baseUrl(managedConnectionFactory.getUrl())
@@ -106,6 +105,11 @@ public class ErpNextManagedConnection implements ManagedConnection {
     public PrintWriter getLogWriter() throws ResourceException {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getLogWriter'");
+    }
+
+    <T> void createDocument(DocTypes doctype, T data) {
+        String path = "/api/resource/" + doctype.type;
+        restClient.post().uri(path).body(data).contentType(MediaType.APPLICATION_JSON).retrieve().toBodilessEntity();
     }
 
 }

@@ -2,6 +2,9 @@ package com.example.blsslab.jca;
 
 import org.springframework.web.client.RestClient;
 
+import com.example.blsslab.model.doctype.DocType;
+import com.example.blsslab.model.doctype.DocTypes;
+
 import jakarta.resource.spi.ManagedConnection;
 
 public class ErpNextConnectionImpl implements ErpNextConnection {
@@ -24,4 +27,10 @@ public class ErpNextConnectionImpl implements ErpNextConnection {
     public void close() {
         managedConnection.closeHandle(this);
     }
+
+    @Override
+    public <T extends DocType> void createDocument(DocTypes doctype, T data) {
+        managedConnection.createDocument(doctype, data);
+    }
+
 }
