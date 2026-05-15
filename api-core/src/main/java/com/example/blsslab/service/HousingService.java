@@ -176,6 +176,12 @@ public class HousingService {
             existHousing.setAddress(address);
         }
 
+        try {
+            gateway.sendToMqtt("housingTopic", toJsonString(existHousing, OperationType.DELETE));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to conver HousingDTO to json string");
+        }
+
         existHousing.setStatus(RequestStatus.PENDING);
         housingRepo.save(existHousing);
         return new HousingDTO(existHousing);
