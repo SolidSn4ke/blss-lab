@@ -10,4 +10,5 @@ public interface ErpNextConnection {
 
     <T extends DocType> void createDocument(DocTypes doctype, T data);
 
+    void deleteDocument(DocTypes doctype, String documentName);
 }

@@ -2,9 +2,9 @@ package com.example.blsslab.service;
 
 import java.time.LocalDate;
 import java.util.List;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,6 +19,8 @@ import com.example.blsslab.exception.BadRequestBodyException;
 import com.example.blsslab.exception.DependencyViolationException;
 import com.example.blsslab.exception.RolePrivilegesViolationException;
 import com.example.blsslab.model.dto.HousingDTO;
+import com.example.blsslab.model.dto.Message;
+import com.example.blsslab.model.dto.OperationType;
 import com.example.blsslab.model.dto.PageInfo;
 import com.example.blsslab.model.dto.RequestStatus;
 import com.example.blsslab.model.dto.UserDTO;
@@ -46,6 +48,8 @@ public class HousingService {
     final BookingRepository bookingRepo;
 
     final MqttGateway gateway;
+
+    final ObjectMapper mapper;
 
     @Transactional(readOnly = true)
     public PageInfo<HousingDTO> getAllHousings(Pageable pageable, String searchQuery) {
@@ -78,10 +82,7 @@ public class HousingService {
         }
 
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            HousingDTO housingDTO = new HousingDTO(housing);
-            String jsonString = mapper.writeValueAsString(housingDTO);
-            gateway.sendToMqtt("housingTopic", jsonString);
+            gateway.sendToMqtt("housingTopic", toJsonString(housing, OperationType.CREATE));
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to convert HousingDTO");
         }
@@ -140,7 +141,7 @@ public class HousingService {
 
         if (!existHousing.getOwner().equals(SecurityContextHolder.getContext().getAuthentication().getName())
                 && !SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-                .contains(new SimpleGrantedAuthority("ROLE_MODER"))) {
+                        .contains(new SimpleGrantedAuthority("ROLE_MODER"))) {
             throw new RolePrivilegesViolationException("Only owner or a moderator can update this housing");
         }
 
@@ -187,7 +188,7 @@ public class HousingService {
 
         if (!housing.getOwner().equals(SecurityContextHolder.getContext().getAuthentication().getName())
                 && !SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-                .contains(new SimpleGrantedAuthority("ROLE_MODER"))) {
+                        .contains(new SimpleGrantedAuthority("ROLE_MODER"))) {
             throw new RolePrivilegesViolationException("Only owner or a moderator can update this housing");
         }
 
@@ -198,7 +199,18 @@ public class HousingService {
             throw new DependencyViolationException("There are already confirmed bookings for this housing");
         }
 
+        try {
+            gateway.sendToMqtt("housingTopic", toJsonString(housing, OperationType.DELETE));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to conver HousingDTO to json string");
+        }
+
         housingRepo.deleteById(id);
         return true;
+    }
+
+    private String toJsonString(HousingEntity entity, OperationType opType) throws JsonProcessingException {
+        Message<HousingDTO> msg = new Message<HousingDTO>(new HousingDTO(entity), opType);
+        return mapper.writeValueAsString(msg);
     }
 }

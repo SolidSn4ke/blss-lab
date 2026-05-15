@@ -33,4 +33,8 @@ public class ErpNextConnectionImpl implements ErpNextConnection {
         managedConnection.createDocument(doctype, data);
     }
 
+    @Override
+    public void deleteDocument(DocTypes doctype, String documentName) {
+        managedConnection.deleteDocument(doctype, documentName);
+    }
 }

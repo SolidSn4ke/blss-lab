@@ -108,8 +108,12 @@ public class ErpNextManagedConnection implements ManagedConnection {
     }
 
     <T> void createDocument(DocTypes doctype, T data) {
-        String path = "/api/resource/" + doctype.type;
+        String path = String.format("/api/resource/%s", doctype.type);
         restClient.post().uri(path).body(data).contentType(MediaType.APPLICATION_JSON).retrieve().toBodilessEntity();
     }
 
+    void deleteDocument(DocTypes doctype, String documentName) {
+        String path = String.format("/api/resource/%s/%s", doctype.type, documentName);
+        restClient.delete().uri(path).retrieve().toBodilessEntity();
+    }
 }
