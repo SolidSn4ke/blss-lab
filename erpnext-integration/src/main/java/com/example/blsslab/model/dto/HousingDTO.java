@@ -20,6 +20,7 @@ public class HousingDTO implements Convertable<Item> {
     HousingType housingType;
     AddressDTO address;
     String owner;
+    RequestStatus status;
 
     @Override
     public Item toDocType() {

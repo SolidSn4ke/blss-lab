@@ -2,9 +2,6 @@ package com.example.blsslab.service;
 
 import java.time.LocalDate;
 import java.util.List;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,13 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.blsslab.config.MqttConfig.MqttGateway;
 import com.example.blsslab.exception.AlreadyProcessedException;
 import com.example.blsslab.exception.BadRequestBodyException;
 import com.example.blsslab.exception.DependencyViolationException;
 import com.example.blsslab.exception.RolePrivilegesViolationException;
 import com.example.blsslab.model.dto.HousingDTO;
-import com.example.blsslab.model.dto.Message;
 import com.example.blsslab.model.dto.OperationType;
 import com.example.blsslab.model.dto.PageInfo;
 import com.example.blsslab.model.dto.RequestStatus;
@@ -29,7 +24,9 @@ import com.example.blsslab.model.mysql.entity.BookingEntity;
 import com.example.blsslab.model.mysql.repos.BookingRepository;
 import com.example.blsslab.model.postgres.entity.AddressEntity;
 import com.example.blsslab.model.postgres.entity.HousingEntity;
+import com.example.blsslab.model.postgres.entity.HousingOutboxEntity;
 import com.example.blsslab.model.postgres.repos.AddressRepository;
+import com.example.blsslab.model.postgres.repos.HousingOutboxRepository;
 import com.example.blsslab.model.postgres.repos.HousingRepository;
 import com.example.blsslab.specs.CustomSpecification;
 import jakarta.persistence.EntityNotFoundException;
@@ -47,9 +44,7 @@ public class HousingService {
 
     final BookingRepository bookingRepo;
 
-    final MqttGateway gateway;
-
-    final ObjectMapper mapper;
+    final HousingOutboxRepository outboxRepository;
 
     @Transactional(readOnly = true)
     public PageInfo<HousingDTO> getAllHousings(Pageable pageable, String searchQuery) {
@@ -81,14 +76,11 @@ public class HousingService {
             throw new AlreadyProcessedException("Housing request already processed");
         }
 
-        try {
-            gateway.sendToMqtt("housingTopic", toJsonString(housing, OperationType.CREATE));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Failed to convert HousingDTO");
-        }
-
         if (approved) {
             housing.setStatus(RequestStatus.CONFIRMED);
+
+            HousingOutboxEntity outboxEntity = new HousingOutboxEntity(housing.getId(), OperationType.CREATE);
+            outboxRepository.save(outboxEntity);
         } else {
             housing.setStatus(RequestStatus.CANCELLED);
         }
@@ -176,10 +168,9 @@ public class HousingService {
             existHousing.setAddress(address);
         }
 
-        try {
-            gateway.sendToMqtt("housingTopic", toJsonString(existHousing, OperationType.DELETE));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Failed to conver HousingDTO to json string");
+        if (existHousing.getStatus().equals(RequestStatus.CONFIRMED)) {
+            HousingOutboxEntity outboxEntity = new HousingOutboxEntity(existHousing.getId(), OperationType.DELETE);
+            outboxRepository.save(outboxEntity);
         }
 
         existHousing.setStatus(RequestStatus.PENDING);
@@ -191,6 +182,10 @@ public class HousingService {
     public Boolean deleteHousing(Long id) {
         HousingEntity housing = housingRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve housing by id"));
+
+        if (housing.getStatus().equals(RequestStatus.CANCELLED)) {
+            throw new AlreadyProcessedException("This housing is already deleted");
+        }
 
         if (!housing.getOwner().equals(SecurityContextHolder.getContext().getAuthentication().getName())
                 && !SecurityContextHolder.getContext().getAuthentication().getAuthorities()
@@ -205,18 +200,12 @@ public class HousingService {
             throw new DependencyViolationException("There are already confirmed bookings for this housing");
         }
 
-        try {
-            gateway.sendToMqtt("housingTopic", toJsonString(housing, OperationType.DELETE));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Failed to conver HousingDTO to json string");
-        }
+        HousingOutboxEntity outboxEntity = new HousingOutboxEntity(housing.getId(), OperationType.DELETE);
+        outboxRepository.save(outboxEntity);
 
-        housingRepo.deleteById(id);
+        housing.setStatus(RequestStatus.CANCELLED);
+        housingRepo.save(housing);
         return true;
     }
 
-    private String toJsonString(HousingEntity entity, OperationType opType) throws JsonProcessingException {
-        Message<HousingDTO> msg = new Message<HousingDTO>(new HousingDTO(entity), opType);
-        return mapper.writeValueAsString(msg);
-    }
 }

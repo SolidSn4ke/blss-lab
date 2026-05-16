@@ -17,6 +17,7 @@ public class HousingDTO {
     HousingType housingType;
     AddressDTO address;
     String owner;
+    RequestStatus status;
 
     public HousingDTO(HousingEntity housingEntity) {
         this.id = housingEntity.getId();
@@ -26,5 +27,6 @@ public class HousingDTO {
         this.housingType = housingEntity.getHousingType();
         this.address = new AddressDTO(housingEntity.getAddress());
         this.owner = housingEntity.getOwner();
+        this.status = housingEntity.getStatus();
     }
 }
