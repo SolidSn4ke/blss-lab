@@ -7,15 +7,11 @@ import com.example.blsslab.jca.ErpNextConnectionFactory;
 import com.example.blsslab.model.doctype.DocTypes;
 import com.example.blsslab.model.dto.HousingDTO;
 import com.example.blsslab.model.dto.OperationType;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.jms.BytesMessage;
-import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 import jakarta.jms.MessageListener;
-import jakarta.resource.ResourceException;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -50,18 +46,8 @@ public class HousingListener implements MessageListener {
                 default -> throw new UnsupportedOperationException();
             }
 
-        } catch (JMSException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (JsonMappingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (JsonProcessingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (ResourceException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }

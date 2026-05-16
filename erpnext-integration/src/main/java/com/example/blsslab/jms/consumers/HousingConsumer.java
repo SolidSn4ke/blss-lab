@@ -1,6 +1,7 @@
 package com.example.blsslab.jms.consumers;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.example.blsslab.jms.listeners.HousingListener;
@@ -23,14 +24,38 @@ public class HousingConsumer extends RMQMessageConsumer {
     @Value("${rabbitmq.connection.housing.queue}")
     String queueName;
 
+    boolean needRecovery = false;
+
     @PostConstruct
     @Override
     public void initConnection() throws JMSException {
         Connection conn = connectionFactory.createConnection();
         conn.start();
-        Session session = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        Session session = conn.createSession(false, Session.CLIENT_ACKNOWLEDGE);
         MessageConsumer consumer = session.createConsumer(setUpDestination(queueName));
-        consumer.setMessageListener(message -> listener.onMessage(message));
+        consumer.setMessageListener(message -> {
+            try {
+                listener.onMessage(message);
+                message.acknowledge();
+            } catch (Exception e) {
+                needRecovery = true;
+                try {
+                    session.close();
+                    conn.close();
+                } catch (JMSException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
         conn.start();
+    }
+
+    @Scheduled(fixedRate = 10000)
+    private void recover() throws JMSException {
+        if (needRecovery) {
+            needRecovery = false;
+            initConnection();
+        }
     }
 }
