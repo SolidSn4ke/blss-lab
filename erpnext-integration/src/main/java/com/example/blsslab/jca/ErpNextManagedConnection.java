@@ -7,9 +7,12 @@ import java.util.List;
 import javax.security.auth.Subject;
 import javax.transaction.xa.XAResource;
 
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
+import com.example.blsslab.jca.exception.ErpNextDuplicateOperationException;
 import com.example.blsslab.model.doctype.DocTypes;
 
 import jakarta.resource.ResourceException;
@@ -109,11 +112,26 @@ public class ErpNextManagedConnection implements ManagedConnection {
 
     <T> void createDocument(DocTypes doctype, T data) {
         String path = String.format("/api/resource/%s", doctype.type);
-        restClient.post().uri(path).body(data).contentType(MediaType.APPLICATION_JSON).retrieve().toBodilessEntity();
+        try {
+            restClient.post().uri(path).body(data).contentType(MediaType.APPLICATION_JSON).retrieve()
+                    .toBodilessEntity();
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode().equals(HttpStatusCode.valueOf(409))) {
+                throw new ErpNextDuplicateOperationException("This document is already created");
+            }
+            throw e;
+        }
     }
 
     void deleteDocument(DocTypes doctype, String documentName) {
         String path = String.format("/api/resource/%s/%s", doctype.type, documentName);
-        restClient.delete().uri(path).retrieve().toBodilessEntity();
+        try {
+            restClient.delete().uri(path).retrieve().toBodilessEntity();
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode().equals(HttpStatusCode.valueOf(404))) {
+                throw new ErpNextDuplicateOperationException("This document is already deleted");
+            }
+            throw e;
+        }
     }
 }

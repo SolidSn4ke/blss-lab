@@ -1,7 +1,7 @@
 package com.example.blsslab.jca;
 
-import jakarta.resource.ResourceException;
+import jakarta.resource.cci.ConnectionFactory;
 
-public interface ErpNextConnectionFactory {
-    ErpNextConnection getConnection() throws ResourceException;
+public interface ErpNextConnectionFactory extends ConnectionFactory {
+
 }

@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.example.blsslab.jca.exception.ErpNextDuplicateOperationException;
 import com.example.blsslab.jms.listeners.HousingListener;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.jms.Connection;
@@ -40,6 +42,10 @@ public class HousingConsumer extends RMQMessageConsumer {
             } catch (Exception e) {
                 needRecovery = true;
                 try {
+                    if (e.getCause() instanceof JsonProcessingException
+                            || e.getCause() instanceof ErpNextDuplicateOperationException) {
+                        message.acknowledge();
+                    }
                     session.close();
                     conn.close();
                 } catch (JMSException e1) {

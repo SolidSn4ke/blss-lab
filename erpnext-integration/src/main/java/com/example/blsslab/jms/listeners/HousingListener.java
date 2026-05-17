@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.jms.BytesMessage;
 import jakarta.jms.Message;
 import jakarta.jms.MessageListener;
+import jakarta.resource.ResourceException;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -22,6 +23,7 @@ public class HousingListener implements MessageListener {
 
     @Override
     public void onMessage(Message message) {
+        ErpNextConnection connection = null;
         try {
             BytesMessage raw = (BytesMessage) message;
             byte[] buf = new byte[(int) raw.getBodyLength()];
@@ -37,7 +39,7 @@ public class HousingListener implements MessageListener {
             HousingDTO housing = (HousingDTO) data.getEntity();
             OperationType opType = data.getOpType();
 
-            ErpNextConnection connection = erpNextConnectionFactory.getConnection();
+            connection = (ErpNextConnection) erpNextConnectionFactory.getConnection();
 
             switch (opType) {
                 case CREATE -> connection.createDocument(DocTypes.ITEM, housing.toDocType());
@@ -48,6 +50,15 @@ public class HousingListener implements MessageListener {
 
         } catch (Exception e) {
             throw new RuntimeException(e);
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (ResourceException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }
