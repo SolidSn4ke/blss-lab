@@ -24,6 +24,7 @@ import com.example.blsslab.model.dto.BookingType;
 import com.example.blsslab.model.dto.PageInfo;
 import com.example.blsslab.model.dto.RequestStatus;
 import com.example.blsslab.model.dto.UserDTO;
+import com.example.blsslab.model.mapper.BookingMapper;
 import com.example.blsslab.model.mysql.entity.BookingEntity;
 import com.example.blsslab.model.mysql.repos.BookingRepository;
 import com.example.blsslab.model.postgres.entity.HousingEntity;
@@ -46,6 +47,8 @@ public class BookingService {
     final XmlUserService xmlUserService;
 
     final MqttGateway gateway;
+
+    final BookingMapper bookingMapper;
 
     private void checkBookingPeriod(BookingDTO bookingDTO) {
         log.debug(
@@ -122,7 +125,7 @@ public class BookingService {
                 newBooking.getHousingId(),
                 newBooking.getStatus());
 
-        return new BookingDTO(newBooking);
+        return bookingMapper.toDto(newBooking);
     }
 
     @Transactional
@@ -147,7 +150,7 @@ public class BookingService {
         existBooking.setCreatedAt(LocalDateTime.now());
         existBooking.setStatus(RequestStatus.PENDING);
 
-        BookingDTO response = new BookingDTO(existBooking);
+        BookingDTO response = bookingMapper.toDto(existBooking);
         checkBookingPeriod(response);
         bookingRepo.save(existBooking);
 
@@ -210,7 +213,7 @@ public class BookingService {
             stream = stream.filter(e -> ownedHousings.contains(e.getHousingId()));
         }
 
-        List<BookingDTO> content = stream.map(b -> new BookingDTO(b)).toList();
+        List<BookingDTO> content = stream.map(b -> bookingMapper.toDto(b)).toList();
         return new PageInfo<BookingDTO>(content, result.getTotalPages(), result.getNumber(), result.getTotalElements());
     }
 
@@ -247,6 +250,6 @@ public class BookingService {
         bookingRepo.save(booking);
 
         log.info("Booking handled successfully: bookingId={}, newStatus={}", id, booking.getStatus());
-        return new BookingDTO(booking);
+        return bookingMapper.toDto(booking);
     }
 }

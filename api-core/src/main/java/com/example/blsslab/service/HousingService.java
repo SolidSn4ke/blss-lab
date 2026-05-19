@@ -20,6 +20,7 @@ import com.example.blsslab.model.dto.PageInfo;
 import com.example.blsslab.model.dto.RequestStatus;
 import com.example.blsslab.model.dto.UserDTO;
 import com.example.blsslab.model.dto.UserRole;
+import com.example.blsslab.model.mapper.HousingMapper;
 import com.example.blsslab.model.mysql.entity.BookingEntity;
 import com.example.blsslab.model.mysql.repos.BookingRepository;
 import com.example.blsslab.model.postgres.entity.AddressEntity;
@@ -48,11 +49,13 @@ public class HousingService {
 
     final HousingOutboxRepository outboxRepository;
 
+    final HousingMapper housingMapper;
+
     @Transactional(readOnly = true)
     public PageInfo<HousingDTO> getAllHousings(Pageable pageable, String searchQuery) {
         Page<HousingEntity> result = housingRepo.findAllWithJoinFetch(CustomSpecification.buildFromFilters(searchQuery),
                 pageable);
-        List<HousingDTO> content = result.toList().stream().map(h -> new HousingDTO(h)).toList();
+        List<HousingDTO> content = result.toList().stream().map(h -> housingMapper.toDto(h)).toList();
         return new PageInfo<HousingDTO>(content, result.getTotalPages(), result.getNumber(), result.getTotalElements());
     }
 
@@ -92,7 +95,7 @@ public class HousingService {
         housingRepo.save(housing);
 
         log.info("Housing handled successfully: housingId={}, newStatus={}", id, housing.getStatus());
-        return new HousingDTO(housing);
+        return housingMapper.toDto(housing);
     }
 
     @Transactional
@@ -138,7 +141,7 @@ public class HousingService {
                 newHousing.getOwner(),
                 newHousing.getStatus());
 
-        return new HousingDTO(newHousing);
+        return housingMapper.toDto(newHousing);
     }
 
     @Transactional
@@ -196,7 +199,7 @@ public class HousingService {
         log.info("Housing updated successfully: housingId={}, newStatus={}",
                 existHousing.getId(),
                 existHousing.getStatus());
-        return new HousingDTO(existHousing);
+        return housingMapper.toDto(existHousing);
     }
 
     @Transactional
