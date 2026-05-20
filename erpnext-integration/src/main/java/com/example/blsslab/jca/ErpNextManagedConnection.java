@@ -22,7 +22,9 @@ import jakarta.resource.spi.ConnectionRequestInfo;
 import jakarta.resource.spi.LocalTransaction;
 import jakarta.resource.spi.ManagedConnection;
 import jakarta.resource.spi.ManagedConnectionMetaData;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class ErpNextManagedConnection implements ManagedConnection {
 
     private ErpNextManagedConnectionFactory managedConnectionFactory;
@@ -35,21 +37,24 @@ public class ErpNextManagedConnection implements ManagedConnection {
                 .baseUrl(managedConnectionFactory.getUrl())
                 .defaultHeader("Authorization", String.format("token %s:%s", apiKey, apiSecret))
                 .build();
+
+        log.info("ERPNextManagedConnection created for URL={}", managedConnectionFactory.getUrl());
     }
 
     @Override
     public Object getConnection(Subject subject, ConnectionRequestInfo cxRequestInfo) throws ResourceException {
+        log.debug("Creating new ERPNextConnection handle");
         return new ErpNextConnectionImpl(this);
     }
 
     @Override
     public void destroy() throws ResourceException {
-        System.out.println("destroy");
+        log.warn("ERPNextManagedConnection destroyed");
     }
 
     @Override
     public void cleanup() throws ResourceException {
-        System.out.println("clean up");
+        log.debug("ERPNextManagedConnection cleanup called");
     }
 
     @Override
@@ -75,6 +80,8 @@ public class ErpNextManagedConnection implements ManagedConnection {
     }
 
     void closeHandle(ErpNextConnection connection) {
+        log.debug("Closing connection handle");
+
         ConnectionEvent event = new ConnectionEvent(this, ConnectionEvent.CONNECTION_CLOSED);
         event.setConnectionHandle(connection);
         listeners.forEach(l -> l.connectionClosed(event));
@@ -112,25 +119,50 @@ public class ErpNextManagedConnection implements ManagedConnection {
 
     <T> void createDocument(DocTypes doctype, T data) {
         String path = String.format("/api/resource/%s", doctype.type);
+
+        log.info("ERPNext CREATE request: doctype={}, url={}", doctype, path);
+        log.debug("Payload: {}", data);
+
         try {
-            restClient.post().uri(path).body(data).contentType(MediaType.APPLICATION_JSON).retrieve()
+            restClient.post()
+                    .uri(path)
+                    .body(data)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .retrieve()
                     .toBodilessEntity();
+
+            log.info("ERPNext CREATE success: doctype={}", doctype);
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode().equals(HttpStatusCode.valueOf(409))) {
+                log.warn("ERPNext duplicate document: doctype={}", doctype);
                 throw new ErpNextDuplicateOperationException("This document is already created");
             }
+
+            log.error("ERPNext CREATE failed: doctype={}, status={}", doctype, e.getStatusCode(), e);
             throw e;
         }
     }
 
     void deleteDocument(DocTypes doctype, String documentName) {
         String path = String.format("/api/resource/%s/%s", doctype.type, documentName);
+
+        log.info("ERPNext DELETE request: doctype={}, name={}", doctype, documentName);
+
         try {
-            restClient.delete().uri(path).retrieve().toBodilessEntity();
+            restClient.delete()
+                    .uri(path)
+                    .retrieve()
+                    .toBodilessEntity();
+
+            log.info("ERPNext DELETE success: doctype={}, name={}", doctype, documentName);
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode().equals(HttpStatusCode.valueOf(404))) {
+                log.warn("ERPNext delete target already removed: name={}", documentName);
                 throw new ErpNextDuplicateOperationException("This document is already deleted");
             }
+
+            log.error("ERPNext DELETE failed: doctype={}, name={}, status={}",
+                    doctype, documentName, e.getStatusCode(), e);
             throw e;
         }
     }

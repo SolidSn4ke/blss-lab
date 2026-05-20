@@ -24,6 +24,7 @@ import com.example.blsslab.model.dto.BookingType;
 import com.example.blsslab.model.dto.PageInfo;
 import com.example.blsslab.model.dto.RequestStatus;
 import com.example.blsslab.model.dto.UserDTO;
+import com.example.blsslab.model.mapper.BookingMapper;
 import com.example.blsslab.model.mysql.entity.BookingEntity;
 import com.example.blsslab.model.mysql.repos.BookingRepository;
 import com.example.blsslab.model.postgres.entity.HousingEntity;
@@ -32,7 +33,9 @@ import com.example.blsslab.specs.CustomSpecification;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BookingService {
@@ -45,9 +48,17 @@ public class BookingService {
 
     final MqttGateway gateway;
 
-    private void checkBookingPeriod(BookingDTO booking) {
-        LocalDate startDate = booking.getCheckIn();
-        LocalDate endDate = booking.getCheckOut();
+    final BookingMapper bookingMapper;
+
+    private void checkBookingPeriod(BookingDTO bookingDTO) {
+        log.debug(
+                "Validating booking period: housingId={}, checkIn={}, checkOut={}",
+                bookingDTO.getHousingId(),
+                bookingDTO.getCheckIn(),
+                bookingDTO.getCheckOut());
+
+        LocalDate startDate = bookingDTO.getCheckIn();
+        LocalDate endDate = bookingDTO.getCheckOut();
         if (LocalDate.now().isAfter(startDate)) {
             throw new BadRequestBodyException("Date of check in must not be in the past");
         }
@@ -57,7 +68,7 @@ public class BookingService {
         }
 
         List<BookingEntity> existingBookings = bookingRepo.findAllByHousingIdAndStatus(
-                booking.getHousingId(), RequestStatus.CONFIRMED);
+                bookingDTO.getHousingId(), RequestStatus.CONFIRMED);
 
         for (BookingEntity existingBooking : existingBookings) {
             LocalDate existingStart = existingBooking.getCheckIn();
@@ -70,41 +81,57 @@ public class BookingService {
     }
 
     @Transactional
-    public BookingDTO requireHousing(BookingDTO booking) {
+    public BookingDTO requireHousing(BookingDTO bookingDTO) {
 
         UserDTO user = xmlUserService
                 .getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
         if (user == null) {
             throw new EntityNotFoundException("Failed to retrieve user by username");
         }
-        HousingEntity housing = housingRepo.findById(booking.getHousingId())
+
+        log.info("Booking creation requested: user={}, housingId={}, checkIn={}, checkOut={}",
+                user.getUsername(),
+                bookingDTO.getHousingId(),
+                bookingDTO.getCheckIn(),
+                bookingDTO.getCheckOut());
+
+        HousingEntity housing = housingRepo.findById(bookingDTO.getHousingId())
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrive housing by id"));
 
-        LocalDate startDate = booking.getCheckIn();
-        LocalDate endDate = booking.getCheckOut();
-        checkBookingPeriod(booking);
+        LocalDate startDate = bookingDTO.getCheckIn();
+        LocalDate endDate = bookingDTO.getCheckOut();
+        checkBookingPeriod(bookingDTO);
 
         BookingEntity newBooking = new BookingEntity();
-        newBooking.setCheckIn(booking.getCheckIn());
-        newBooking.setCheckOut(booking.getCheckOut());
+        newBooking.setCheckIn(bookingDTO.getCheckIn());
+        newBooking.setCheckOut(bookingDTO.getCheckOut());
         newBooking.setCreatedAt(LocalDateTime.now());
         newBooking.setStatus(RequestStatus.PENDING);
         newBooking.setTotalPrice(housing.getPrice() * ChronoUnit.DAYS.between(startDate, endDate));
-        newBooking.setAdultsCount(booking.getAdultsCount());
-        newBooking.setChildCount(booking.getChildCount());
-        newBooking.setInfantsCount(booking.getInfantsCount());
-        newBooking.setPetCount(booking.getPetCount());
+        newBooking.setAdultsCount(bookingDTO.getAdultsCount());
+        newBooking.setChildCount(bookingDTO.getChildCount());
+        newBooking.setInfantsCount(bookingDTO.getInfantsCount());
+        newBooking.setPetCount(bookingDTO.getPetCount());
 
         newBooking.setGuest(user.getUsername());
         newBooking.setHousingId(housing.getId());
 
         bookingRepo.save(newBooking);
 
-        return new BookingDTO(newBooking);
+        log.info(
+                "Booking created successfully: bookingId={}, guest={}, housingId={}, status={}",
+                newBooking.getId(),
+                newBooking.getGuest(),
+                newBooking.getHousingId(),
+                newBooking.getStatus());
+
+        return bookingMapper.toDto(newBooking);
     }
 
     @Transactional
     public BookingDTO updateBooking(Long id, BookingDTO bookingDTO) {
+        log.info("Booking update requested: bookingId={}", id);
+
         BookingEntity existBooking = bookingRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve booking by id"));
 
@@ -123,14 +150,20 @@ public class BookingService {
         existBooking.setCreatedAt(LocalDateTime.now());
         existBooking.setStatus(RequestStatus.PENDING);
 
-        BookingDTO response = new BookingDTO(existBooking);
+        BookingDTO response = bookingMapper.toDto(existBooking);
         checkBookingPeriod(response);
         bookingRepo.save(existBooking);
+
+        log.info("Booking updated successfully: bookingId={}, newStatus={}",
+                existBooking.getId(),
+                existBooking.getStatus());
         return response;
     }
 
     @Transactional
     public Boolean deleteBooking(Long id) {
+        log.info("Booking delete requested: bookingId={}", id);
+
         BookingEntity booking = bookingRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve booking by id"));
 
@@ -146,6 +179,8 @@ public class BookingService {
         }
 
         bookingRepo.deleteById(id);
+
+        log.info("Booking deleted successfully: bookingId={}", id);
         return true;
     }
 
@@ -178,12 +213,14 @@ public class BookingService {
             stream = stream.filter(e -> ownedHousings.contains(e.getHousingId()));
         }
 
-        List<BookingDTO> content = stream.map(b -> new BookingDTO(b)).toList();
+        List<BookingDTO> content = stream.map(b -> bookingMapper.toDto(b)).toList();
         return new PageInfo<BookingDTO>(content, result.getTotalPages(), result.getNumber(), result.getTotalElements());
     }
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public BookingDTO handleRequest(String username, Long id, Boolean approved) {
+        log.info("Booking handle requested: bookingId={}, user={}, approved={}", id, username, approved);
+
         if (approved == null) {
             throw new BadRequestBodyException("Field 'approved' is required");
         }
@@ -212,6 +249,7 @@ public class BookingService {
 
         bookingRepo.save(booking);
 
-        return new BookingDTO(booking);
+        log.info("Booking handled successfully: bookingId={}, newStatus={}", id, booking.getStatus());
+        return bookingMapper.toDto(booking);
     }
 }

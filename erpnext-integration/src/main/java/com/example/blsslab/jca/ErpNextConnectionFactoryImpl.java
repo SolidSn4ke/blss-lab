@@ -10,7 +10,9 @@ import jakarta.resource.cci.RecordFactory;
 import jakarta.resource.cci.ResourceAdapterMetaData;
 import jakarta.resource.spi.ConnectionManager;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 public class ErpNextConnectionFactoryImpl implements ErpNextConnectionFactory {
 
@@ -20,8 +22,12 @@ public class ErpNextConnectionFactoryImpl implements ErpNextConnectionFactory {
     @Override
     public ErpNextConnection getConnection() throws ResourceException {
         if (connectionManager == null) {
+            log.info("ERPNext ConnectionManager is null, using direct managed connection");
             return new ErpNextConnectionImpl(managedConnectionFactory.createManagedConnection(null, null));
         }
+
+        log.debug("Allocating ERPNext connection via ConnectionManager");
+
         return (ErpNextConnection) connectionManager.allocateConnection(managedConnectionFactory, null);
     }
 

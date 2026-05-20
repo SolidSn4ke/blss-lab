@@ -38,3 +38,4 @@ front/elm-stuff
 
 logs/
 docker/rabbitmq/data
+.DS_Store

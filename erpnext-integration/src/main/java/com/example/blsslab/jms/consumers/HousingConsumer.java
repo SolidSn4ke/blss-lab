@@ -14,54 +14,80 @@ import jakarta.jms.ConnectionFactory;
 import jakarta.jms.JMSException;
 import jakarta.jms.MessageConsumer;
 import jakarta.jms.Session;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class HousingConsumer extends RMQMessageConsumer {
 
-    HousingConsumer(ConnectionFactory connection, HousingListener listener) {
+    public HousingConsumer(ConnectionFactory connection, HousingListener listener) {
         super.connectionFactory = connection;
         super.listener = listener;
     }
 
     @Value("${rabbitmq.connection.housing.queue}")
-    String queueName;
+    private String queueName;
 
-    boolean needRecovery = false;
+    private boolean needRecovery = false;
 
     @PostConstruct
     @Override
     public void initConnection() throws JMSException {
+        log.info("Initializing HousingConsumer for queue={}", queueName);
+
         Connection conn = connectionFactory.createConnection();
         conn.start();
+
         Session session = conn.createSession(false, Session.CLIENT_ACKNOWLEDGE);
+
+        log.info("JMS session created (CLIENT_ACKNOWLEDGE)");
+
         MessageConsumer consumer = session.createConsumer(setUpDestination(queueName));
+
         consumer.setMessageListener(message -> {
             try {
+                log.debug("Received JMS message, delegating to listener");
+
                 listener.onMessage(message);
+
                 message.acknowledge();
+                log.debug("Message acknowledged successfully");
             } catch (Exception e) {
                 needRecovery = true;
+
+                log.error("Error while processing JMS message", e);
+
                 try {
                     if (e.getCause() instanceof JsonProcessingException
                             || e.getCause() instanceof ErpNextDuplicateOperationException) {
+                        log.warn("Non-critical error, acknowledging message anyway: {}",
+                                e.getCause().getClass().getSimpleName());
                         message.acknowledge();
                     }
+
+                    log.warn("Closing JMS session and connection due to error");
+
                     session.close();
                     conn.close();
                 } catch (JMSException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
+                    log.error("Failed to close JMS resources", e1);
                 }
             }
         });
         conn.start();
+
+        log.info("HousingConsumer successfully started");
     }
 
     @Scheduled(fixedRate = 10000)
     private void recover() throws JMSException {
         if (needRecovery) {
+            log.warn("Attempting to recover HousingConsumer connection...");
+
             needRecovery = false;
             initConnection();
+
+            log.info("HousingConsumer recovery completed");
         }
     }
 }

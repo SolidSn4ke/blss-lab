@@ -16,7 +16,9 @@ import jakarta.resource.spi.ResourceAdapter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Getter
 @Setter
 @NoArgsConstructor
@@ -30,17 +32,20 @@ public class ErpNextManagedConnectionFactory implements ManagedConnectionFactory
 
     @Override
     public Object createConnectionFactory() throws ResourceException {
+        log.info("Creating ERPNextConnectionFactory without ConnectionManager");
         return new ErpNextConnectionFactoryImpl(null, this);
     }
 
     @Override
     public Object createConnectionFactory(ConnectionManager connectionManager) throws ResourceException {
+        log.info("Creating ERPNextConnectionFactory with ConnectionManager");
         return new ErpNextConnectionFactoryImpl(connectionManager, this);
     }
 
     @Override
     public ManagedConnection createManagedConnection(Subject arg0, ConnectionRequestInfo arg1)
             throws ResourceException {
+        log.info("Creating ERPNext managed connection for url={}", url);
         return new ErpNextManagedConnection(this, this.apiKey, this.apiSecret);
     }
 
@@ -54,6 +59,8 @@ public class ErpNextManagedConnectionFactory implements ManagedConnectionFactory
     public ManagedConnection matchManagedConnections(Set connectionSet, Subject subject,
             ConnectionRequestInfo cxRequestInfo)
             throws ResourceException {
+        log.debug("Trying to match existing ERPNext managed connection");
+
         ManagedConnection result = null;
         Iterator<ManagedConnection> iterator = connectionSet.iterator();
         while (result == null && iterator.hasNext()) {

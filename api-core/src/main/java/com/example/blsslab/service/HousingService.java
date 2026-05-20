@@ -20,6 +20,7 @@ import com.example.blsslab.model.dto.PageInfo;
 import com.example.blsslab.model.dto.RequestStatus;
 import com.example.blsslab.model.dto.UserDTO;
 import com.example.blsslab.model.dto.UserRole;
+import com.example.blsslab.model.mapper.HousingMapper;
 import com.example.blsslab.model.mysql.entity.BookingEntity;
 import com.example.blsslab.model.mysql.repos.BookingRepository;
 import com.example.blsslab.model.postgres.entity.AddressEntity;
@@ -31,7 +32,9 @@ import com.example.blsslab.model.postgres.repos.HousingRepository;
 import com.example.blsslab.specs.CustomSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class HousingService {
@@ -46,16 +49,20 @@ public class HousingService {
 
     final HousingOutboxRepository outboxRepository;
 
+    final HousingMapper housingMapper;
+
     @Transactional(readOnly = true)
     public PageInfo<HousingDTO> getAllHousings(Pageable pageable, String searchQuery) {
         Page<HousingEntity> result = housingRepo.findAllWithJoinFetch(CustomSpecification.buildFromFilters(searchQuery),
                 pageable);
-        List<HousingDTO> content = result.toList().stream().map(h -> new HousingDTO(h)).toList();
+        List<HousingDTO> content = result.toList().stream().map(h -> housingMapper.toDto(h)).toList();
         return new PageInfo<HousingDTO>(content, result.getTotalPages(), result.getNumber(), result.getTotalElements());
     }
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public HousingDTO handleRequest(String username, Long id, Boolean approved) {
+        log.info("Housing handle requested: housingId={}, user={}, approved={}", id, username, approved);
+
         UserDTO user = xmlUserService.getUserByUsername(username);
         if (user == null) {
             throw new EntityNotFoundException("Failed to retrieve user by username");
@@ -87,11 +94,12 @@ public class HousingService {
 
         housingRepo.save(housing);
 
-        return new HousingDTO(housing);
+        log.info("Housing handled successfully: housingId={}, newStatus={}", id, housing.getStatus());
+        return housingMapper.toDto(housing);
     }
 
     @Transactional
-    public HousingDTO addHousing(HousingDTO housing) {
+    public HousingDTO addHousing(HousingDTO housingDTO) {
         UserDTO owner = xmlUserService
                 .getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 
@@ -99,35 +107,47 @@ public class HousingService {
             throw new EntityNotFoundException("Failed to retrieve user by username");
         }
 
-        HousingEntity housingEntity = new HousingEntity();
-        housingEntity.setPrice(housing.getPrice());
-        housingEntity.setNumOfBeds(housing.getNumOfBeds());
-        housingEntity.setRating(housing.getRating());
-        housingEntity.setHousingType(housing.getHousingType());
-        housingEntity.setStatus(RequestStatus.PENDING);
-        housingEntity.setOwner(owner.getUsername());
+        log.info("Housing creation requested: user={}, housingType={}",
+                owner,
+                housingDTO.getHousingType());
+
+        HousingEntity newHousing = new HousingEntity();
+        newHousing.setPrice(housingDTO.getPrice());
+        newHousing.setNumOfBeds(housingDTO.getNumOfBeds());
+        newHousing.setRating(housingDTO.getRating());
+        newHousing.setHousingType(housingDTO.getHousingType());
+        newHousing.setStatus(RequestStatus.PENDING);
+        newHousing.setOwner(owner.getUsername());
 
         AddressEntity address;
 
-        if (housing.getAddress().getId() == null) {
+        if (housingDTO.getAddress().getId() == null) {
             address = new AddressEntity();
-            address.setStreet(housing.getAddress().getStreet());
-            address.setCountry(housing.getAddress().getCountry());
+            address.setStreet(housingDTO.getAddress().getStreet());
+            address.setCountry(housingDTO.getAddress().getCountry());
             addressRepo.save(address);
         } else {
-            address = addressRepo.findById(housing.getAddress().getId())
+            address = addressRepo.findById(housingDTO.getAddress().getId())
                     .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve address by id"));
         }
 
-        housingEntity.setAddress(address);
+        newHousing.setAddress(address);
 
-        housingRepo.save(housingEntity);
+        housingRepo.save(newHousing);
 
-        return new HousingDTO(housingEntity);
+        log.info(
+                "Housing created successfully: housingId={}, owner={}, status={}",
+                newHousing.getId(),
+                newHousing.getOwner(),
+                newHousing.getStatus());
+
+        return housingMapper.toDto(newHousing);
     }
 
     @Transactional
     public HousingDTO updateHousing(Long id, HousingDTO housingDTO) {
+        log.info("Housing update requested: housingId={}", id);
+
         HousingEntity existHousing = housingRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve housing by id"));
 
@@ -175,11 +195,17 @@ public class HousingService {
 
         existHousing.setStatus(RequestStatus.PENDING);
         housingRepo.save(existHousing);
-        return new HousingDTO(existHousing);
+
+        log.info("Housing updated successfully: housingId={}, newStatus={}",
+                existHousing.getId(),
+                existHousing.getStatus());
+        return housingMapper.toDto(existHousing);
     }
 
     @Transactional
     public Boolean deleteHousing(Long id) {
+        log.info("Housing delete requested: housingId={}", id);
+
         HousingEntity housing = housingRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve housing by id"));
 
@@ -205,6 +231,8 @@ public class HousingService {
 
         housing.setStatus(RequestStatus.CANCELLED);
         housingRepo.save(housing);
+
+        log.info("Housing deleted successfully: housingId={}", id);
         return true;
     }
 
