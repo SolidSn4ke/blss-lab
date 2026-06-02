@@ -1,0 +1,112 @@
+{
+  "components": [
+    {
+      "label": "Id Жилья",
+      "type": "number",
+      "layout": {
+        "row": "Row_1r3epgc",
+        "columns": null
+      },
+      "id": "Field_100j81c",
+      "key": "housingId",
+      "serializeToString": false,
+      "validate": {
+        "required": true,
+        "min": "1"
+      }
+    },
+    {
+      "subtype": "date",
+      "dateLabel": "Дата заселения",
+      "type": "datetime",
+      "layout": {
+        "row": "Row_1id71if",
+        "columns": null
+      },
+      "id": "Field_0h1nhnj",
+      "key": "checkIn",
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "subtype": "date",
+      "dateLabel": "Дата выселения",
+      "type": "datetime",
+      "layout": {
+        "row": "Row_16jpzad",
+        "columns": null
+      },
+      "id": "Field_0hg50tm",
+      "key": "checkOut",
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Кол-во взрослых",
+      "type": "number",
+      "layout": {
+        "row": "Row_04cp51m",
+        "columns": null
+      },
+      "id": "Field_15tun85",
+      "key": "adultsCount",
+      "validate": {
+        "required": true,
+        "min": "1"
+      }
+    },
+    {
+      "label": "Кол-во детей",
+      "type": "number",
+      "layout": {
+        "row": "Row_0xctsbx",
+        "columns": null
+      },
+      "id": "Field_1ndqmd5",
+      "key": "childCount",
+      "defaultValue": 0,
+      "validate": {
+        "min": "0"
+      }
+    },
+    {
+      "label": "Кол-во младенцев",
+      "type": "number",
+      "layout": {
+        "row": "Row_04c5c9z",
+        "columns": null
+      },
+      "id": "Field_05gf54q",
+      "key": "infantsCount",
+      "defaultValue": 0,
+      "validate": {
+        "min": "0"
+      }
+    },
+    {
+      "label": "Кол-во животных",
+      "type": "number",
+      "layout": {
+        "row": "Row_0ippxzh",
+        "columns": null
+      },
+      "id": "Field_0h7sz5i",
+      "key": "petCount",
+      "defaultValue": 0,
+      "validate": {
+        "min": "0"
+      }
+    }
+  ],
+  "type": "default",
+  "id": "book-housing",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.46.1"
+  },
+  "executionPlatform": "Camunda Platform",
+  "executionPlatformVersion": "7.24.0",
+  "schemaVersion": 19
+}

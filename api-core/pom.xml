@@ -98,6 +98,30 @@
 			<groupId>org.springframework.integration</groupId>
 			<artifactId>spring-integration-mqtt</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>org.camunda.bpm.springboot</groupId>
+			<artifactId>camunda-bpm-spring-boot-starter-external-task-client</artifactId>
+			<version>7.24.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.camunda.bpm.springboot</groupId>
+			<artifactId>camunda-bpm-spring-boot-starter-rest</artifactId>
+			<version>7.24.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.camunda.bpm.springboot</groupId>
+			<artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
+			<version>7.24.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openjdk.nashorn</groupId>
+			<artifactId>nashorn-core</artifactId>
+			<version>15.4</version>
+		</dependency>
 	</dependencies>
 
 	<build>

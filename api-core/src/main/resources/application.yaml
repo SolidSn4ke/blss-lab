@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: api-core
+  jta:
+    enabled: true
+  jpa:
+    show-sql: true
+
+app:
+  datasource:
+    postgres:
+      url: jdbc:postgresql://localhost:5433/blss
+      username: postgres
+      password: postgres
+    mysql:
+      url: jdbc:mysql://localhost:3307/blss
+      username: root
+      password: root
+
+jwt:
+  sign:
+    key: JKWFBVUWEHBCUFBEWUCBOUEWBCUQEBDCUOBWDOUCBWNWEBO
+
+users:
+  xml:
+    path: /Users/einherjar/ITMO/BLSS/blss-lab/api-core/src/main/resources/users.xml
+
+mqtt:
+  server:
+    url: tcp://localhost:1883
+  username: admin
+  password: admin
+
+server:
+  port: 8082
+
+logging:
+  level:
+    root: INFO
+    com.example.blsslab: DEBUG
+    org.springframework: WARN
+  file:
+    name: logs/app.log
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+camunda:
+  bpm:
+    admin-user:
+      id: demo
+      password: demo
+    client:
+      base-url: http://localhost:8080/engine-rest
+      worker-id: spring-boot-client
+    generic-properties:
+      properties:
+        scriptEngineNameJavaScript: nashorn

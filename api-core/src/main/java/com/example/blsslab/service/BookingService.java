@@ -23,7 +23,6 @@ import com.example.blsslab.model.dto.BookingDTO;
 import com.example.blsslab.model.dto.BookingType;
 import com.example.blsslab.model.dto.PageInfo;
 import com.example.blsslab.model.dto.RequestStatus;
-import com.example.blsslab.model.dto.UserDTO;
 import com.example.blsslab.model.mapper.BookingMapper;
 import com.example.blsslab.model.mysql.entity.BookingEntity;
 import com.example.blsslab.model.mysql.repos.BookingRepository;
@@ -43,8 +42,6 @@ public class BookingService {
     final HousingRepository housingRepo;
 
     final BookingRepository bookingRepo;
-
-    final XmlUserService xmlUserService;
 
     final MqttGateway gateway;
 
@@ -82,15 +79,8 @@ public class BookingService {
 
     @Transactional
     public BookingDTO requireHousing(BookingDTO bookingDTO) {
-
-        UserDTO user = xmlUserService
-                .getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-        if (user == null) {
-            throw new EntityNotFoundException("Failed to retrieve user by username");
-        }
-
         log.info("Booking creation requested: user={}, housingId={}, checkIn={}, checkOut={}",
-                user.getUsername(),
+                bookingDTO.getGuest(),
                 bookingDTO.getHousingId(),
                 bookingDTO.getCheckIn(),
                 bookingDTO.getCheckOut());
@@ -113,7 +103,7 @@ public class BookingService {
         newBooking.setInfantsCount(bookingDTO.getInfantsCount());
         newBooking.setPetCount(bookingDTO.getPetCount());
 
-        newBooking.setGuest(user.getUsername());
+        newBooking.setGuest(bookingDTO.getGuest());
         newBooking.setHousingId(housing.getId());
 
         bookingRepo.save(newBooking);
@@ -228,13 +218,13 @@ public class BookingService {
         BookingEntity booking = bookingRepo.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve booking by id"));
 
-        UserDTO owner = xmlUserService.getUserByUsername(housingRepo.findById(booking.getHousingId())
-                .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username")).getOwner());
+        String owner = housingRepo.findById(booking.getHousingId())
+                .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve user by username")).getOwner();
         if (owner == null) {
             throw new EntityNotFoundException("Failed to retrieve user by username");
         }
 
-        if (owner == null || !owner.getUsername().equals(username)) {
+        if (owner == null || !owner.equals(username)) {
             throw new RolePrivilegesViolationException("Only owner can approve or deny request");
         }
 

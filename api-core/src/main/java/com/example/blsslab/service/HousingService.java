@@ -59,6 +59,12 @@ public class HousingService {
         return new PageInfo<HousingDTO>(content, result.getTotalPages(), result.getNumber(), result.getTotalElements());
     }
 
+    @Transactional(readOnly = true)
+    public HousingDTO getHousingById(Long id) {
+        HousingEntity housing = housingRepo.getReferenceById(id);
+        return housingMapper.toDto(housing);
+    }
+
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public HousingDTO handleRequest(String username, Long id, Boolean approved) {
         log.info("Housing handle requested: housingId={}, user={}, approved={}", id, username, approved);

@@ -1,0 +1,36 @@
+{
+  "components": [
+    {
+      "label": "Подтвердить бронь?",
+      "values": [
+        {
+          "label": "Да",
+          "value": "true"
+        },
+        {
+          "label": "Нет",
+          "value": "false"
+        }
+      ],
+      "type": "radio",
+      "layout": {
+        "row": "Row_0b07j30",
+        "columns": null
+      },
+      "id": "Field_0wnfj03",
+      "key": "approved",
+      "validate": {
+        "required": true
+      }
+    }
+  ],
+  "type": "default",
+  "id": "moderate-booking",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.46.1"
+  },
+  "executionPlatform": "Camunda Platform",
+  "executionPlatformVersion": "7.24.0",
+  "schemaVersion": 19
+}
