@@ -1,0 +1,36 @@
+{
+  "components": [
+    {
+      "label": "Подтвердить жилье?",
+      "values": [
+        {
+          "label": "Да",
+          "value": "true"
+        },
+        {
+          "label": "Нет",
+          "value": "false"
+        }
+      ],
+      "type": "radio",
+      "layout": {
+        "row": "Row_1dtdpws",
+        "columns": null
+      },
+      "id": "Field_05pwiew",
+      "key": "approved",
+      "validate": {
+        "required": true
+      }
+    }
+  ],
+  "type": "default",
+  "id": "moderate-housing",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.46.1"
+  },
+  "executionPlatform": "Camunda Platform",
+  "executionPlatformVersion": "7.24.0",
+  "schemaVersion": 19
+}

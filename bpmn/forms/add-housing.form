@@ -1,0 +1,148 @@
+{
+  "components": [
+    {
+      "label": "Цена за ночь",
+      "type": "number",
+      "layout": {
+        "row": "Row_06od9is",
+        "columns": null
+      },
+      "id": "Field_1xoq3nj",
+      "key": "price",
+      "validate": {
+        "required": true,
+        "min": "1"
+      }
+    },
+    {
+      "label": "Рейтинг",
+      "type": "number",
+      "layout": {
+        "row": "Row_0t9mrgi",
+        "columns": null
+      },
+      "id": "Field_1dwey7y",
+      "key": "rating",
+      "decimalDigits": 1,
+      "validate": {
+        "required": true,
+        "min": "0.0",
+        "max": "5.0"
+      }
+    },
+    {
+      "label": "Количество спальных мест",
+      "type": "number",
+      "layout": {
+        "row": "Row_0qnhbns",
+        "columns": null
+      },
+      "id": "Field_1qnxz1e",
+      "key": "numOfBeds",
+      "validate": {
+        "required": true,
+        "min": "0"
+      }
+    },
+    {
+      "label": "Тип жилья",
+      "values": [
+        {
+          "label": "Комната",
+          "value": "ROOM"
+        },
+        {
+          "label": "Дом",
+          "value": "HOUSE"
+        },
+        {
+          "label": "Отель",
+          "value": "HOTEL"
+        },
+        {
+          "label": "Квартира",
+          "value": "APPARTMENT"
+        },
+        {
+          "label": "Хостел",
+          "value": "HOSTEL"
+        }
+      ],
+      "type": "select",
+      "layout": {
+        "row": "Row_0guet9k",
+        "columns": null
+      },
+      "id": "Field_1wkqjxv",
+      "key": "housingType",
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Улица",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_1nh3ogd",
+        "columns": null
+      },
+      "id": "Field_00rina0",
+      "key": "street",
+      "validate": {
+        "required": true
+      }
+    },
+    {
+      "label": "Страна",
+      "values": [
+        {
+          "label": "Россия",
+          "value": "RUSSIA"
+        },
+        {
+          "label": "Великобритания",
+          "value": "UK"
+        },
+        {
+          "label": "США",
+          "value": "USA"
+        },
+        {
+          "label": "Франция",
+          "value": "FRANCE"
+        },
+        {
+          "label": "Испания",
+          "value": "SPAIN"
+        },
+        {
+          "label": "Италия",
+          "value": "ITALY"
+        },
+        {
+          "label": "Германия",
+          "value": "GERMANY"
+        }
+      ],
+      "type": "select",
+      "layout": {
+        "row": "Row_0zz99j3",
+        "columns": null
+      },
+      "id": "Field_0nafcc7",
+      "key": "country",
+      "validate": {
+        "required": true
+      }
+    }
+  ],
+  "type": "default",
+  "id": "add-housing",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.46.1"
+  },
+  "executionPlatform": "Camunda Platform",
+  "executionPlatformVersion": "7.24.0",
+  "schemaVersion": 19
+}
