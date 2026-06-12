@@ -2,7 +2,6 @@ package com.example.blsslab.service;
 
 import java.util.List;
 
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +29,7 @@ public class PublisherService {
 
     final HousingMapper housingMapper;
 
-    @Scheduled(cron = "0 * * * * *")
+    // @Scheduled(cron = "0 * * * * *")
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public void publish() {
         List<HousingOutboxEntity> entities = outboxRepository.findAllByStatus(MessageStatus.PENDING);

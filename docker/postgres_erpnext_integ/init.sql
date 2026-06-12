@@ -1,0 +1,1 @@
+create database erpnext_integ;

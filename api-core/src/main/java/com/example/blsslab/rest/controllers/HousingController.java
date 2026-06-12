@@ -1,7 +1,6 @@
 package com.example.blsslab.rest.controllers;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,7 +35,8 @@ public class HousingController {
             @PathVariable Long id,
             @RequestBody ModerationRequest body) {
         HousingDTO response = housingService.handleRequest(
-                SecurityContextHolder.getContext().getAuthentication().getName(), id,
+                // SecurityContextHolder.getContext().getAuthentication().getName(),
+                id,
                 body.getApproved());
         return response;
     }

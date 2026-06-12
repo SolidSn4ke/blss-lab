@@ -145,7 +145,7 @@
       <bpmn:incoming>Flow_06yww4n</bpmn:incoming>
       <bpmn:outgoing>Flow_0qlsy2s</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:startEvent id="Event_1ngydgd" name="Необходимо добавить жилье" camunda:formRef="add-housing" camunda:formRefBinding="latest">
+    <bpmn:startEvent id="Event_1ngydgd" name="Необходимо добавить жилье" camunda:formRef="add-housing" camunda:formRefBinding="latest" camunda:initiator="initiator">
       <bpmn:outgoing>Flow_14gz3fs</bpmn:outgoing>
     </bpmn:startEvent>
     <bpmn:intermediateCatchEvent id="Event_0ykton6" name="Жилье не подтверждено">

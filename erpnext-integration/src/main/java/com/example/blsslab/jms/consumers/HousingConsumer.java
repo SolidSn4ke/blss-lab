@@ -1,5 +1,6 @@
 package com.example.blsslab.jms.consumers;
 
+import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -20,9 +21,12 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class HousingConsumer extends RMQMessageConsumer {
 
-    public HousingConsumer(ConnectionFactory connection, HousingListener listener) {
+    RuntimeService runtimeService;
+
+    public HousingConsumer(ConnectionFactory connection, HousingListener listener, RuntimeService runtimeService) {
         super.connectionFactory = connection;
         super.listener = listener;
+        this.runtimeService = runtimeService;
     }
 
     @Value("${rabbitmq.connection.housing.queue}")
@@ -50,28 +54,13 @@ public class HousingConsumer extends RMQMessageConsumer {
 
                 listener.onMessage(message);
 
+                runtimeService.startProcessInstanceByMessage("housingConsumer");
+
                 message.acknowledge();
                 log.debug("Message acknowledged successfully");
             } catch (Exception e) {
                 needRecovery = true;
-
                 log.error("Error while processing JMS message", e);
-
-                try {
-                    if (e.getCause() instanceof JsonProcessingException
-                            || e.getCause() instanceof ErpNextDuplicateOperationException) {
-                        log.warn("Non-critical error, acknowledging message anyway: {}",
-                                e.getCause().getClass().getSimpleName());
-                        message.acknowledge();
-                    }
-
-                    log.warn("Closing JMS session and connection due to error");
-
-                    session.close();
-                    conn.close();
-                } catch (JMSException e1) {
-                    log.error("Failed to close JMS resources", e1);
-                }
             }
         });
         conn.start();

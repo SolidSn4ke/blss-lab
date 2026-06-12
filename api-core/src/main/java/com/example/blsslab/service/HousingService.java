@@ -19,7 +19,6 @@ import com.example.blsslab.model.dto.OperationType;
 import com.example.blsslab.model.dto.PageInfo;
 import com.example.blsslab.model.dto.RequestStatus;
 import com.example.blsslab.model.dto.UserDTO;
-import com.example.blsslab.model.dto.UserRole;
 import com.example.blsslab.model.mapper.HousingMapper;
 import com.example.blsslab.model.mysql.entity.BookingEntity;
 import com.example.blsslab.model.mysql.repos.BookingRepository;
@@ -66,17 +65,8 @@ public class HousingService {
     }
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public HousingDTO handleRequest(String username, Long id, Boolean approved) {
-        log.info("Housing handle requested: housingId={}, user={}, approved={}", id, username, approved);
-
-        UserDTO user = xmlUserService.getUserByUsername(username);
-        if (user == null) {
-            throw new EntityNotFoundException("Failed to retrieve user by username");
-        }
-
-        if (user.getRole() != UserRole.MODERATOR) {
-            throw new RolePrivilegesViolationException("Only moderator has access to this action");
-        }
+    public HousingDTO handleRequest(Long id, Boolean approved) {
+        log.info("Housing handle requested: housingId={}, approved={}", id, approved);
 
         if (approved == null) {
             throw new BadRequestBodyException("Field 'approved' is required");
@@ -106,15 +96,8 @@ public class HousingService {
 
     @Transactional
     public HousingDTO addHousing(HousingDTO housingDTO) {
-        UserDTO owner = xmlUserService
-                .getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-
-        if (owner == null) {
-            throw new EntityNotFoundException("Failed to retrieve user by username");
-        }
-
         log.info("Housing creation requested: user={}, housingType={}",
-                owner,
+                housingDTO.getOwner(),
                 housingDTO.getHousingType());
 
         HousingEntity newHousing = new HousingEntity();
@@ -123,7 +106,7 @@ public class HousingService {
         newHousing.setRating(housingDTO.getRating());
         newHousing.setHousingType(housingDTO.getHousingType());
         newHousing.setStatus(RequestStatus.PENDING);
-        newHousing.setOwner(owner.getUsername());
+        newHousing.setOwner(housingDTO.getOwner());
 
         AddressEntity address;
 
