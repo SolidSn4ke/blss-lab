@@ -36,7 +36,7 @@ public class HousingBPMNConfig {
             Integer numOfBeds = externalTask.getVariable("numOfBeds");
             HousingType housingType = HousingType.valueOf(externalTask.getVariable("housingType"));
             String street = externalTask.getVariable("street");
-            Country country = externalTask.getVariable("country");
+            Country country = Country.valueOf(externalTask.getVariable("country"));
             String initiator = externalTask.getVariable("initiator");
 
             log.info("got price={}, rating={}, numOfBeds={}, housingType={}, street={}, country={}", price, rating,
