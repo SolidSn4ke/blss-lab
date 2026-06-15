@@ -18,5 +18,4 @@ public class AddressDTO {
     public String toString() {
         return String.format("%s, %s", street, country.name());
     }
-
 }

@@ -32,4 +32,14 @@ public class HousingDTO implements Convertable<Item> {
         return item;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        s.append("price: " + price + "\n");
+        s.append("rating: " + rating + "\n");
+        s.append("numOfBeds: " + numOfBeds + "\n");
+        s.append("type: " + housingType + "\n");
+        s.append("address: " + address.toString() + "\n");
+        return s.toString();
+    }
 }

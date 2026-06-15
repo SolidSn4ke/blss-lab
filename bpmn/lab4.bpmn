@@ -125,6 +125,7 @@
       </bpmn:lane>
     </bpmn:laneSet>
     <bpmn:userTask id="Activity_0wuw1mr" name="Рассмотрение жилья" camunda:formRef="moderate-housing" camunda:formRefBinding="latest" camunda:candidateGroups="moder">
+      <bpmn:documentation>${information}</bpmn:documentation>
       <bpmn:incoming>Flow_0qlsy2s</bpmn:incoming>
       <bpmn:outgoing>Flow_1owp2nt</bpmn:outgoing>
     </bpmn:userTask>
