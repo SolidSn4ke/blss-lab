@@ -120,10 +120,10 @@
         <bpmn:flowNodeRef>Activity_0wuw1mr</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_0a8wrja</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Gateway_16kit4s</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Event_09oy9qj</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Event_0phgvud</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_13v9ysn</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Activity_0812d2u</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_09oy9qj</bpmn:flowNodeRef>
       </bpmn:lane>
     </bpmn:laneSet>
     <bpmn:userTask id="Activity_0wuw1mr" name="Рассмотрение жилья" camunda:formRef="moderate-housing" camunda:formRefBinding="latest" camunda:candidateGroups="moder">
@@ -140,10 +140,6 @@
       <bpmn:outgoing>Flow_1hz8e85</bpmn:outgoing>
       <bpmn:outgoing>Flow_15ethyi</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:intermediateThrowEvent id="Event_09oy9qj" name="Жилье не подтверждено">
-      <bpmn:incoming>Flow_1hz8e85</bpmn:incoming>
-      <bpmn:linkEventDefinition id="LinkEventDefinition_136756c" name="housing-rejected" />
-    </bpmn:intermediateThrowEvent>
     <bpmn:intermediateCatchEvent id="Event_0ykton6" name="Жилье не подтверждено">
       <bpmn:outgoing>Flow_09yzsja</bpmn:outgoing>
       <bpmn:linkEventDefinition id="LinkEventDefinition_19jc2u0" name="housing-rejected" />
@@ -179,25 +175,42 @@ execution.setProcessBusinessKey(myKey)</bpmn:script>
       <bpmn:incoming>Flow_15ethyi</bpmn:incoming>
       <bpmn:outgoing>Flow_0i2akgj</bpmn:outgoing>
       <bpmn:intermediateCatchEvent id="Event_1qlpmyf" name="Каждую минуту">
-        <bpmn:incoming>Flow_19k8e7k</bpmn:incoming>
+        <bpmn:incoming>Flow_10x04eh</bpmn:incoming>
         <bpmn:outgoing>Flow_1caas2u</bpmn:outgoing>
         <bpmn:timerEventDefinition id="TimerEventDefinition_0f81jlx">
           <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT1M</bpmn:timeDuration>
         </bpmn:timerEventDefinition>
       </bpmn:intermediateCatchEvent>
       <bpmn:sequenceFlow id="Flow_1caas2u" sourceRef="Event_1qlpmyf" targetRef="Activity_0tuzcl5" />
-      <bpmn:serviceTask id="Activity_0tuzcl5" name="Обработка неотправленных сообщений" camunda:type="external" camunda:topic="publishMessages">
+      <bpmn:serviceTask id="Activity_0tuzcl5" name="Отправка сообщения" camunda:type="external" camunda:topic="publishMessage">
         <bpmn:incoming>Flow_1caas2u</bpmn:incoming>
         <bpmn:outgoing>Flow_1ki9xnt</bpmn:outgoing>
       </bpmn:serviceTask>
-      <bpmn:sequenceFlow id="Flow_1ki9xnt" sourceRef="Activity_0tuzcl5" targetRef="Event_0lny2no" />
+      <bpmn:sequenceFlow id="Flow_1ki9xnt" sourceRef="Activity_0tuzcl5" targetRef="Gateway_1uovesb" />
       <bpmn:endEvent id="Event_0lny2no" name="Сообщение отправлено">
-        <bpmn:incoming>Flow_1ki9xnt</bpmn:incoming>
+        <bpmn:incoming>Flow_0ivkqc5</bpmn:incoming>
       </bpmn:endEvent>
       <bpmn:startEvent id="Event_1p6bt1f">
         <bpmn:outgoing>Flow_19k8e7k</bpmn:outgoing>
       </bpmn:startEvent>
-      <bpmn:sequenceFlow id="Flow_19k8e7k" sourceRef="Event_1p6bt1f" targetRef="Event_1qlpmyf" />
+      <bpmn:sequenceFlow id="Flow_19k8e7k" sourceRef="Event_1p6bt1f" targetRef="Gateway_1b3s785" />
+      <bpmn:exclusiveGateway id="Gateway_1b3s785">
+        <bpmn:incoming>Flow_19k8e7k</bpmn:incoming>
+        <bpmn:incoming>Flow_0o6eyh3</bpmn:incoming>
+        <bpmn:outgoing>Flow_10x04eh</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:sequenceFlow id="Flow_10x04eh" sourceRef="Gateway_1b3s785" targetRef="Event_1qlpmyf" />
+      <bpmn:exclusiveGateway id="Gateway_1uovesb" name="Сообщение отправлено?">
+        <bpmn:incoming>Flow_1ki9xnt</bpmn:incoming>
+        <bpmn:outgoing>Flow_0ivkqc5</bpmn:outgoing>
+        <bpmn:outgoing>Flow_0o6eyh3</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:sequenceFlow id="Flow_0ivkqc5" name="Да" sourceRef="Gateway_1uovesb" targetRef="Event_0lny2no">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isSent == true}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:sequenceFlow id="Flow_0o6eyh3" name="Нет" sourceRef="Gateway_1uovesb" targetRef="Gateway_1b3s785">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isSent == false}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
     </bpmn:subProcess>
     <bpmn:subProcess id="Activity_0812d2u" name="Обработка сообщения">
       <bpmn:incoming>Flow_0i2akgj</bpmn:incoming>
@@ -237,6 +250,10 @@ execution.setProcessBusinessKey(myKey)</bpmn:script>
     <bpmn:sequenceFlow id="Flow_1rogslj" sourceRef="Activity_0812d2u" targetRef="Event_0phgvud" />
     <bpmn:sequenceFlow id="Flow_11afkr1" sourceRef="Activity_0c824tw" targetRef="Activity_1u9ngtl" />
     <bpmn:sequenceFlow id="Flow_0i2akgj" sourceRef="Activity_13v9ysn" targetRef="Activity_0812d2u" />
+    <bpmn:intermediateThrowEvent id="Event_09oy9qj" name="Жилье не подтверждено">
+      <bpmn:incoming>Flow_1hz8e85</bpmn:incoming>
+      <bpmn:linkEventDefinition id="LinkEventDefinition_136756c" name="housing-rejected" />
+    </bpmn:intermediateThrowEvent>
   </bpmn:process>
   <bpmn:message id="Message_26kfr2h" name="housingConsumer" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
@@ -399,12 +416,6 @@ execution.setProcessBusinessKey(myKey)</bpmn:script>
           <dc:Bounds x="1102" y="438" width="56" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0pd7wzl_di" bpmnElement="Event_09oy9qj">
-        <dc:Bounds x="1262" y="622" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1244" y="665" width="74" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0ue2ca6_di" bpmnElement="Event_0ykton6">
         <dc:Bounds x="232" y="122" width="36" height="36" />
         <bpmndi:BPMNLabel>
@@ -438,6 +449,12 @@ execution.setProcessBusinessKey(myKey)</bpmn:script>
         <dc:Bounds x="520" y="260" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0pd7wzl_di" bpmnElement="Event_09oy9qj">
+        <dc:Bounds x="1262" y="612" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1244" y="655" width="74" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0y3f356_di" bpmnElement="Activity_13v9ysn">
         <dc:Bounds x="1230" y="460" width="100" height="80" />
         <bpmndi:BPMNLabel />
@@ -460,10 +477,10 @@ execution.setProcessBusinessKey(myKey)</bpmn:script>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1hz8e85_di" bpmnElement="Flow_1hz8e85">
         <di:waypoint x="1130" y="525" />
-        <di:waypoint x="1130" y="640" />
-        <di:waypoint x="1262" y="640" />
+        <di:waypoint x="1130" y="630" />
+        <di:waypoint x="1262" y="630" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1136" y="580" width="19" height="14" />
+          <dc:Bounds x="1136" y="575" width="19" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_15ethyi_di" bpmnElement="Flow_15ethyi">
@@ -522,35 +539,64 @@ execution.setProcessBusinessKey(myKey)</bpmn:script>
   <bpmndi:BPMNDiagram id="BPMNDiagram_0srp23t">
     <bpmndi:BPMNPlane id="BPMNPlane_1nk5j8m" bpmnElement="Activity_13v9ysn">
       <bpmndi:BPMNShape id="Event_1wz4sk8_di" bpmnElement="Event_1qlpmyf">
-        <dc:Bounds x="292" y="82" width="36" height="36" />
+        <dc:Bounds x="422" y="172" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="271" y="125" width="80" height="14" />
+          <dc:Bounds x="401" y="215" width="80" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_09cpzza_di" bpmnElement="Activity_0tuzcl5">
-        <dc:Bounds x="420" y="60" width="100" height="80" />
+        <dc:Bounds x="550" y="150" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1p6bt1f_di" bpmnElement="Event_1p6bt1f">
+        <dc:Bounds x="152" y="172" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1b3s785_di" bpmnElement="Gateway_1b3s785" isMarkerVisible="true">
+        <dc:Bounds x="275" y="165" width="50" height="50" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_127nnod_di" bpmnElement="Event_0lny2no">
-        <dc:Bounds x="612" y="82" width="36" height="36" />
+        <dc:Bounds x="892" y="172" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="600" y="125" width="60" height="27" />
+          <dc:Bounds x="880" y="215" width="60" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1p6bt1f_di" bpmnElement="Event_1p6bt1f">
-        <dc:Bounds x="152" y="82" width="36" height="36" />
+      <bpmndi:BPMNShape id="Gateway_1uovesb_di" bpmnElement="Gateway_1uovesb" isMarkerVisible="true">
+        <dc:Bounds x="735" y="165" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="728" y="222" width="66" height="27" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_10x04eh_di" bpmnElement="Flow_10x04eh">
+        <di:waypoint x="325" y="190" />
+        <di:waypoint x="422" y="190" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1caas2u_di" bpmnElement="Flow_1caas2u">
-        <di:waypoint x="328" y="100" />
-        <di:waypoint x="420" y="100" />
+        <di:waypoint x="458" y="190" />
+        <di:waypoint x="550" y="190" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1ki9xnt_di" bpmnElement="Flow_1ki9xnt">
-        <di:waypoint x="520" y="100" />
-        <di:waypoint x="612" y="100" />
+        <di:waypoint x="650" y="190" />
+        <di:waypoint x="735" y="190" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_19k8e7k_di" bpmnElement="Flow_19k8e7k">
-        <di:waypoint x="188" y="100" />
-        <di:waypoint x="292" y="100" />
+        <di:waypoint x="188" y="190" />
+        <di:waypoint x="275" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0o6eyh3_di" bpmnElement="Flow_0o6eyh3">
+        <di:waypoint x="760" y="165" />
+        <di:waypoint x="760" y="100" />
+        <di:waypoint x="300" y="100" />
+        <di:waypoint x="300" y="165" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="521" y="82" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ivkqc5_di" bpmnElement="Flow_0ivkqc5">
+        <di:waypoint x="785" y="190" />
+        <di:waypoint x="892" y="190" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="832" y="172" width="14" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

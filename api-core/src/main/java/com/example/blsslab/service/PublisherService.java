@@ -2,6 +2,8 @@ package com.example.blsslab.service;
 
 import java.util.List;
 
+import org.camunda.bpm.client.task.ExternalTask;
+import org.camunda.bpm.client.task.ExternalTaskService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,10 +33,12 @@ public class PublisherService {
 
     // @Scheduled(cron = "0 * * * * *")
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void publish() {
-        List<HousingOutboxEntity> entities = outboxRepository.findAllByStatus(MessageStatus.PENDING);
+    public void publish(ExternalTask externalTask, ExternalTaskService externalTaskService) {
+        Long id = externalTask.getVariable("housingId");
 
-        entities.stream().sorted((e1, e2) -> e1.getId().compareTo(e2.getId())).forEach(e -> {
+        List<HousingOutboxEntity> entities = outboxRepository.findAllByStatusAndHousingId(MessageStatus.PENDING, id);
+
+        entities.stream().forEach(e -> {
             try {
                 gateway.sendToMqtt(e.getTopic().topic,
                         jsonService.toJsonString(

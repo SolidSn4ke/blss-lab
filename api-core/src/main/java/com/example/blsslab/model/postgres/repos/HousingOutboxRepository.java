@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface HousingOutboxRepository extends JpaRepository<HousingOutboxEntity, Long> {
-    List<HousingOutboxEntity> findAllByStatus(MessageStatus status);
+    List<HousingOutboxEntity> findAllByStatusAndHousingId(MessageStatus status, Long housingId);
 }

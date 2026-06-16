@@ -84,12 +84,20 @@ public class HousingBPMNConfig {
         };
     }
 
-    @ExternalTaskSubscription("publishMessages")
+    @ExternalTaskSubscription("publishMessage")
     @Bean
     ExternalTaskHandler publishMessages() {
         return (externalTask, externalTaskService) -> {
-            publisherService.publish();
-            externalTaskService.complete(externalTask);
+            try {
+                publisherService.publish(externalTask, externalTaskService);
+                externalTaskService.setVariables(externalTask,
+                        Map.ofEntries(Map.entry("isSent", true)));
+            } catch (Exception e) {
+                externalTaskService.setVariables(externalTask,
+                        Map.ofEntries(Map.entry("isSent", false)));
+            } finally {
+                externalTaskService.complete(externalTask);
+            }
         };
     }
 }
