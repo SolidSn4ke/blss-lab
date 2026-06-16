@@ -56,8 +56,9 @@ public class HousingBPMNConfig {
 
             housing = housingService.addHousing(housing);
 
-            externalTaskService.setVariables(externalTask, Map.ofEntries(Map.entry("housingId", housing.getId())));
-            externalTaskService.setVariables(externalTask, Map.ofEntries(Map.entry("information", housing.toString())));
+            externalTaskService.setVariables(externalTask, Map.ofEntries(
+                    Map.entry("housingId", housing.getId()),
+                    Map.entry("information", housing.toString())));
             externalTaskService.complete(externalTask);
         };
     }

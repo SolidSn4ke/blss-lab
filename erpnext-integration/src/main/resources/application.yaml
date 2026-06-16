@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: blss-lab
+  jta:
+    enabled: true
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin
+  erpnext:
+    host: localhost
+    port: 8128
+    api:
+      key: aabe94341273b2d
+      secret: 60e8ef383a39abb
+  datasource:
+    url: jdbc:postgresql://localhost:5434/erpnext_integ
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: create
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+rabbitmq:
+  connection:
+    housing:
+      queue: moderation.housing.queue
+
+server:
+  port: 8081
+
+logging:
+  level:
+    root: INFO
+    com.example.blsslab: DEBUG
+    org.springframework: WARN
+  file:
+    name: logs/app.log
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+camunda:
+  bpm:
+    admin-user:
+      id: demo
+      password: demo
+    client:
+      base-url: http://localhost:8080/engine-rest
+      worker-id: spring-boot-client
+    generic-properties:
+      properties:
+        scriptEngineNameJavaScript: nashorn

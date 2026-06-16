@@ -1,6 +1,5 @@
 package com.example.blsslab.jms.consumers;
 
-import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -19,12 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class HousingConsumer extends RMQMessageConsumer {
 
-    RuntimeService runtimeService;
-
-    public HousingConsumer(ConnectionFactory connection, HousingListener listener, RuntimeService runtimeService) {
+    public HousingConsumer(ConnectionFactory connection, HousingListener listener) {
         super.connectionFactory = connection;
         super.listener = listener;
-        this.runtimeService = runtimeService;
     }
 
     @Value("${rabbitmq.connection.housing.queue}")
@@ -52,12 +48,16 @@ public class HousingConsumer extends RMQMessageConsumer {
 
                 listener.onMessage(message);
 
-                runtimeService.startProcessInstanceByMessage("housingConsumer");
-
                 message.acknowledge();
                 log.debug("Message acknowledged successfully");
             } catch (Exception e) {
                 needRecovery = true;
+                try {
+                    session.close();
+                    conn.close();
+                } catch (JMSException ex) {
+                    // ignore
+                }
                 log.error("Error while processing JMS message", e);
             }
         });
